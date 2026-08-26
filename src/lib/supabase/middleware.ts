@@ -4,18 +4,7 @@ import {
   adminCookieName,
   verifyAdminSessionToken,
 } from "@/lib/admin-auth";
-
-function isSupabaseConfigured() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
-  return (
-    url.startsWith("https://") &&
-    !url.includes("placeholder") &&
-    !url.includes("YOUR_PROJECT") &&
-    key.length > 20 &&
-    !key.includes("placeholder")
-  );
-}
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });

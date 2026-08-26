@@ -14,7 +14,9 @@ import {
   UserRound,
 } from "lucide-react";
 import { PhoneAuthForm } from "./phone-auth-form";
-import { getMyOrders } from "@/lib/actions";
+import { SocialAuthButtons } from "./social-auth-buttons";
+import { getAccountSession, getMyOrders } from "@/lib/actions";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from "@/lib/constants";
 import { ZONE_LABELS } from "@/lib/shipping";
 import { formatPrice, cn } from "@/lib/utils";
@@ -42,7 +44,10 @@ const BENEFITS = [
 ];
 
 export function AccountView() {
-  const [phone, setPhone] = useState<string | null>(null);
+  const [identity, setIdentity] = useState<{
+    label: string;
+    provider: string;
+  } | null>(null);
   const [client, setClient] = useState<ClientData | null>(null);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
@@ -55,10 +60,9 @@ export function AccountView() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/auth/phone-session");
-        if (res.ok) {
-          const data = (await res.json()) as { phone?: string };
-          if (!cancelled && data.phone) setPhone(data.phone);
+        const session = await getAccountSession();
+        if (!cancelled && session) {
+          setIdentity(session);
         }
       } catch {
         // pas de session
@@ -72,7 +76,7 @@ export function AccountView() {
   }, []);
 
   useEffect(() => {
-    if (!phone) {
+    if (!identity) {
       setClient(null);
       return;
     }
@@ -80,12 +84,24 @@ export function AccountView() {
     getMyOrders()
       .then((data) => setClient(data))
       .finally(() => setLoading(false));
-  }, [phone]);
+  }, [identity]);
 
   async function logout() {
     await fetch("/api/auth/phone-session", { method: "DELETE" });
-    setPhone(null);
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {
+        // ignore
+      }
+    }
+    setIdentity(null);
     setClient(null);
+  }
+
+  function onPhoneAuth(phone: string) {
+    setIdentity({ label: phone, provider: "phone" });
   }
 
   if (!ready) {
@@ -96,7 +112,7 @@ export function AccountView() {
     );
   }
 
-  if (!phone) {
+  if (!identity) {
     return (
       <div className="relative overflow-hidden pb-10">
         <div className="relative isolate overflow-hidden px-4 pb-10 pt-8 md:px-0 md:pt-12">
@@ -112,15 +128,15 @@ export function AccountView() {
               Connexion
             </h1>
             <p className="mt-2 text-sm text-muted">
-              Entre ton numéro — on t’envoie un code SMS. Pas d’email, pas de
-              mot de passe.
+              Google, Facebook ou numéro SMS — à toi de choisir.
             </p>
           </div>
         </div>
 
         <div className="mx-auto max-w-md space-y-6 px-4 md:px-0">
-          <div className="rounded-3xl border border-border bg-bg-elevated p-5 shadow-card md:p-6">
-            <PhoneAuthForm onAuthenticated={setPhone} />
+          <div className="space-y-5 rounded-3xl border border-border bg-bg-elevated p-5 shadow-card md:p-6">
+            <SocialAuthButtons />
+            <PhoneAuthForm onAuthenticated={onPhoneAuth} />
           </div>
 
           <ul className="grid gap-3">
@@ -178,6 +194,15 @@ export function AccountView() {
     },
   ];
 
+  const providerLabel =
+    identity.provider === "google"
+      ? "Google"
+      : identity.provider === "facebook"
+        ? "Facebook"
+        : identity.provider === "phone"
+          ? "SMS"
+          : "Compte";
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pb-10 pt-5 md:px-0 md:pt-8">
       <section className="overflow-hidden rounded-3xl border border-border bg-bg-elevated shadow-card">
@@ -191,7 +216,10 @@ export function AccountView() {
                 <p className="font-display text-xl font-bold">
                   {client?.nom ?? "Bonjour"}
                 </p>
-                <p className="text-sm text-white/75">{phone}</p>
+                <p className="text-sm text-white/75">{identity.label}</p>
+                <p className="mt-0.5 text-[11px] text-white/55">
+                  Via {providerLabel}
+                </p>
               </div>
             </div>
             <button
