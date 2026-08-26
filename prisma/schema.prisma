@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum VendorStatus {
+  actif
+  en_attente
+  suspendu
+}
+
+enum Categorie {
+  montre
+  bijou
+  sac
+}
+
+enum Genre {
+  homme
+  femme
+  unisexe
+}
+
+enum ProductSource {
+  local
+  chine
+}
+
+enum ProductStatus {
+  actif
+  rupture
+  archive
+}
+
+enum DeliveryZone {
+  cotonou
+  porto_novo
+  godomey
+}
+
+enum OrderStatus {
+  en_attente
+  confirmee
+  en_livraison
+  livree
+  annulee
+}
+
+enum PaymentMode {
+  mobile_money
+  livraison
+}
+
+model Vendor {
+  id            String       @id @default(cuid())
+  nomBoutique   String       @map("nom_boutique")
+  contact       String
+  statut        VendorStatus @default(en_attente)
+  dateCreation  DateTime     @default(now()) @map("date_creation")
+  products      Product[]
+  orders        Order[]
+
+  @@map("vendors")
+}
+
+model Product {
+  id             String        @id @default(cuid())
+  vendorId       String        @map("vendor_id")
+  nom            String
+  description    String
+  categorie      Categorie
+  genre          Genre
+  prix           Int
+  prixPromo      Int?          @map("prix_promo")
+  stockQuantite  Int           @map("stock_quantite")
+  source         ProductSource @default(local)
+  images         String[]
+  statut         ProductStatus @default(actif)
+  dateCreation   DateTime      @default(now()) @map("date_creation")
+  vendor         Vendor        @relation(fields: [vendorId], references: [id])
+  orderItems     OrderItem[]
+
+  @@index([vendorId])
+  @@index([categorie, genre, statut])
+  @@map("products")
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  nom       String
+  telephone String    @unique
+  authId    String?   @unique @map("auth_id")
+  adresses  Address[]
+  orders    Order[]
+
+  @@map("clients")
+}
+
+model Address {
+  id              String       @id @default(cuid())
+  clientId        String       @map("client_id")
+  zone            DeliveryZone
+  adresseComplete String       @map("adresse_complete")
+  estPrincipale   Boolean      @default(false) @map("est_principale")
+  client          Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@map("addresses")
+}
+
+model Order {
+  id              String       @id @default(cuid())
+  clientId        String       @map("client_id")
+  vendorId        String       @map("vendor_id")
+  statut          OrderStatus  @default(en_attente)
+  modePaiement    PaymentMode  @map("mode_paiement")
+  zoneLivraison   DeliveryZone @map("zone_livraison")
+  fraisLivraison  Int          @map("frais_livraison")
+  montantTotal    Int          @map("montant_total")
+  telephone       String
+  nomClient       String       @map("nom_client")
+  adresseLivraison String      @map("adresse_livraison")
+  dateCreation    DateTime     @default(now()) @map("date_creation")
+  client          Client       @relation(fields: [clientId], references: [id])
+  vendor          Vendor       @relation(fields: [vendorId], references: [id])
+  items           OrderItem[]
+
+  @@index([clientId])
+  @@index([vendorId])
+  @@index([statut])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                        String  @id @default(cuid())
+  orderId                   String  @map("order_id")
+  productId                 String  @map("product_id")
+  quantite                  Int
+  prixUnitaireAuMomentCommande Int  @map("prix_unitaire_au_moment_commande")
+  order                     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product                   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model AppConfig {
+  id    String @id @default(cuid())
+  cle   String @unique
+  valeur String
+
+  @@map("app_config")
+}

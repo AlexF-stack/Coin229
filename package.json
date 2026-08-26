@@ -1,0 +1,49 @@
+{
+  "name": "coin229",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@prisma/client": "6.5.0",
+    "@supabase/ssr": "0.6.1",
+    "@supabase/supabase-js": "2.49.1",
+    "clsx": "2.1.1",
+    "lucide-react": "0.484.0",
+    "next": "15.5.23",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "tailwind-merge": "3.0.2",
+    "zustand": "5.0.3"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "3.3.0",
+    "@tailwindcss/postcss": "4.0.14",
+    "@types/node": "20.17.24",
+    "@types/react": "19.0.10",
+    "@types/react-dom": "19.0.4",
+    "eslint": "9.22.0",
+    "eslint-config-next": "15.5.23",
+    "prisma": "6.5.0",
+    "tailwindcss": "4.0.14",
+    "tsx": "4.19.3",
+    "typescript": "5.8.2"
+  }
+}
