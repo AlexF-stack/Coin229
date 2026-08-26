@@ -1,9 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { DEMO_PRODUCTS, filterDemoProducts } from "@/lib/demo-data";
+import { allowDemoCatalog } from "@/lib/runtime-flags";
 import type { Categorie, Genre } from "@prisma/client";
 
 export function sortForCatalog<
-  T extends { statut: string; stockQuantite: number; prixPromo: number | null; prix: number; dateCreation: Date },
+  T extends {
+    statut: string;
+    stockQuantite: number;
+    prixPromo: number | null;
+    prix: number;
+    dateCreation: Date;
+  },
 >(products: T[]): T[] {
   return [...products].sort((a, b) => {
     const aOk = a.statut === "actif" && a.stockQuantite > 0 ? 0 : 1;
@@ -45,10 +52,15 @@ export async function fetchProducts(filters?: {
   } catch {
     // DB indisponible
   }
-  return {
-    products: sortForCatalog(filterDemoProducts(filters)),
-    source: "demo" as const,
-  };
+
+  if (allowDemoCatalog()) {
+    return {
+      products: sortForCatalog(filterDemoProducts(filters)),
+      source: "demo" as const,
+    };
+  }
+
+  return { products: [], source: "db" as const };
 }
 
 export async function fetchProductById(id: string) {
@@ -61,6 +73,11 @@ export async function fetchProductById(id: string) {
   } catch {
     // fallthrough
   }
+
+  if (!allowDemoCatalog()) {
+    return { product: null, source: "db" as const };
+  }
+
   const demo = DEMO_PRODUCTS.find((p) => p.id === id);
   if (!demo) return { product: null, source: "demo" as const };
   return {
@@ -94,8 +111,10 @@ export async function fetchSimilar(productId: string, categorie: Categorie) {
   } catch {
     // fallthrough
   }
+  if (!allowDemoCatalog()) return [];
   return DEMO_PRODUCTS.filter(
-    (p) => p.id !== productId && p.categorie === categorie && p.statut === "actif"
+    (p) =>
+      p.id !== productId && p.categorie === categorie && p.statut === "actif"
   ).slice(0, 4);
 }
 
@@ -109,5 +128,6 @@ export async function fetchProductsByIds(ids: string[]) {
   } catch {
     // fallthrough
   }
+  if (!allowDemoCatalog()) return [];
   return DEMO_PRODUCTS.filter((p) => ids.includes(p.id));
 }

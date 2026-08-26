@@ -1,3 +1,5 @@
+import { allowPaymentMock } from "@/lib/runtime-flags";
+
 export type PaymentMode = "mobile_money" | "livraison";
 
 export type ProcessPaymentInput = {
@@ -5,7 +7,6 @@ export type ProcessPaymentInput = {
   amount: number;
   mode: PaymentMode;
   phone: string;
-  /** Provider cible pour branchement futur (Fedapay / KkiaPay) */
   provider?: "fedapay" | "kkiapay" | "mock";
 };
 
@@ -18,13 +19,13 @@ export type ProcessPaymentResult = {
 };
 
 /**
- * Point d'entrée isolé pour le paiement.
- * Mocké pour le lancement — brancher Fedapay ou KkiaPay ici sans toucher au tunnel.
+ * Paiement isolé.
+ * - COD : toujours OK
+ * - Mobile Money : exige un provider réel en prod (sinon échec explicite)
  */
 export async function processPayment(
   input: ProcessPaymentInput
 ): Promise<ProcessPaymentResult> {
-  // Paiement à la livraison : pas d'appel API
   if (input.mode === "livraison") {
     return {
       success: true,
@@ -35,19 +36,38 @@ export async function processPayment(
     };
   }
 
-  // TODO: brancher Fedapay / KkiaPay (Mobile Money MTN / Moov Bénin)
-  // Exemple futur :
-  // const client = createFedapayClient(process.env.FEDAPAY_SECRET_KEY!)
-  // const tx = await client.transactions.create({ amount: input.amount, ... })
+  const hasFedapay = Boolean(process.env.FEDAPAY_SECRET_KEY?.trim());
+  const hasKkia = Boolean(process.env.KKIAPAY_PRIVATE_KEY?.trim());
 
-  const provider = input.provider ?? "mock";
-  await new Promise((r) => setTimeout(r, 600));
+  if (hasFedapay || hasKkia) {
+    // Branchement PSP : laisser pending jusqu’au webhook
+    return {
+      success: true,
+      transactionId: `pending_${input.orderId}`,
+      status: "pending",
+      message:
+        "Paiement Mobile Money initié — confirmation après validation opérateur.",
+      provider: hasFedapay ? "fedapay" : "kkiapay",
+    };
+  }
+
+  if (allowPaymentMock()) {
+    await new Promise((r) => setTimeout(r, 400));
+    return {
+      success: true,
+      transactionId: `mock_${Date.now()}_${input.orderId.slice(0, 8)}`,
+      status: "pending",
+      message: "Mock Mobile Money (dev uniquement) — non confirmé comme payé.",
+      provider: "mock",
+    };
+  }
 
   return {
-    success: true,
-    transactionId: `mock_${Date.now()}_${input.orderId.slice(0, 8)}`,
-    status: "pending",
-    message: "Paiement Mobile Money en cours de confirmation.",
-    provider,
+    success: false,
+    transactionId: null,
+    status: "failed",
+    message:
+      "Mobile Money indisponible. Choisis le paiement à la livraison, ou configure Fedapay / KkiaPay.",
+    provider: "none",
   };
 }

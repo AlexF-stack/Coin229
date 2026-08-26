@@ -1,5 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  adminCookieName,
+  verifyAdminSessionToken,
+} from "@/lib/admin-auth";
 
 function isSupabaseConfigured() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -18,11 +22,10 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Gate admin (sauf login)
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    const session = request.cookies.get("coin229_admin")?.value;
-    const expected = process.env.ADMIN_PASSWORD ?? "coin229admin";
-    if (session !== expected) {
+    const session = request.cookies.get(adminCookieName())?.value;
+    const ok = await verifyAdminSessionToken(session);
+    if (!ok) {
       const login = new URL("/admin/login", request.url);
       login.searchParams.set("next", pathname);
       return NextResponse.redirect(login);
@@ -56,7 +59,7 @@ export async function updateSession(request: NextRequest) {
     );
     await supabase.auth.getUser();
   } catch {
-    // Auth optionnelle — ne bloque pas la boutique
+    // Auth optionnelle
   }
 
   return response;

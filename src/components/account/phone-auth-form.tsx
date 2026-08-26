@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -53,18 +53,18 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
         });
 
         if (err) {
-          if (
+          const isPlaceholder =
             process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("placeholder") ||
-            err.message.toLowerCase().includes("fetch")
-          ) {
-            setInfo("Code envoyé. Vérifie tes SMS.");
+            err.message.toLowerCase().includes("fetch");
+          if (isPlaceholder && process.env.NODE_ENV !== "production") {
+            setInfo("Mode démo local — utilise le code 123456.");
             setPhone(normalized);
             setStep("otp");
             setResendIn(45);
             setOtpDigits(["", "", "", "", "", ""]);
             return;
           }
-          setError(err.message);
+          setError(err.message || "Impossible d’envoyer le SMS.");
           return;
         }
 
@@ -74,11 +74,7 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
         setOtpDigits(["", "", "", "", "", ""]);
         setInfo("Code SMS envoyé.");
       } catch {
-        setInfo("Code envoyé. Vérifie tes SMS.");
-        setPhone(normalized!);
-        setStep("otp");
-        setResendIn(45);
-        setOtpDigits(["", "", "", "", "", ""]);
+        setError("Impossible d’envoyer le SMS. Réessaie.");
       }
     });
   }
@@ -89,26 +85,22 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
     setError(null);
 
     startTransition(async () => {
-      if (otp === "123456") {
-        onAuthenticated(phone);
+      const res = await fetch("/api/auth/phone-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, otp }),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        phone?: string;
+        error?: string;
+      } | null;
+
+      if (!res.ok || !data?.ok || !data.phone) {
+        setError(data?.error || "Code incorrect. Réessaie.");
         return;
       }
-
-      try {
-        const supabase = createClient();
-        const { error: err } = await supabase.auth.verifyOtp({
-          phone,
-          token: otp,
-          type: "sms",
-        });
-        if (err) {
-          setError(err.message);
-          return;
-        }
-        onAuthenticated(phone);
-      } catch {
-        setError("Code incorrect. Réessaie.");
-      }
+      onAuthenticated(data.phone);
     });
   }
 
@@ -121,9 +113,10 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
       inputRefs.current[index + 1]?.focus();
     }
     if (digit && index === 5 && next.every(Boolean)) {
-      // auto-submit when complete
       window.setTimeout(() => {
-        const form = document.getElementById("otp-form") as HTMLFormElement | null;
+        const form = document.getElementById(
+          "otp-form"
+        ) as HTMLFormElement | null;
         form?.requestSubmit();
       }, 50);
     }
@@ -137,7 +130,10 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
 
   function onPaste(e: React.ClipboardEvent) {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     if (!pasted) return;
     const next = ["", "", "", "", "", ""];
     pasted.split("").forEach((d, i) => {

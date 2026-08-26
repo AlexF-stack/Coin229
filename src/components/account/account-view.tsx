@@ -14,14 +14,14 @@ import {
   UserRound,
 } from "lucide-react";
 import { PhoneAuthForm } from "./phone-auth-form";
-import { getClientOrders } from "@/lib/actions";
+import { getMyOrders } from "@/lib/actions";
 import { ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from "@/lib/constants";
 import { ZONE_LABELS } from "@/lib/shipping";
 import { formatPrice, cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 
-type ClientData = NonNullable<Awaited<ReturnType<typeof getClientOrders>>>;
+type ClientData = NonNullable<Awaited<ReturnType<typeof getMyOrders>>>;
 
 const BENEFITS = [
   {
@@ -52,9 +52,23 @@ export function AccountView() {
   const favCount = useWishlistStore((s) => s.ids.length);
 
   useEffect(() => {
-    const saved = localStorage.getItem("coin229-phone");
-    if (saved) setPhone(saved);
-    setReady(true);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/auth/phone-session");
+        if (res.ok) {
+          const data = (await res.json()) as { phone?: string };
+          if (!cancelled && data.phone) setPhone(data.phone);
+        }
+      } catch {
+        // pas de session
+      } finally {
+        if (!cancelled) setReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -62,15 +76,14 @@ export function AccountView() {
       setClient(null);
       return;
     }
-    localStorage.setItem("coin229-phone", phone);
     setLoading(true);
-    getClientOrders(phone)
+    getMyOrders()
       .then((data) => setClient(data))
       .finally(() => setLoading(false));
   }, [phone]);
 
-  function logout() {
-    localStorage.removeItem("coin229-phone");
+  async function logout() {
+    await fetch("/api/auth/phone-session", { method: "DELETE" });
     setPhone(null);
     setClient(null);
   }
@@ -183,7 +196,7 @@ export function AccountView() {
             </div>
             <button
               type="button"
-              onClick={logout}
+              onClick={() => void logout()}
               className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur hover:bg-white/20"
             >
               <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
@@ -206,18 +219,22 @@ export function AccountView() {
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber/12 text-amber">
                 <Icon className="h-5 w-5 stroke-[1.5]" />
               </span>
-              <span className="text-[11px] font-medium leading-tight">{label}</span>
+              <span className="text-[11px] font-medium leading-tight">
+                {label}
+              </span>
               <span className="text-[10px] text-muted">{hint}</span>
             </Link>
           ))}
         </div>
       </section>
 
-      <section id="commandes" className="space-y-3 scroll-mt-24">
+      <section id="commandes" className="scroll-mt-24 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold">Mes commandes</h2>
           {client && client.orders.length > 0 && (
-            <span className="text-xs text-muted">{client.orders.length} au total</span>
+            <span className="text-xs text-muted">
+              {client.orders.length} au total
+            </span>
           )}
         </div>
 

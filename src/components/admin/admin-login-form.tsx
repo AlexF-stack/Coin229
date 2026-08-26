@@ -4,10 +4,16 @@ import { FormEvent, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Lock } from "lucide-react";
 
+function safeNext(raw: string | null): string {
+  if (!raw || !raw.startsWith("/admin")) return "/admin";
+  if (raw.startsWith("//") || raw.includes("://")) return "/admin";
+  return raw;
+}
+
 export function AdminLoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || "/admin";
+  const next = safeNext(params.get("next"));
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -21,6 +27,14 @@ export function AdminLoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
       });
+      if (res.status === 429) {
+        setError("Trop de tentatives. Réessaie dans quelques minutes.");
+        return;
+      }
+      if (res.status === 503) {
+        setError("Admin non configuré (ADMIN_PASSWORD).");
+        return;
+      }
       if (!res.ok) {
         setError("Mot de passe incorrect");
         return;
