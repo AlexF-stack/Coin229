@@ -128,6 +128,16 @@ export function CheckoutForm() {
       } else {
         clear();
       }
+
+      const pay = result.payment;
+      if (
+        pay &&
+        (pay.paymentUrl || pay.useKkiaWidget || pay.provider === "kkiapay")
+      ) {
+        router.push(`/commande/paiement?id=${result.orderId}`);
+        return;
+      }
+
       router.push(`/commande/confirmation?id=${result.orderId}`);
     });
   }

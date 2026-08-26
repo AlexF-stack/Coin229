@@ -13,6 +13,8 @@ import {
   phoneCookieName,
   readPhoneFromToken,
 } from "@/lib/phone-session";
+import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type {
   Categorie,
   DeliveryZone,
@@ -265,15 +267,14 @@ export async function createOrder(input: {
     amount: montantTotal,
     mode: data.modePaiement,
     phone: telephone,
+    customerName: data.nom,
   });
 
   if (!payment.success) {
-    // Annule la commande si paiement échoue (MoMo non configuré)
     await prisma.order.update({
       where: { id: order.id },
       data: { statut: "annulee" },
     });
-    // Restore stock best-effort
     for (const item of data.items) {
       await prisma.product.update({
         where: { id: item.productId },
@@ -286,13 +287,15 @@ export async function createOrder(input: {
     return { success: false as const, error: payment.message };
   }
 
-  if (
-    payment.status === "paid" &&
-    data.modePaiement === "mobile_money"
-  ) {
+  if (payment.provider !== "cash_on_delivery") {
     await prisma.order.update({
       where: { id: order.id },
-      data: { statut: "confirmee" },
+      data: {
+        paymentProvider: payment.provider,
+        paymentRef: payment.transactionId,
+        paymentUrl: payment.paymentUrl ?? null,
+        ...(payment.status === "paid" ? { statut: "confirmee" as const } : {}),
+      },
     });
   }
 
@@ -307,17 +310,42 @@ export async function createOrder(input: {
   };
 }
 
-/** Commandes du compte connecté uniquement (cookie session téléphone). */
+/** Compte connecté : session téléphone OU session Supabase (Google/Facebook). */
 export async function getMyOrders() {
-  const jar = await cookies();
-  const phone = await readPhoneFromToken(
-    jar.get(phoneCookieName())?.value
-  );
-  if (!phone) return null;
-
   try {
-    return await prisma.client.findUnique({
-      where: { telephone: phone },
+    const jar = await cookies();
+    const phone = await readPhoneFromToken(
+      jar.get(phoneCookieName())?.value
+    );
+    if (phone) {
+      return await prisma.client.findUnique({
+        where: { telephone: phone },
+        include: {
+          orders: {
+            include: {
+              items: { include: { product: true } },
+            },
+            orderBy: { dateCreation: "desc" },
+          },
+          adresses: true,
+        },
+      });
+    }
+
+    if (!isSupabaseConfigured()) return null;
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    return await prisma.client.findFirst({
+      where: {
+        OR: [
+          { authId: user.id },
+          ...(user.email ? [{ email: user.email }] : []),
+        ],
+      },
       include: {
         orders: {
           include: {
@@ -328,6 +356,93 @@ export async function getMyOrders() {
         adresses: true,
       },
     });
+  } catch {
+    return null;
+  }
+}
+
+/** Crée / met à jour le Client après OAuth Google ou Facebook. */
+export async function ensureOAuthClient() {
+  if (!isSupabaseConfigured()) return { ok: false as const };
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { ok: false as const };
+
+    const email = user.email?.toLowerCase() ?? null;
+    const nom =
+      (user.user_metadata?.full_name as string | undefined) ||
+      (user.user_metadata?.name as string | undefined) ||
+      (user.user_metadata?.user_name as string | undefined) ||
+      email?.split("@")[0] ||
+      "Client Coin229";
+
+    const existing = await prisma.client.findFirst({
+      where: {
+        OR: [
+          { authId: user.id },
+          ...(email ? [{ email }] : []),
+        ],
+      },
+    });
+
+    if (existing) {
+      await prisma.client.update({
+        where: { id: existing.id },
+        data: {
+          authId: user.id,
+          email: email ?? existing.email,
+          nom: existing.nom || nom,
+        },
+      });
+    } else {
+      await prisma.client.create({
+        data: {
+          nom,
+          email,
+          authId: user.id,
+          telephone: null,
+        },
+      });
+    }
+
+    return { ok: true as const };
+  } catch {
+    return { ok: false as const };
+  }
+}
+
+/** Session affichée côté client (téléphone ou OAuth). */
+export async function getAccountSession(): Promise<{
+  label: string;
+  provider: "phone" | "google" | "facebook" | "oauth";
+} | null> {
+  try {
+    const jar = await cookies();
+    const phone = await readPhoneFromToken(
+      jar.get(phoneCookieName())?.value
+    );
+    if (phone) return { label: phone, provider: "phone" };
+
+    if (!isSupabaseConfigured()) return null;
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const provider = (user.app_metadata?.provider as string) || "oauth";
+    const label =
+      user.email ||
+      (user.user_metadata?.full_name as string | undefined) ||
+      "Compte connecté";
+
+    if (provider === "google" || provider === "facebook") {
+      return { label, provider };
+    }
+    return { label, provider: "oauth" };
   } catch {
     return null;
   }

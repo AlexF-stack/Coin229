@@ -29,6 +29,11 @@ npm run db:seed
 ```
 
 4. (Optionnel) Activer Phone Auth OTP SMS dans Supabase
+5. (Optionnel) Google + Facebook : Authentication → Providers, redirect `…/auth/callback`
+
+## Auth sociale
+
+Sur `/compte` : Google, Facebook (OAuth Supabase) et SMS. Configurer les apps Google Cloud / Meta avec le callback fourni par Supabase.
 
 ## Déployer sur Vercel
 
@@ -63,7 +68,15 @@ Visible sur la boutique uniquement — pas dans l’admin.
 
 ## Paiement
 
-`src/lib/payment.ts` → `processPayment()` est mocké. Brancher Fedapay ou KkiaPay sans toucher au tunnel de commande.
+- **COD** : toujours disponible
+- **Fedapay** : si `FEDAPAY_SECRET_KEY` → transaction + redirect checkout
+- **KkiaPay** : si clés publiques/privées → widget sur `/commande/paiement`
+- Callbacks : `/api/payments/fedapay/callback`, `/api/payments/kkiapay/webhook`
+
+## Base de données
+
+Postgres Neon (claimable) branchée en local + Vercel. **Réclame la DB** (lien claim) sous 72 h pour la garder.
+`npx prisma migrate deploy && npm run db:seed`
 
 ## Sécurité admin
 

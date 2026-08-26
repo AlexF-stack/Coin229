@@ -93,7 +93,8 @@ model Product {
 model Client {
   id        String    @id @default(cuid())
   nom       String
-  telephone String    @unique
+  telephone String?   @unique
+  email     String?   @unique
   authId    String?   @unique @map("auth_id")
   adresses  Address[]
   orders    Order[]
@@ -114,21 +115,24 @@ model Address {
 }
 
 model Order {
-  id              String       @id @default(cuid())
-  clientId        String       @map("client_id")
-  vendorId        String       @map("vendor_id")
-  statut          OrderStatus  @default(en_attente)
-  modePaiement    PaymentMode  @map("mode_paiement")
-  zoneLivraison   DeliveryZone @map("zone_livraison")
-  fraisLivraison  Int          @map("frais_livraison")
-  montantTotal    Int          @map("montant_total")
-  telephone       String
-  nomClient       String       @map("nom_client")
-  adresseLivraison String      @map("adresse_livraison")
-  dateCreation    DateTime     @default(now()) @map("date_creation")
-  client          Client       @relation(fields: [clientId], references: [id])
-  vendor          Vendor       @relation(fields: [vendorId], references: [id])
-  items           OrderItem[]
+  id               String       @id @default(cuid())
+  clientId         String       @map("client_id")
+  vendorId         String       @map("vendor_id")
+  statut           OrderStatus  @default(en_attente)
+  modePaiement     PaymentMode  @map("mode_paiement")
+  zoneLivraison    DeliveryZone @map("zone_livraison")
+  fraisLivraison   Int          @map("frais_livraison")
+  montantTotal     Int          @map("montant_total")
+  telephone        String
+  nomClient        String       @map("nom_client")
+  adresseLivraison String       @map("adresse_livraison")
+  paymentProvider  String?      @map("payment_provider")
+  paymentRef       String?      @unique @map("payment_ref")
+  paymentUrl       String?      @map("payment_url")
+  dateCreation     DateTime     @default(now()) @map("date_creation")
+  client           Client       @relation(fields: [clientId], references: [id])
+  vendor           Vendor       @relation(fields: [vendorId], references: [id])
+  items            OrderItem[]
 
   @@index([clientId])
   @@index([vendorId])
