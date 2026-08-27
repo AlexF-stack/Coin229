@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyFedapayTransaction } from "@/lib/payment";
 import { revalidatePath } from "next/cache";
+import {
+  assertFedapayWebhookAuth,
+  confirmOrderPaid,
+} from "@/lib/payment-confirm";
 
 /**
- * Callback navigateur Fedapay + éventuel ping.
- * Confirme la commande si la transaction est approved.
+ * Callback navigateur Fedapay + webhook.
+ * Confirmation uniquement après re-vérification API + match montant.
  */
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -20,25 +22,28 @@ export async function GET(request: Request) {
   }
 
   try {
-    const order = await prisma.order.findUnique({ where: { id: orderId } });
-    if (order && order.statut === "en_attente") {
-      const ref = txId || order.paymentRef;
-      if (ref) {
-        const remote = await verifyFedapayTransaction(ref);
-        const approved =
-          remote?.status === "approved" || remote?.status === "transferred";
-        if (approved) {
-          await prisma.order.update({
-            where: { id: orderId },
-            data: {
-              statut: "confirmee",
-              paymentRef: String(ref),
-              paymentProvider: "fedapay",
-            },
-          });
-          revalidatePath("/compte");
-          revalidatePath("/admin");
-        }
+    if (txId) {
+      await confirmOrderPaid({
+        orderId,
+        provider: "fedapay",
+        paymentRef: String(txId),
+      });
+      revalidatePath("/compte");
+      revalidatePath("/admin");
+    } else {
+      const { prisma } = await import("@/lib/prisma");
+      const order = await prisma.order.findUnique({
+        where: { id: orderId },
+        select: { paymentRef: true, statut: true },
+      });
+      if (order?.paymentRef && order.statut === "en_attente") {
+        await confirmOrderPaid({
+          orderId,
+          provider: "fedapay",
+          paymentRef: order.paymentRef,
+        });
+        revalidatePath("/compte");
+        revalidatePath("/admin");
       }
     }
   } catch {
@@ -51,38 +56,48 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // Webhook Fedapay (entity.transaction.approved etc.)
-  const body = (await request.json().catch(() => null)) as {
+  const rawBody = await request.text();
+  if (!assertFedapayWebhookAuth(request, rawBody)) {
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
+
+  type FedapayWebhookBody = {
     entity?: {
       id?: number;
       status?: string;
       custom_metadata?: { orderId?: string };
-      amount?: number;
     };
-    name?: string;
-  } | null;
+  };
 
-  const entity = body?.entity;
+  let body: FedapayWebhookBody;
+  try {
+    body = JSON.parse(rawBody) as FedapayWebhookBody;
+  } catch {
+    return NextResponse.json({ ok: false }, { status: 400 });
+  }
+
+  const entity = body.entity;
   const orderId = entity?.custom_metadata?.orderId;
-  const status = entity?.status;
   const txId = entity?.id;
 
-  if (!orderId) {
+  if (!orderId || !txId) {
     return NextResponse.json({ ok: true, ignored: true });
   }
 
-  if (status === "approved" || status === "transferred") {
-    await prisma.order.updateMany({
-      where: { id: orderId, statut: "en_attente" },
-      data: {
-        statut: "confirmee",
-        paymentRef: txId ? String(txId) : undefined,
-        paymentProvider: "fedapay",
-      },
-    });
-    revalidatePath("/compte");
-    revalidatePath("/admin");
+  const result = await confirmOrderPaid({
+    orderId,
+    provider: "fedapay",
+    paymentRef: String(txId),
+  });
+
+  if (!result.ok && result.reason !== "already_processed") {
+    return NextResponse.json(
+      { ok: false, reason: result.reason },
+      { status: 400 }
+    );
   }
 
+  revalidatePath("/compte");
+  revalidatePath("/admin");
   return NextResponse.json({ ok: true });
 }

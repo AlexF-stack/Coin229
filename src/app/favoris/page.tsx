@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ProductCard } from "@/components/product/product-card";
 import { useWishlistStore } from "@/lib/wishlist-store";
+import { getWishlistProducts } from "@/lib/actions";
 import type { ProductCardData } from "@/lib/constants";
-import { DEMO_PRODUCTS } from "@/lib/demo-data";
 
 export default function FavorisPage() {
   const ids = useWishlistStore((s) => s.ids);
   const [products, setProducts] = useState<ProductCardData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -18,11 +19,29 @@ export default function FavorisPage() {
 
   useEffect(() => {
     if (!mounted) return;
-    // Catalogue démo + éventuels IDs persistés
-    setProducts(DEMO_PRODUCTS.filter((p) => ids.includes(p.id)));
+    let cancelled = false;
+    setLoading(true);
+    if (!ids.length) {
+      setProducts([]);
+      setLoading(false);
+      return;
+    }
+    getWishlistProducts(ids)
+      .then((rows) => {
+        if (!cancelled) setProducts(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setProducts([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [ids, mounted]);
 
-  if (!mounted) {
+  if (!mounted || loading) {
     return (
       <div className="space-y-4 px-4 py-6">
         <div className="h-8 w-40 animate-pulse rounded bg-card" />

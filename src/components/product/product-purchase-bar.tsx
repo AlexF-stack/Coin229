@@ -21,6 +21,7 @@ export function ProductPurchaseBar({ product }: Props) {
   const [qty, setQty] = useState(1);
   const max = Math.max(1, product.stockQuantite);
   const addItem = useCartStore((s) => s.addItem);
+  const prepareCheckout = useCartStore((s) => s.prepareCheckout);
   const router = useRouter();
   const price = getEffectivePrice(product.prix, product.prixPromo);
 
@@ -37,6 +38,7 @@ export function ProductPurchaseBar({ product }: Props) {
       },
       qty
     );
+    prepareCheckout([product.id]);
     router.push("/commande");
   }
 

@@ -31,11 +31,16 @@ export function HowItWorks() {
     () => {
       const el = root.current;
       if (!el) return;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
       const heading = el.querySelector("[data-how-heading]");
       const items = el.querySelectorAll("[data-how-item]");
       const line = el.querySelector("[data-how-line]");
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set([heading, items], { clearProps: "all", opacity: 1, y: 0 });
+        if (line) gsap.set(line, { clearProps: "transform", scaleX: 1 });
+        return;
+      }
 
       gsap.fromTo(
         heading,

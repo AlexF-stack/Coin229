@@ -9,12 +9,22 @@ import { checkoutSchema } from "@/lib/checkout-schema";
 import { requireAdmin } from "@/lib/assert-admin";
 import { allowDemoCatalog } from "@/lib/runtime-flags";
 import {
+  createPhoneSessionToken,
   normalizeBjPhone,
   phoneCookieName,
+  phoneCookieOptions,
   readPhoneFromToken,
 } from "@/lib/phone-session";
+import {
+  createOrderConfirmToken,
+  orderConfirmCookieName,
+  orderConfirmCookieOptions,
+  readOrderConfirmToken,
+} from "@/lib/order-confirm";
+import { fetchProductsByIds } from "@/lib/catalog";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import type { ProductCardData } from "@/lib/constants";
 import type {
   Categorie,
   DeliveryZone,
@@ -299,6 +309,20 @@ export async function createOrder(input: {
     });
   }
 
+  const jar = await cookies();
+  const confirmToken = createOrderConfirmToken(order.id);
+  if (confirmToken) {
+    jar.set(
+      orderConfirmCookieName(),
+      confirmToken,
+      orderConfirmCookieOptions()
+    );
+  }
+  const phoneToken = await createPhoneSessionToken(telephone);
+  if (phoneToken) {
+    jar.set(phoneCookieName(), phoneToken, phoneCookieOptions());
+  }
+
   revalidatePath("/");
   revalidatePath("/compte");
   revalidatePath("/admin");
@@ -466,16 +490,77 @@ export async function getOrderForConfirmation(orderId: string) {
     return { demo: true as const, order: null };
   }
   try {
+    const jar = await cookies();
+    const sessionPhone = await readPhoneFromToken(
+      jar.get(phoneCookieName())?.value
+    );
+    const confirmOrderId = readOrderConfirmToken(
+      jar.get(orderConfirmCookieName())?.value
+    );
+
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
         items: { include: { product: true } },
       },
     });
+    if (!order) return { demo: false as const, order: null };
+
+    let allowed = confirmOrderId === order.id;
+    if (
+      !allowed &&
+      sessionPhone &&
+      normalizeBjPhone(order.telephone) === sessionPhone
+    ) {
+      allowed = true;
+    }
+
+    if (!allowed && isSupabaseConfigured()) {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const client = await prisma.client.findFirst({
+          where: { authId: user.id },
+          select: { id: true },
+        });
+        if (client && client.id === order.clientId) {
+          allowed = true;
+        }
+      }
+    }
+
+    if (!allowed) return { demo: false as const, order: null };
     return { demo: false as const, order };
   } catch {
     return { demo: false as const, order: null };
   }
+}
+
+/** Produits favoris (IDs panier local) — catalogue réel, pas seulement DEMO. */
+export async function getWishlistProducts(
+  ids: string[]
+): Promise<ProductCardData[]> {
+  const unique = [...new Set(ids.filter(Boolean))].slice(0, 60);
+  if (!unique.length) return [];
+  const products = await fetchProductsByIds(unique);
+  const map = new Map(products.map((p) => [p.id, p]));
+  return unique
+    .map((id) => map.get(id))
+    .filter((p): p is NonNullable<typeof p> => Boolean(p))
+    .map((p) => ({
+      id: p.id,
+      nom: p.nom,
+      prix: p.prix,
+      prixPromo: p.prixPromo,
+      images: p.images,
+      categorie: p.categorie,
+      genre: p.genre,
+      stockQuantite: p.stockQuantite,
+      statut: p.statut,
+      vendorId: p.vendorId,
+    }));
 }
 
 /* ——— Admin / Vendor ——— */

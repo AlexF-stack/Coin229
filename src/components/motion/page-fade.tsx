@@ -14,7 +14,10 @@ export function PageFade({ children }: { children: ReactNode }) {
     () => {
       const el = ref.current;
       if (!el) return;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(el, { clearProps: "all", opacity: 1, y: 0 });
+        return;
+      }
 
       gsap.fromTo(
         el,

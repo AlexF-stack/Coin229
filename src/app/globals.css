@@ -56,6 +56,22 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+
+    /* Contenu animé GSAP (opacity-0 initial) reste lisible */
+    [data-trust-item],
+    [data-how-heading],
+    [data-how-item],
+    [data-how-line],
+    [data-reveal],
+    [data-reveal-item],
+    [data-hero-line],
+    [data-hero-title],
+    [data-hero-copy],
+    [data-hero-cta],
+    [data-hero-scroll] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }
 
