@@ -6,10 +6,12 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(amount: number): string {
-  return new Intl.NumberFormat("fr-BJ", {
-    style: "decimal",
-    maximumFractionDigits: 0,
-  }).format(amount) + " F";
+  return (
+    new Intl.NumberFormat("fr-BJ", {
+      style: "decimal",
+      maximumFractionDigits: 0,
+    }).format(amount) + " FCFA"
+  );
 }
 
 export function getDiscountPercent(prix: number, prixPromo: number | null | undefined): number | null {

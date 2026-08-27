@@ -57,7 +57,7 @@ export function ProductPurchaseBar({ product }: Props) {
         <button
           type="button"
           onClick={buyNow}
-          className="hidden w-full items-center justify-center rounded-[16px] border border-amber bg-amber/10 py-3.5 font-semibold text-amber transition active:scale-[0.98] md:flex"
+          className="hidden w-full items-center justify-center rounded-full border border-amber bg-amber/10 py-3.5 font-semibold text-amber transition active:scale-[0.98] md:flex"
         >
           Acheter maintenant · {formatPrice(price * qty)}
         </button>
@@ -65,20 +65,20 @@ export function ProductPurchaseBar({ product }: Props) {
           href={waHref}
           target="_blank"
           rel="noreferrer"
-          className="flex w-full items-center justify-center gap-2 rounded-[16px] border border-border bg-card py-3 text-sm font-medium text-fg"
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-white py-3 text-sm font-medium text-navy"
         >
           <MessageCircle className="h-4 w-4 stroke-[1.5] text-[#25D366]" />
           Commander sur WhatsApp
         </a>
       </div>
 
-      <div className="safe-pb fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg-elevated/95 px-4 pt-3 backdrop-blur-md md:hidden">
+      <div className="safe-pb fixed inset-x-0 bottom-0 z-40 border-t border-border bg-white/95 px-4 pt-3 shadow-[0_-8px_30px_rgba(2,11,38,0.08)] backdrop-blur-md md:hidden">
         <div className="mx-auto flex max-w-lg gap-2 pb-2">
           <AddToCartButton product={product} quantity={qty} className="flex-1" />
           <button
             type="button"
             onClick={buyNow}
-            className="flex-1 rounded-[16px] bg-fg py-3.5 text-sm font-semibold text-bg"
+            className="flex-1 rounded-full bg-navy py-3.5 text-sm font-semibold text-white"
           >
             Acheter
           </button>

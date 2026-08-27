@@ -32,6 +32,7 @@ export function CheckoutForm() {
   const [nom, setNom] = useState("");
   const [telephone, setTelephone] = useState("");
   const [adresse, setAdresse] = useState("");
+  const [acceptCgv, setAcceptCgv] = useState(false);
 
   const items = useMemo(() => {
     if (!checkoutIds?.length) return allItems;
@@ -84,6 +85,11 @@ export function CheckoutForm() {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (!acceptCgv) {
+      setError("Merci d’accepter les Conditions générales de vente pour continuer.");
+      return;
+    }
 
     const phone = telephone.replace(/\s/g, "");
     if (!/^\+?229\d{8}$|^\d{8,10}$/.test(phone)) {
@@ -252,11 +258,37 @@ export function CheckoutForm() {
         </p>
       )}
 
+      <label className="flex items-start gap-3 rounded-xl border border-border bg-card p-3 text-sm">
+        <input
+          type="checkbox"
+          checked={acceptCgv}
+          onChange={(e) => setAcceptCgv(e.target.checked)}
+          className="mt-1 h-4 w-4 accent-[var(--color-amber)]"
+          required
+        />
+        <span className="text-muted">
+          J&apos;ai lu et j&apos;accepte les{" "}
+          <a href="/cgv" target="_blank" rel="noreferrer" className="font-medium text-amber">
+            Conditions générales de vente
+          </a>{" "}
+          et la{" "}
+          <a
+            href="/confidentialite"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium text-amber"
+          >
+            Politique de confidentialité
+          </a>
+          . Les prix sont en FCFA (XOF).
+        </span>
+      </label>
+
       <div className="safe-pb fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg-elevated/95 px-4 pt-3 backdrop-blur-md md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <button
           type="submit"
-          disabled={pending}
-          className="mx-auto flex w-full max-w-xl items-center justify-center gap-2 rounded-[16px] bg-amber py-3.5 font-semibold text-bg disabled:opacity-60 md:mx-0"
+          disabled={pending || !acceptCgv}
+          className="mx-auto flex w-full max-w-xl items-center justify-center gap-2 rounded-full bg-amber py-3.5 font-semibold text-white shadow-[0_8px_20px_rgba(43,155,255,0.25)] disabled:opacity-60 md:mx-0"
         >
           {pending ? (
             <>

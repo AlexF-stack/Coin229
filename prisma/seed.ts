@@ -66,16 +66,15 @@ async function main() {
       id: "prod_bijou_creoles",
       nom: "Créoles Rose Éclat",
       description:
-        "Créoles saturées rose-doré. Accessoire viral TikTok-ready.",
+        "Créoles saturées rose-doré. Accessoire viral TikTok-ready — restock Cotonou.",
       categorie: "bijou" as const,
       genre: "femme" as const,
       prix: 9500,
       prixPromo: null,
-      stockQuantite: 0,
+      stockQuantite: 24,
       images: [
         "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80",
       ],
-      statut: "rupture" as const,
     },
     {
       id: "prod_sac_mini",
@@ -159,9 +158,171 @@ async function main() {
         "https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=800&q=80",
       ],
     },
+    {
+      id: "prod_lunette_aviator",
+      nom: "Aviator Or Night",
+      description:
+        "Pilote doré, verres fumés. Look soirée Cotonou / clips Insta.",
+      categorie: "lunette" as const,
+      genre: "unisexe" as const,
+      prix: 19500,
+      prixPromo: 15900,
+      stockQuantite: 14,
+      images: [
+        "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80",
+        "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_lunette_cat",
+      nom: "Cat-Eye Rouge Soleil",
+      description:
+        "Monture cat-eye vive. Accessoire signature femmes — stock limité.",
+      categorie: "lunette" as const,
+      genre: "femme" as const,
+      prix: 16800,
+      prixPromo: null,
+      stockQuantite: 10,
+      images: [
+        "https://images.unsplash.com/photo-1577803645773-f96470509666?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_lunette_square",
+      nom: "Square Noir Mat",
+      description:
+        "Carré mat anti-reflet. Street clean homme — résiste au soleil Atlantique.",
+      categorie: "lunette" as const,
+      genre: "homme" as const,
+      prix: 17500,
+      prixPromo: 14900,
+      stockQuantite: 16,
+      images: [
+        "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_lunette_shield",
+      nom: "Shield Noir Fidjrossè",
+      description:
+        "Masque oversized UV. Plage Fidjrossè, balades soleil, clips WhatsApp.",
+      categorie: "lunette" as const,
+      genre: "unisexe" as const,
+      prix: 18900,
+      prixPromo: 15500,
+      stockQuantite: 18,
+      images: [
+        "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_lunette_clear",
+      nom: "Clear Frame Urban",
+      description:
+        "Monture transparente tendance. Bureau, campus, look clean Cotonou.",
+      categorie: "lunette" as const,
+      genre: "femme" as const,
+      prix: 16500,
+      prixPromo: null,
+      stockQuantite: 14,
+      images: [
+        "https://images.unsplash.com/photo-1577803645773-f96470509666?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_sac_banane",
+      nom: "Banane Zip City",
+      description:
+        "Banane zip sécurisée. Mains libres en zémidjan — quotidien urbain.",
+      categorie: "sac" as const,
+      genre: "homme" as const,
+      prix: 17900,
+      prixPromo: 14900,
+      stockQuantite: 20,
+      images: [
+        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_sac_seau",
+      nom: "Seau Soft Nude",
+      description:
+        "Sac seau soft nude. Sorties, église, événements — look premium accessible.",
+      categorie: "sac" as const,
+      genre: "femme" as const,
+      prix: 22500,
+      prixPromo: 18900,
+      stockQuantite: 12,
+      images: [
+        "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_bijou_hoops",
+      nom: "Hoops XL Or",
+      description:
+        "Créoles XXL dorées. Impulse gift / layering soirée — ticket bas.",
+      categorie: "bijou" as const,
+      genre: "femme" as const,
+      prix: 11500,
+      prixPromo: null,
+      stockQuantite: 28,
+      images: [
+        "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_bijou_cauri",
+      nom: "Bracelet Stack Cauri",
+      description:
+        "Stack perles & cauri. Identité locale soft + street unisexe.",
+      categorie: "bijou" as const,
+      genre: "unisexe" as const,
+      prix: 9900,
+      prixPromo: null,
+      stockQuantite: 30,
+      images: [
+        "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_bijou_bar",
+      nom: "Collier Bar Minimal",
+      description:
+        "Barre fine dorée. Quotidien layering — simple et photo-ready.",
+      categorie: "bijou" as const,
+      genre: "femme" as const,
+      prix: 12900,
+      prixPromo: 10900,
+      stockQuantite: 22,
+      images: [
+        "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80",
+      ],
+    },
+    {
+      id: "prod_montre_recta",
+      nom: "Recta Gold Slim",
+      description:
+        "Cadran rectangle doré slim. Signature soirée / Insta femme.",
+      categorie: "montre" as const,
+      genre: "femme" as const,
+      prix: 24500,
+      prixPromo: 19900,
+      stockQuantite: 10,
+      images: [
+        "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800&q=80",
+      ],
+    },
   ];
 
   for (const p of products) {
+    const statut =
+      "statut" in p && typeof p.statut === "string"
+        ? (p.statut as "actif" | "rupture" | "archive")
+        : p.stockQuantite > 0
+          ? ("actif" as const)
+          : ("rupture" as const);
+
     await prisma.product.upsert({
       where: { id: p.id },
       update: {
@@ -174,7 +335,7 @@ async function main() {
         stockQuantite: p.stockQuantite,
         images: p.images,
         source: "local",
-        statut: "statut" in p && p.statut ? p.statut : p.stockQuantite > 0 ? "actif" : "rupture",
+        statut,
         vendorId: vendor.id,
       },
       create: {
@@ -189,7 +350,7 @@ async function main() {
         stockQuantite: p.stockQuantite,
         images: p.images,
         source: "local",
-        statut: "statut" in p && p.statut ? p.statut : p.stockQuantite > 0 ? "actif" : "rupture",
+        statut,
       },
     });
   }

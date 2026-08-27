@@ -98,9 +98,9 @@ export function replyToUser(input: string): Reply {
     };
   }
 
-  if (/montre|bijou|sac|catalogue|produit|prix|promo|acheter/.test(q) || q === "voir la boutique") {
+  if (/montre|bijou|sac|lunette|catalogue|produit|prix|promo|acheter/.test(q) || q === "voir la boutique") {
     return {
-      text: "On a des montres, bijoux et sacs pour hommes et femmes. Filtre par catégorie sur l’accueil, ou cherche un modèle.",
+      text: "On a des montres, bijoux, sacs et lunettes pour hommes et femmes. Filtre par catégorie sur l’accueil, ou cherche un modèle.",
       quickReplies: ["Livraison", "Paiement", "Parler à un humain"],
     };
   }
@@ -121,8 +121,8 @@ export function replyToUser(input: string): Reply {
 
   if (/retour|échanger|rembours/.test(q)) {
     return {
-      text: "Pour un échange ou un souci sur un article, contacte-nous sur WhatsApp avec ta référence de commande — on trouve une solution rapidement.",
-      quickReplies: ["Parler à un humain", "Suivre ma commande"],
+      text: "Retours possibles sous 48 h si l’article n’est pas porté. Détails sur la page Retours, ou écris-nous sur WhatsApp avec ta commande.",
+      quickReplies: ["Parler à un humain", "Livraison", "Suivre ma commande"],
     };
   }
 

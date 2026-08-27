@@ -1,13 +1,18 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { ProductCard } from "@/components/product/product-card";
 import { SearchBoxFromParams } from "@/components/catalog/search-box";
 import { fetchProducts } from "@/lib/catalog";
+import { buildPageMetadata } from "@/lib/seo";
 
 type SearchParams = Promise<{ q?: string }>;
 
-export const metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Recherche",
-};
+  description:
+    "Recherche montres, bijoux, sacs et lunettes Coin229 — accessoires mode au Bénin, prix en FCFA.",
+  path: "/recherche",
+});
 
 export default async function SearchPage({
   searchParams,
@@ -25,7 +30,7 @@ export default async function SearchPage({
       <header className="px-4 md:px-0">
         <h1 className="font-display text-2xl font-bold md:text-3xl">Recherche</h1>
         <p className="mt-1 text-sm text-muted">
-          Trouve ta prochaine pièce parmi montres, bijoux et sacs.
+          Trouve ta prochaine pièce parmi montres, bijoux, sacs et lunettes.
         </p>
       </header>
 

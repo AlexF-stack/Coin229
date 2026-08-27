@@ -9,6 +9,7 @@ const categories: { value: Categorie | "all"; label: string }[] = [
   { value: "montre", label: "Montres" },
   { value: "bijou", label: "Bijoux" },
   { value: "sac", label: "Sacs" },
+  { value: "lunette", label: "Lunettes" },
 ];
 
 const genres: { value: Genre | "all"; label: string }[] = [
@@ -40,10 +41,10 @@ export function CatalogFilters() {
             type="button"
             onClick={() => update("categorie", c.value)}
             className={cn(
-              "shrink-0 rounded-[20px] px-4 py-2 text-sm font-medium transition-colors",
+              "btn-press shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300",
               categorie === c.value
-                ? "bg-amber text-bg"
-                : "bg-card/80 text-muted backdrop-blur-sm md:border md:border-border md:bg-card"
+                ? "scale-[1.02] bg-amber text-white shadow-[0_8px_20px_rgba(43,155,255,0.3)]"
+                : "border border-border bg-white text-muted hover:border-amber/40 hover:text-navy"
             )}
           >
             {c.label}
@@ -57,10 +58,10 @@ export function CatalogFilters() {
             type="button"
             onClick={() => update("genre", g.value)}
             className={cn(
-              "shrink-0 rounded-[20px] border px-3.5 py-1.5 text-xs font-medium transition-colors",
+              "btn-press shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all duration-300",
               genre === g.value
                 ? "border-amber bg-amber/15 text-amber"
-                : "border-border bg-transparent text-muted"
+                : "border-border bg-transparent text-muted hover:text-navy"
             )}
           >
             {g.label}

@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { TrustStrip } from "@/components/trust/trust-strip";
 import { ShopChatbot } from "@/components/chat/shop-chatbot";
+import { PageFade } from "@/components/motion/page-fade";
 
 /** Chrome boutique — allégé sur fiche produit & tunnel (conversion) */
 export function ShopShell({ children }: { children: React.ReactNode }) {
@@ -35,7 +36,7 @@ export function ShopShell({ children }: { children: React.ReactNode }) {
             : "page-shell min-h-[70dvh] pb-24 md:pb-8"
         }
       >
-        {children}
+        <PageFade>{children}</PageFade>
       </main>
       {!leanFunnel && <SiteFooter />}
       {!hideChat && <ShopChatbot />}

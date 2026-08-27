@@ -42,3 +42,12 @@ next-env.d.ts
 # prisma
 prisma/*.db
 prisma/*.db-journal
+
+# PWA (générés au build)
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+public/swe-worker-*.js
+public/swe-worker-*.js.map
+public/fallback-*.js

@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { CartView } from "@/components/cart/cart-view";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Panier",
-};
+  description: "Votre panier Coin229 — accessoires mode, prix en FCFA.",
+  path: "/panier",
+  noIndex: true,
+});
 
 export default function CartPage() {
   return (

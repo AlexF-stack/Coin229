@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Heart, Search, ShoppingBag, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
@@ -22,6 +22,14 @@ export function SiteHeader() {
   const favorites = useWishlistStore((s) => s.ids);
   const cartCount = items.reduce((n, i) => n + i.quantite, 0);
   const [q, setQ] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   function onSearch(e: FormEvent) {
     e.preventDefault();
@@ -34,30 +42,49 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 hidden border-b border-border bg-bg-elevated/90 backdrop-blur-md md:block">
-      <div className="page-shell flex items-center gap-6 py-3">
-        <Link href="/" className="shrink-0">
-          <span className="font-display text-xl font-bold tracking-tight text-fg">
+    <header
+      className={cn(
+        "sticky top-0 z-40 hidden transition-[background-color,box-shadow,backdrop-filter,border-color] duration-300 md:block",
+        scrolled
+          ? "border-b border-border/80 bg-white/85 shadow-[0_8px_30px_rgba(2,11,38,0.06)] backdrop-blur-xl"
+          : "border-b border-transparent bg-white/70 backdrop-blur-md"
+      )}
+    >
+      <div
+        className={cn(
+          "page-shell flex items-center gap-6 transition-[padding] duration-300",
+          scrolled ? "py-2.5" : "py-3.5"
+        )}
+      >
+        <Link href="/" className="shrink-0 transition-transform hover:scale-[1.02] active:scale-[0.98]">
+          <span className="font-display text-xl font-bold tracking-tight text-navy">
             Coin<span className="text-amber">229</span>
           </span>
         </Link>
 
         <nav className="flex items-center gap-1">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                pathname === item.href ||
-                  (item.href !== "/" && pathname.startsWith(item.href))
-                  ? "bg-amber/15 text-amber"
-                  : "text-muted hover:text-fg"
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {nav.map((item) => {
+            const active =
+              pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-amber/10 text-amber"
+                    : "text-muted hover:text-navy"
+                )}
+              >
+                {item.label}
+                {active && (
+                  <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-amber md:hidden" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         <form onSubmit={onSearch} className="ml-auto flex max-w-sm flex-1">
@@ -66,8 +93,8 @@ export function SiteHeader() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Rechercher une montre, un bijou…"
-              className="w-full rounded-full border border-border bg-surface py-2 pl-9 pr-3 text-sm outline-none focus:border-amber"
+              placeholder="Montre, bijou, sac, lunettes…"
+              className="w-full rounded-full border border-border bg-bg-elevated py-2 pl-9 pr-3 text-sm outline-none transition focus:border-amber focus:ring-2 focus:ring-amber/20"
             />
           </div>
         </form>
@@ -75,29 +102,29 @@ export function SiteHeader() {
         <div className="flex items-center gap-1">
           <Link
             href="/favoris"
-            className="relative rounded-full p-2 text-muted hover:bg-surface hover:text-fg"
+            className="relative rounded-full p-2 text-muted transition hover:bg-surface hover:text-navy active:scale-95"
             aria-label="Favoris"
           >
             <Heart className="h-5 w-5 stroke-[1.5]" />
             {favorites.length > 0 && (
-              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-rose" />
+              <span className="absolute right-1 top-1 h-2 w-2 animate-pulse rounded-full bg-amber" />
             )}
           </Link>
           <Link
             href="/panier"
-            className="relative rounded-full p-2 text-muted hover:bg-surface hover:text-fg"
+            className="relative rounded-full p-2 text-muted transition hover:bg-surface hover:text-navy active:scale-95"
             aria-label="Panier"
           >
             <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
             {cartCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-semibold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 animate-[pop_0.35s_ease-out] items-center justify-center rounded-full bg-amber px-1 text-[10px] font-semibold text-white">
                 {cartCount}
               </span>
             )}
           </Link>
           <Link
             href="/compte"
-            className="rounded-full p-2 text-muted hover:bg-surface hover:text-fg"
+            className="rounded-full p-2 text-muted transition hover:bg-surface hover:text-navy active:scale-95"
             aria-label="Compte"
           >
             <User className="h-5 w-5 stroke-[1.5]" />

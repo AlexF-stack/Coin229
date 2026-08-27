@@ -56,19 +56,19 @@ export function ShopChatbot() {
     <>
       {open && (
         <div
-          className="fixed bottom-24 right-4 z-50 flex w-[min(100vw-2rem,22rem)] flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated shadow-2xl md:bottom-24 md:right-8"
+          className="fixed bottom-24 right-4 z-50 flex w-[min(100vw-2rem,22rem)] flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-[0_20px_50px_rgba(2,11,38,0.15)] md:bottom-24 md:right-8"
           role="dialog"
           aria-label="Assistant Coin229"
         >
-          <header className="flex items-center justify-between bg-amber px-4 py-3 text-bg">
+          <header className="flex items-center justify-between bg-navy px-4 py-3 text-white">
             <div>
               <p className="text-sm font-semibold">Assistant Coin229</p>
-              <p className="text-[11px] text-bg/80">Réponse rapide</p>
+              <p className="text-[11px] text-white/70">Réponse rapide</p>
             </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-full p-1.5 hover:bg-black/10"
+              className="rounded-full p-1.5 hover:bg-white/10"
               aria-label="Fermer"
             >
               <X className="h-4 w-4 stroke-[1.5]" />
@@ -83,7 +83,7 @@ export function ShopChatbot() {
                   "max-w-[90%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm leading-relaxed",
                   m.role === "bot"
                     ? "self-start bg-card text-fg shadow-card md:border md:border-border"
-                    : "self-end bg-amber text-bg"
+                    : "self-end bg-amber text-white"
                 )}
               >
                 {m.text}
@@ -166,7 +166,7 @@ export function ShopChatbot() {
             <button
               type="submit"
               aria-label="Envoyer"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber text-bg"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber text-white"
             >
               <Send className="h-4 w-4 stroke-[1.5]" />
             </button>
@@ -179,10 +179,11 @@ export function ShopChatbot() {
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Fermer le chat" : "Ouvrir le chat"}
         className={cn(
-          "fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition hover:scale-105 active:scale-95 md:bottom-8 md:right-8",
+          "fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-[0_10px_30px_rgba(43,155,255,0.35)] transition hover:scale-105 active:scale-95 md:bottom-8 md:right-8",
+          "animate-[fab-in_0.5s_ease-out_both]",
           open
-            ? "border border-border bg-card text-fg"
-            : "bg-amber text-bg"
+            ? "border border-border bg-white text-navy shadow-md"
+            : "bg-amber text-white"
         )}
       >
         {open ? (

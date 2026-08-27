@@ -9,6 +9,7 @@ function run(cmd) {
   execSync(cmd, { stdio: "inherit", env: process.env });
 }
 
+run("node scripts/generate-pwa-icons.cjs");
 run("npx prisma generate");
 
 const db = process.env.DATABASE_URL || "";

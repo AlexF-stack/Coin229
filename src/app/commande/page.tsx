@@ -1,10 +1,15 @@
+import type { Metadata } from "next";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Commande",
-};
+  description: "Finaliser votre commande Coin229 — livraison Bénin, paiement FCFA.",
+  path: "/commande",
+  noIndex: true,
+});
 
 export default function CheckoutPage() {
   return (

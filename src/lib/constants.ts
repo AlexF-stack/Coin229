@@ -18,7 +18,10 @@ export const CATEGORIE_LABELS: Record<Categorie, string> = {
   montre: "Montres",
   bijou: "Bijoux",
   sac: "Sacs",
+  lunette: "Lunettes",
 };
+
+export const CATEGORIES: Categorie[] = ["montre", "bijou", "sac", "lunette"];
 
 export const GENRE_LABELS: Record<Genre, string> = {
   homme: "Homme",
@@ -39,7 +42,7 @@ export const ORDER_STATUS_COLORS = {
   confirmee: "bg-violet/20 text-violet border-violet/40",
   en_livraison: "bg-coral/20 text-coral border-coral/40",
   livree: "bg-green/20 text-green border-green/40",
-  annulee: "bg-white/10 text-muted border-white/10",
+  annulee: "bg-surface text-muted border-border",
 } as const;
 
 export function isProductAvailable(statut: ProductStatus, stock: number) {

@@ -1,11 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Syne } from "next/font/google";
+import { Outfit, Syne } from "next/font/google";
 import "./globals.css";
 import { ShopShell } from "@/components/layout/shop-shell";
+import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/components/seo/json-ld";
+import { CookieBanner } from "@/components/legal/cookie-banner";
+import { PwaInstallPrompt } from "@/components/pwa/install-prompt";
+import { SITE } from "@/lib/site";
 
-const dmSans = DM_Sans({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-outfit",
   display: "swap",
 });
 
@@ -16,14 +20,76 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE.url),
   title: {
-    default: "Coin229 — Accessoires mode",
-    template: "%s · Coin229",
+    default: `${SITE.name} — ${SITE.tagline}`,
+    template: `%s · ${SITE.name}`,
   },
-  description:
-    "Montres, bijoux et sacs. Livraison Cotonou, Porto-Novo et Godomey.",
+  description: SITE.description,
+  applicationName: SITE.name,
+  authors: [{ name: SITE.name }],
+  creator: SITE.name,
+  publisher: SITE.legalName,
+  keywords: [
+    "accessoires mode Bénin",
+    "montres Cotonou",
+    "lunettes soleil Bénin",
+    "bijoux Cotonou",
+    "sacs mode Porto-Novo",
+    "livraison Godomey",
+    "Mobile Money",
+    "paiement à la livraison",
+    "Coin229",
+  ],
+  category: "shopping",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: SITE.name,
+  },
+  formatDetection: {
+    telephone: true,
+    email: true,
+    address: true,
+  },
+  alternates: {
+    canonical: SITE.url,
+    languages: { "fr-BJ": SITE.url, fr: SITE.url },
+  },
+  openGraph: {
+    type: "website",
+    locale: SITE.locale,
+    url: SITE.url,
+    siteName: SITE.name,
+    title: `${SITE.name} — ${SITE.tagline}`,
+    description: SITE.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE.name} — ${SITE.tagline}`,
+    description: SITE.description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
   },
 };
 
@@ -31,9 +97,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(max-width: 767px)", color: "#0c0c0c" },
-    { media: "(min-width: 768px)", color: "#f7f4ef" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#020b26" },
   ],
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -42,9 +109,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${dmSans.variable} ${syne.variable}`}>
+    <html lang="fr-BJ" className={`${outfit.variable} ${syne.variable}`}>
       <body className="min-h-dvh bg-bg font-sans text-fg antialiased">
+        <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <ShopShell>{children}</ShopShell>
+        <CookieBanner />
+        <PwaInstallPrompt />
       </body>
     </html>
   );
