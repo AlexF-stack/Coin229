@@ -288,7 +288,7 @@ export function CheckoutForm() {
         <button
           type="submit"
           disabled={pending || !acceptCgv}
-          className="mx-auto flex w-full max-w-xl items-center justify-center gap-2 rounded-full bg-amber py-3.5 font-semibold text-white shadow-[0_8px_20px_rgba(43,155,255,0.25)] disabled:opacity-60 md:mx-0"
+          className="mx-auto flex w-full max-w-xl items-center justify-center gap-2 rounded-full bg-amber py-3.5 font-semibold text-navy shadow-[0_8px_20px_rgba(201,162,39,0.25)] disabled:opacity-60 md:mx-0"
         >
           {pending ? (
             <>

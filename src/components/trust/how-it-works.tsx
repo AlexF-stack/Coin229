@@ -103,7 +103,7 @@ export function HowItWorks() {
             data-how-item
             className="group flex gap-3 opacity-0 transition-transform duration-300 hover:-translate-y-0.5"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber/10 text-amber transition-colors group-hover:bg-amber group-hover:text-white">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber/10 text-amber transition-colors group-hover:bg-amber group-hover:text-navy">
               <Icon className="h-5 w-5 stroke-[1.5]" />
             </span>
             <div>

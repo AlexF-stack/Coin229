@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Instagram, Mail, Phone } from "lucide-react";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { SITE, whatsappHref } from "@/lib/site";
 
 export function SiteFooter() {
@@ -7,8 +8,9 @@ export function SiteFooter() {
     <footer className="mt-12 border-t border-border bg-navy text-white">
       <div className="page-shell grid gap-8 px-4 py-12 md:grid-cols-4 md:px-6">
         <div className="md:col-span-2">
-          <p className="font-display text-2xl font-bold">
-            Coin<span className="text-amber">229</span>
+          <BrandLogo variant="wordmark" height={44} onDark className="text-2xl" />
+          <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.22em] text-amber">
+            Accessoires. Style. Confiance.
           </p>
           <p className="mt-3 max-w-md text-sm text-white/65">
             Accessoires mode pour le Bénin — montres, bijoux, sacs et lunettes.

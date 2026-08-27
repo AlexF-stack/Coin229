@@ -84,7 +84,7 @@ export default function AboutPage() {
 
       <Link
         href="/"
-        className="inline-flex rounded-full bg-amber px-5 py-3 text-sm font-semibold text-white"
+        className="inline-flex rounded-full bg-amber px-5 py-3 text-sm font-semibold text-navy"
       >
         Voir la boutique
       </Link>

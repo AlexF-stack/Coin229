@@ -3,7 +3,7 @@ import { SITE } from "@/lib/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE.name} — Accessoires mode Bénin`,
+    name: `${SITE.name} — Accessoires. Style. Confiance.`,
     short_name: SITE.name,
     description: SITE.description,
     start_url: "/",
@@ -11,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     orientation: "portrait-primary",
     background_color: "#020b26",
-    theme_color: "#020b26",
+    theme_color: "#c9a227",
     lang: "fr-BJ",
     dir: "ltr",
     categories: ["shopping", "lifestyle"],

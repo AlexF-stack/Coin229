@@ -2,19 +2,20 @@
 
 @theme {
   --color-bg: #ffffff;
-  --color-bg-elevated: #f4f7fb;
+  --color-bg-elevated: #f7f5f0;
   --color-card: #ffffff;
-  --color-card-hover: #f8fafc;
-  --color-amber: #2b9bff;
-  --color-amber-dark: #1a7fe0;
+  --color-card-hover: #faf8f4;
+  /* Accent or (identité logo) — remplace l’ancien bleu électrique */
+  --color-amber: #c9a227;
+  --color-amber-dark: #a57f1a;
   --color-coral: #e5484d;
   --color-rose: #e5484d;
   --color-violet: #5b6cff;
   --color-green: #1f9d63;
   --color-muted: #5c6b82;
-  --color-border: #d8e0ec;
+  --color-border: #e2ddd3;
   --color-fg: #020b26;
-  --color-surface: #eef3f9;
+  --color-surface: #f3efe6;
   --color-navy: #020b26;
   --color-navy-soft: #0a1628;
 
@@ -36,7 +37,7 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     background-image:
-      radial-gradient(ellipse 90% 50% at 50% -15%, rgba(43, 155, 255, 0.12), transparent 55%),
+      radial-gradient(ellipse 90% 50% at 50% -15%, rgba(201, 162, 39, 0.14), transparent 55%),
       radial-gradient(ellipse 45% 35% at 100% 0%, rgba(2, 11, 38, 0.04), transparent);
   }
 

@@ -22,7 +22,7 @@ export default function OfflinePage() {
       </p>
       <Link
         href="/"
-        className="mt-8 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-white"
+        className="mt-8 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-navy"
       >
         Réessayer
       </Link>

@@ -49,7 +49,7 @@ export function PromoBanner() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/?categorie=montre"
-                className="rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-bg transition hover:bg-amber-dark"
+                className="rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-navy transition hover:bg-amber-dark"
               >
                 Explorer les montres
               </Link>

@@ -21,7 +21,7 @@ export default async function AuthErrorPage({ searchParams }: Props) {
       <p className="mt-3 text-sm text-muted">{message}</p>
       <Link
         href="/compte"
-        className="mt-8 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-bg"
+        className="mt-8 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-navy"
       >
         Retour à la connexion
       </Link>

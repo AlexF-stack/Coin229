@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { Heart, Search, ShoppingBag, User } from "lucide-react";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
@@ -44,7 +45,7 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 hidden transition-[background-color,box-shadow,backdrop-filter,border-color] duration-300 md:block",
+        "sticky top-0 z-40 transition-[background-color,box-shadow,backdrop-filter,border-color] duration-300",
         scrolled
           ? "border-b border-border/80 bg-white/85 shadow-[0_8px_30px_rgba(2,11,38,0.06)] backdrop-blur-xl"
           : "border-b border-transparent bg-white/70 backdrop-blur-md"
@@ -52,17 +53,19 @@ export function SiteHeader() {
     >
       <div
         className={cn(
-          "page-shell flex items-center gap-6 transition-[padding] duration-300",
-          scrolled ? "py-2.5" : "py-3.5"
+          "page-shell flex items-center gap-3 px-4 transition-[padding] duration-300 md:gap-6 md:px-0",
+          scrolled ? "py-2 md:py-2.5" : "py-2.5 md:py-3.5"
         )}
       >
-        <Link href="/" className="shrink-0 transition-transform hover:scale-[1.02] active:scale-[0.98]">
-          <span className="font-display text-xl font-bold tracking-tight text-navy">
-            Coin<span className="text-amber">229</span>
-          </span>
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <BrandLogo variant="mark" height={scrolled ? 28 : 32} priority />
+          <BrandLogo variant="wordmark" height={scrolled ? 30 : 34} />
         </Link>
 
-        <nav className="flex items-center gap-1">
+        <nav className="hidden items-center gap-1 md:flex">
           {nav.map((item) => {
             const active =
               pathname === item.href ||
@@ -87,7 +90,10 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <form onSubmit={onSearch} className="ml-auto flex max-w-sm flex-1">
+        <form
+          onSubmit={onSearch}
+          className="ml-auto hidden max-w-sm flex-1 md:flex"
+        >
           <div className="relative w-full">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 stroke-[1.5] text-muted" />
             <input
@@ -99,7 +105,7 @@ export function SiteHeader() {
           </div>
         </form>
 
-        <div className="flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-1 md:ml-0">
           <Link
             href="/favoris"
             className="relative rounded-full p-2 text-muted transition hover:bg-surface hover:text-navy active:scale-95"
@@ -112,19 +118,19 @@ export function SiteHeader() {
           </Link>
           <Link
             href="/panier"
-            className="relative rounded-full p-2 text-muted transition hover:bg-surface hover:text-navy active:scale-95"
+            className="relative hidden rounded-full p-2 text-muted transition hover:bg-surface hover:text-navy active:scale-95 md:inline-flex"
             aria-label="Panier"
           >
             <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
             {cartCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 animate-[pop_0.35s_ease-out] items-center justify-center rounded-full bg-amber px-1 text-[10px] font-semibold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 animate-[pop_0.35s_ease-out] items-center justify-center rounded-full bg-amber px-1 text-[10px] font-semibold text-navy">
                 {cartCount}
               </span>
             )}
           </Link>
           <Link
             href="/compte"
-            className="rounded-full p-2 text-muted transition hover:bg-surface hover:text-navy active:scale-95"
+            className="hidden rounded-full p-2 text-muted transition hover:bg-surface hover:text-navy active:scale-95 md:inline-flex"
             aria-label="Compte"
           >
             <User className="h-5 w-5 stroke-[1.5]" />

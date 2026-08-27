@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Download, X } from "lucide-react";
 
 type BeforeInstallPromptEvent = Event & {
@@ -88,9 +89,13 @@ export function PwaInstallPrompt() {
     >
       <div className="rounded-2xl border border-border bg-white p-4 shadow-[0_16px_50px_rgba(2,11,38,0.15)]">
         <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-navy font-display text-lg font-bold text-amber">
-            C
-          </span>
+          <Image
+            src="/icons/icon-192.png"
+            alt=""
+            width={44}
+            height={44}
+            className="h-11 w-11 shrink-0 rounded-xl"
+          />
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-navy">Installer Coin229</p>
             <p className="mt-1 text-xs leading-relaxed text-muted">
@@ -112,7 +117,7 @@ export function PwaInstallPrompt() {
           <button
             type="button"
             onClick={install}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-amber py-2.5 text-sm font-semibold text-white"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-amber py-2.5 text-sm font-semibold text-navy"
           >
             <Download className="h-4 w-4 stroke-[1.5]" />
             Télécharger l&apos;app

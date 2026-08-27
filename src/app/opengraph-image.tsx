@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Coin229 — Accessoires mode au Bénin";
+export const alt = "Coin229 — Accessoires. Style. Confiance.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -21,8 +21,8 @@ export default function OgImage() {
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ fontSize: 28, color: "#2b9bff", letterSpacing: 6 }}>
-          BÉNIN · ACCESSOIRES
+        <div style={{ fontSize: 28, color: "#c9a227", letterSpacing: 6 }}>
+          ACCESSOIRES · STYLE · CONFIANCE
         </div>
         <div
           style={{
@@ -32,9 +32,11 @@ export default function OgImage() {
             lineHeight: 1,
           }}
         >
-          Coin<span style={{ color: "#2b9bff" }}>229</span>
+          Coin<span style={{ color: "#c9a227" }}>229</span>
         </div>
-        <div style={{ marginTop: 28, fontSize: 32, color: "#d8e0ec", maxWidth: 800 }}>
+        <div
+          style={{ marginTop: 28, fontSize: 32, color: "#e2ddd3", maxWidth: 800 }}
+        >
           Montres, bijoux, sacs & lunettes — livrés à Cotonou, Porto-Novo et
           Godomey.
         </div>

@@ -103,7 +103,7 @@ export function HomeHero() {
         className="pointer-events-none absolute inset-0 opacity-40"
         style={{
           background:
-            "radial-gradient(ellipse 60% 50% at 20% 80%, rgba(43,155,255,0.25), transparent 60%)",
+            "radial-gradient(ellipse 60% 50% at 20% 80%, rgba(201,162,39,0.28), transparent 60%)",
         }}
         aria-hidden
       />
@@ -112,7 +112,7 @@ export function HomeHero() {
         <div className="page-shell md:px-0">
           <p
             data-hero-line
-            className="text-xs font-medium uppercase tracking-[0.28em] text-[#2b9bff] opacity-0"
+            className="text-xs font-medium uppercase tracking-[0.28em] text-amber opacity-0"
           >
             Cotonou · Accessoires
           </p>
@@ -120,7 +120,7 @@ export function HomeHero() {
             data-hero-title
             className="mt-3 font-display text-[clamp(3rem,11vw,5.75rem)] font-bold leading-[0.92] tracking-tight text-white opacity-0"
           >
-            Coin<span className="text-[#2b9bff]">229</span>
+            Coin<span className="text-amber">229</span>
           </h1>
           <p
             data-hero-copy
@@ -133,7 +133,7 @@ export function HomeHero() {
             <Link
               data-hero-cta
               href="#catalogue"
-              className="btn-press rounded-full bg-[#2b9bff] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(43,155,255,0.35)] transition hover:bg-[#1a7fe0] opacity-0"
+              className="btn-press rounded-full bg-amber px-6 py-3.5 text-sm font-semibold text-navy shadow-[0_8px_24px_rgba(201,162,39,0.4)] transition hover:bg-amber-dark opacity-0"
             >
               Voir la sélection
             </Link>

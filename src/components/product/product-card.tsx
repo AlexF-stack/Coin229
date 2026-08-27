@@ -27,7 +27,7 @@ export function ProductCard({ product, className }: Props) {
     >
       <Link
         href={`/produit/${product.id}`}
-        className="relative block aspect-[4/5] overflow-hidden rounded-xl border border-border/70 bg-surface shadow-[0_0_0_0_rgba(43,155,255,0)] transition-[box-shadow,border-color] duration-500 group-hover:border-amber/35 group-hover:shadow-[0_16px_40px_rgba(2,11,38,0.1)]"
+        className="relative block aspect-[4/5] overflow-hidden rounded-xl border border-border/70 bg-surface shadow-[0_0_0_0_rgba(201,162,39,0)] transition-[box-shadow,border-color] duration-500 group-hover:border-amber/35 group-hover:shadow-[0_16px_40px_rgba(2,11,38,0.1)]"
       >
         <Image
           src={image}

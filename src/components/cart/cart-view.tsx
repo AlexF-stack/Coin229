@@ -119,7 +119,7 @@ export function CartView() {
         </p>
         <Link
           href="/"
-          className="mt-6 w-full rounded-full bg-amber py-3.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(43,155,255,0.25)] transition active:scale-[0.98]"
+          className="mt-6 w-full rounded-full bg-amber py-3.5 text-sm font-semibold text-navy shadow-[0_8px_20px_rgba(201,162,39,0.25)] transition active:scale-[0.98]"
         >
           Continuer mes achats
         </Link>
@@ -302,7 +302,7 @@ export function CartView() {
               type="button"
               disabled={!canCheckout}
               onClick={goCheckout}
-              className="flex w-full items-center justify-center rounded-full bg-amber py-3.5 text-sm font-semibold text-white transition active:scale-[0.98] disabled:opacity-50"
+              className="flex w-full items-center justify-center rounded-full bg-amber py-3.5 text-sm font-semibold text-navy transition active:scale-[0.98] disabled:opacity-50"
             >
               {canCheckout
                 ? `Commander · ${formatPrice(total)}`
@@ -356,7 +356,7 @@ export function CartView() {
             type="button"
             disabled={!canCheckout}
             onClick={goCheckout}
-            className="shrink-0 rounded-full bg-amber px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+            className="shrink-0 rounded-full bg-amber px-5 py-3 text-sm font-semibold text-navy disabled:opacity-50"
           >
             Commander
           </button>

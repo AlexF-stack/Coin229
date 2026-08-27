@@ -43,7 +43,7 @@ export function BottomNav() {
             >
               <Icon className="h-5 w-5 stroke-[1.5]" />
               {href === "/panier" && count > 0 && (
-                <span className="absolute right-1.5 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber px-1 text-[10px] font-semibold text-white">
+                <span className="absolute right-1.5 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber px-1 text-[10px] font-semibold text-navy">
                   {count}
                 </span>
               )}

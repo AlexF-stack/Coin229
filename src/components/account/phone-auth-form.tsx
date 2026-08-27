@@ -181,7 +181,7 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
         <button
           type="submit"
           disabled={pending || otp.length < 6}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-amber py-3.5 text-sm font-semibold text-bg transition active:scale-[0.98] disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-amber py-3.5 text-sm font-semibold text-navy transition active:scale-[0.98] disabled:opacity-50"
         >
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}
           Se connecter
@@ -241,7 +241,7 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
       <button
         type="submit"
         disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-amber py-3.5 text-sm font-semibold text-bg transition active:scale-[0.98] disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-amber py-3.5 text-sm font-semibold text-navy transition active:scale-[0.98] disabled:opacity-60"
       >
         {pending && <Loader2 className="h-4 w-4 animate-spin" />}
         Continuer

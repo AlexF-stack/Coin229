@@ -70,7 +70,7 @@ export default function FavorisPage() {
           </p>
           <Link
             href="/"
-            className="mt-4 inline-flex rounded-[16px] bg-amber px-5 py-3 text-sm font-semibold text-bg"
+            className="mt-4 inline-flex rounded-[16px] bg-amber px-5 py-3 text-sm font-semibold text-navy"
           >
             Voir le catalogue
           </Link>

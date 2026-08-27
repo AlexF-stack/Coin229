@@ -4,7 +4,7 @@ export const SITE = {
   name: "Coin229",
   legalName:
     process.env.NEXT_PUBLIC_LEGAL_NAME?.trim() || "Coin229 (activité commerciale)",
-  tagline: "Accessoires mode livrés au Bénin",
+  tagline: "Accessoires. Style. Confiance.",
   description:
     "Boutique en ligne d'accessoires mode au Bénin : montres, bijoux, sacs et lunettes. Livraison à Cotonou, Porto-Novo et Godomey. Paiement à la livraison ou Mobile Money (MTN MoMo, Moov).",
   locale: "fr_BJ",

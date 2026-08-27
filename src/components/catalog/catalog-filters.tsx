@@ -43,7 +43,7 @@ export function CatalogFilters() {
             className={cn(
               "btn-press shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300",
               categorie === c.value
-                ? "scale-[1.02] bg-amber text-white shadow-[0_8px_20px_rgba(43,155,255,0.3)]"
+                ? "scale-[1.02] bg-amber text-navy shadow-[0_8px_20px_rgba(201,162,39,0.3)]"
                 : "border border-border bg-white text-muted hover:border-amber/40 hover:text-navy"
             )}
           >

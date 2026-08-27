@@ -19,7 +19,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
         </h1>
         <Link
           href="/"
-          className="mt-8 rounded-[16px] bg-amber px-6 py-3.5 font-semibold text-bg"
+          className="mt-8 rounded-[16px] bg-amber px-6 py-3.5 font-semibold text-navy"
         >
           Retour boutique
         </Link>
@@ -41,7 +41,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
         </p>
         <Link
           href="/"
-          className="mt-8 rounded-[16px] bg-amber px-6 py-3.5 font-semibold text-bg"
+          className="mt-8 rounded-[16px] bg-amber px-6 py-3.5 font-semibold text-navy"
         >
           Retour boutique
         </Link>
@@ -83,7 +83,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
       <div className="mt-8 flex w-full flex-col gap-3">
         <Link
           href="/"
-          className="rounded-[16px] bg-amber py-3.5 font-semibold text-bg"
+          className="rounded-[16px] bg-amber py-3.5 font-semibold text-navy"
         >
           Continuer le shopping
         </Link>

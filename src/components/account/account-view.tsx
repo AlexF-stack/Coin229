@@ -282,7 +282,7 @@ export function AccountView() {
             </p>
             <Link
               href="/"
-              className="mt-4 inline-flex rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-bg"
+              className="mt-4 inline-flex rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-navy"
             >
               Explorer la boutique
             </Link>
