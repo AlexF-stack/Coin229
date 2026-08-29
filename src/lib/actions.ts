@@ -560,6 +560,7 @@ export async function getWishlistProducts(
       stockQuantite: p.stockQuantite,
       statut: p.statut,
       vendorId: p.vendorId,
+      dateCreation: p.dateCreation,
     }));
 }
 

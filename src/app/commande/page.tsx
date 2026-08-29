@@ -22,7 +22,7 @@ export default function CheckoutPage() {
         >
           <ArrowLeft className="h-5 w-5 stroke-[1.5]" />
         </Link>
-        <h1 className="font-display text-2xl font-bold">Commande</h1>
+        <h1 className="font-display text-2xl font-bold text-navy">Commande</h1>
       </header>
       <CheckoutForm />
     </div>

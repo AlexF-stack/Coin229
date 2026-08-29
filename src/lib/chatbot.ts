@@ -100,7 +100,7 @@ export function replyToUser(input: string): Reply {
 
   if (/montre|bijou|sac|lunette|catalogue|produit|prix|promo|acheter/.test(q) || q === "voir la boutique") {
     return {
-      text: "On a des montres, bijoux, sacs et lunettes pour hommes et femmes. Filtre par catégorie sur l’accueil, ou cherche un modèle.",
+      text: "On a des montres, bijoux, sacs et lunettes pour hommes et femmes. Filtre et cherche dans la Boutique, ou lance une recherche.",
       quickReplies: ["Livraison", "Paiement", "Parler à un humain"],
     };
   }

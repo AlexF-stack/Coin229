@@ -4,15 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Heart,
-  Lock,
-  ShieldCheck,
-  ShoppingBag,
-  Trash2,
-} from "lucide-react";
+import { Heart, Lock, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
+import type { ProductCardData } from "@/lib/constants";
 import {
   cn,
   formatPrice,
@@ -22,9 +17,14 @@ import {
 import { QuantitySelector } from "@/components/product/quantity-selector";
 import { FreeShippingProgress } from "@/components/cart/free-shipping-progress";
 import { ZoneSelector } from "@/components/cart/zone-selector";
+import { ProductCard } from "@/components/product/product-card";
 import { calculateShippingFee } from "@/lib/shipping";
 
-export function CartView() {
+type Props = {
+  suggestions?: ProductCardData[];
+};
+
+export function CartView({ suggestions }: Props) {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const zone = useCartStore((s) => s.zone);
@@ -98,37 +98,45 @@ export function CartView() {
 
   if (!mounted) {
     return (
-      <div className="space-y-4 px-4 py-6">
-        <div className="h-24 animate-pulse rounded-2xl bg-card" />
-        <div className="h-28 animate-pulse rounded-2xl bg-card" />
-        <div className="h-28 animate-pulse rounded-2xl bg-card" />
+      <div className="space-y-4 px-4 py-6 md:px-0">
+        <div className="h-24 animate-pulse rounded-xl bg-cream" />
+        <div className="h-28 animate-pulse rounded-xl bg-cream" />
+        <div className="h-28 animate-pulse rounded-xl bg-cream" />
       </div>
     );
   }
 
   if (!items.length) {
+    const shown = suggestions?.slice(0, 4) ?? [];
+
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center">
-        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-surface text-muted">
-          <ShoppingBag className="h-9 w-9 stroke-[1.25]" />
-        </span>
-        <p className="mt-5 font-display text-2xl font-bold">Panier vide</p>
-        <p className="mt-2 text-sm text-muted">
-          Remplis-le avec des montres, bijoux, sacs ou lunettes — livraison Cotonou &amp;
-          environs.
-        </p>
-        <Link
-          href="/"
-          className="mt-6 w-full rounded-full bg-amber py-3.5 text-sm font-semibold text-navy shadow-[0_8px_20px_rgba(201,162,39,0.25)] transition active:scale-[0.98]"
-        >
-          Continuer mes achats
-        </Link>
-        <Link
-          href="/favoris"
-          className="mt-3 text-sm font-medium text-amber hover:underline"
-        >
-          Voir mes favoris
-        </Link>
+      <div className="px-4 py-10 md:px-0 md:py-14">
+        <div className="mx-auto flex max-w-md flex-col items-center text-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-navy">
+            <ShoppingBag className="h-7 w-7 stroke-[1.25]" />
+          </span>
+          <p className="mt-5 font-display text-2xl font-semibold text-navy">
+            Votre panier est encore vide.
+          </p>
+          <Link href="/boutique" className="btn btn-primary mt-6">
+            Découvrir la collection
+          </Link>
+        </div>
+
+        {shown.length > 0 ? (
+          <section className="mt-12">
+            <h2 className="font-display text-lg font-semibold text-navy">
+              Suggestions
+            </h2>
+            <ul className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+              {shown.map((product) => (
+                <li key={product.id}>
+                  <ProductCard product={product} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </div>
     );
   }
@@ -147,8 +155,8 @@ export function CartView() {
             subtotal={subtotal}
           />
 
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-3 py-2.5 text-sm">
-            <label className="flex cursor-pointer items-center gap-2.5 font-medium">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-cream/60 px-3 py-2.5 text-sm">
+            <label className="flex cursor-pointer items-center gap-2.5 font-medium text-navy">
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -177,8 +185,10 @@ export function CartView() {
                 <li
                   key={item.productId}
                   className={cn(
-                    "flex gap-3 rounded-2xl border bg-card p-3 shadow-card transition md:p-4",
-                    checked ? "border-border" : "border-border/60 opacity-70"
+                    "flex gap-3 rounded-xl border bg-white p-3 transition md:p-4",
+                    checked
+                      ? "border-border"
+                      : "border-border/60 opacity-70"
                   )}
                 >
                   <label className="flex shrink-0 items-start pt-8">
@@ -193,7 +203,7 @@ export function CartView() {
 
                   <Link
                     href={`/produit/${item.productId}`}
-                    className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-surface md:h-28 md:w-24"
+                    className="relative h-24 w-20 shrink-0 overflow-hidden rounded-[10px] bg-cream md:h-28 md:w-24"
                   >
                     <Image
                       src={item.image || "/placeholder-product.svg"}
@@ -203,7 +213,7 @@ export function CartView() {
                       sizes="96px"
                     />
                     {discount && (
-                      <span className="absolute left-1 top-1 rounded-full bg-coral px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      <span className="badge-sale absolute left-1 top-1">
                         -{discount}%
                       </span>
                     )}
@@ -213,7 +223,7 @@ export function CartView() {
                     <div className="flex items-start justify-between gap-2">
                       <Link
                         href={`/produit/${item.productId}`}
-                        className="line-clamp-2 text-sm font-medium leading-snug"
+                        className="line-clamp-2 text-sm font-medium leading-snug text-navy"
                       >
                         {item.nom}
                       </Link>
@@ -221,14 +231,14 @@ export function CartView() {
                         type="button"
                         aria-label="Retirer"
                         onClick={() => removeItem(item.productId)}
-                        className="shrink-0 rounded-full p-1 text-muted hover:bg-surface hover:text-coral"
+                        className="shrink-0 rounded-[10px] p-1 text-muted hover:bg-cream hover:text-coral"
                       >
                         <Trash2 className="h-4 w-4 stroke-[1.5]" />
                       </button>
                     </div>
 
                     <div className="mt-1 flex flex-wrap items-baseline gap-x-2">
-                      <p className="font-semibold text-amber">
+                      <p className="font-semibold text-navy">
                         {formatPrice(unit)}
                       </p>
                       {item.prixPromo && item.prixPromo < item.prix && (
@@ -245,11 +255,13 @@ export function CartView() {
                         onChange={(q) => updateQuantity(item.productId, q)}
                       />
                       <div className="text-right">
-                        <p className="text-sm font-semibold">{formatPrice(line)}</p>
+                        <p className="text-sm font-semibold text-navy">
+                          {formatPrice(line)}
+                        </p>
                         <button
                           type="button"
                           onClick={() => moveToWishlist(item.productId)}
-                          className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted hover:text-rose"
+                          className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted hover:text-amber"
                         >
                           <Heart className="h-3 w-3 stroke-[1.5]" />
                           Favoris
@@ -266,8 +278,10 @@ export function CartView() {
         <aside className="hidden space-y-4 md:sticky md:top-24 md:block">
           <ZoneSelector value={zone} onChange={setZone} />
 
-          <div className="space-y-3 rounded-2xl border border-border bg-card p-5 shadow-card">
-            <p className="font-display text-lg font-semibold">Récapitulatif</p>
+          <div className="space-y-3 rounded-xl border border-border bg-cream/40 p-5">
+            <p className="font-display text-lg font-semibold text-navy">
+              Récapitulatif
+            </p>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between text-muted">
                 <span>Sous-total ({itemCount})</span>
@@ -290,11 +304,9 @@ export function CartView() {
                 </span>
               </div>
               <p className="text-xs text-muted">{shipping.etaLabel}</p>
-              <div className="flex justify-between border-t border-border pt-3 text-base font-semibold">
+              <div className="flex justify-between border-t border-border pt-3 text-base font-semibold text-navy">
                 <span>Total</span>
-                <span className="text-amber">
-                  {formatPrice(canCheckout ? total : 0)}
-                </span>
+                <span>{formatPrice(canCheckout ? total : 0)}</span>
               </div>
             </div>
 
@@ -302,11 +314,11 @@ export function CartView() {
               type="button"
               disabled={!canCheckout}
               onClick={goCheckout}
-              className="flex w-full items-center justify-center rounded-full bg-amber py-3.5 text-sm font-semibold text-navy transition active:scale-[0.98] disabled:opacity-50"
+              className="btn btn-primary w-full"
             >
               {canCheckout
-                ? `Commander · ${formatPrice(total)}`
-                : "Sélectionne un article"}
+                ? "Continuer la commande"
+                : "Sélectionnez un article"}
             </button>
 
             <div className="flex items-center justify-center gap-4 pt-1 text-[11px] text-muted">
@@ -320,17 +332,17 @@ export function CartView() {
           </div>
 
           <Link
-            href="/"
-            className="block text-center text-sm text-muted hover:text-fg"
+            href="/boutique"
+            className="block text-center text-sm text-muted hover:text-navy"
           >
             Continuer mes achats
           </Link>
         </aside>
       </div>
 
-      <div className="fixed inset-x-0 bottom-16 z-40 border-t border-border bg-bg-elevated/95 px-3 py-2.5 backdrop-blur-md md:hidden">
+      <div className="fixed inset-x-0 bottom-16 z-40 border-t border-border bg-white/95 px-3 py-2.5 backdrop-blur-md md:hidden">
         <div className="flex items-center gap-3">
-          <label className="flex shrink-0 items-center gap-1.5 text-xs">
+          <label className="flex shrink-0 items-center gap-1.5 text-xs text-navy">
             <input
               type="checkbox"
               checked={allSelected}
@@ -347,7 +359,7 @@ export function CartView() {
             )}
             <p className="truncate text-sm">
               <span className="text-muted">Total </span>
-              <span className="font-display text-base font-bold text-amber">
+              <span className="font-display text-base font-bold text-navy">
                 {formatPrice(canCheckout ? total : 0)}
               </span>
             </p>
@@ -356,9 +368,9 @@ export function CartView() {
             type="button"
             disabled={!canCheckout}
             onClick={goCheckout}
-            className="shrink-0 rounded-full bg-amber px-5 py-3 text-sm font-semibold text-navy disabled:opacity-50"
+            className="btn btn-primary shrink-0 !px-4 !py-2.5"
           >
-            Commander
+            Continuer
           </button>
         </div>
       </div>

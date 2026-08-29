@@ -1,29 +1,39 @@
 @import "tailwindcss";
 
+/**
+ * Coin229 V1 — Deep Green × Gold × Cream
+ * --color-navy  = Deep Green (classes Tailwind existantes conservées)
+ * --color-amber = Gold signature
+ */
+
 @theme {
   --color-bg: #ffffff;
-  --color-bg-elevated: #f7f5f0;
+  --color-bg-elevated: #f6f3ec;
   --color-card: #ffffff;
-  --color-card-hover: #faf8f4;
-  /* Accent or (identité logo) — remplace l’ancien bleu électrique */
-  --color-amber: #c9a227;
-  --color-amber-dark: #a57f1a;
-  --color-coral: #e5484d;
-  --color-rose: #e5484d;
+  --color-card-hover: #faf9f6;
+  --color-cream: #f6f3ec;
+  --color-amber: #d4af37;
+  --color-amber-dark: #b8942a;
+  --color-coral: #c45c5c;
+  --color-rose: #c45c5c;
   --color-violet: #5b6cff;
-  --color-green: #1f9d63;
-  --color-muted: #5c6b82;
-  --color-border: #e2ddd3;
-  --color-fg: #020b26;
-  --color-surface: #f3efe6;
-  --color-navy: #020b26;
-  --color-navy-soft: #0a1628;
+  --color-green: #1f7a5c;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-fg: #111111;
+  --color-surface: #f6f3ec;
+  --color-navy: #0f2d26;
+  --color-navy-soft: #163a32;
 
-  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 14px;
+  --radius-card: 12px;
   --radius-pill: 999px;
+  --radius-control: 10px;
+
+  --shadow-soft: 0 1px 2px rgba(17, 17, 17, 0.04), 0 8px 24px rgba(15, 45, 38, 0.06);
+  --max-content: 80rem;
 }
 
 @layer base {
@@ -36,13 +46,29 @@
     color: var(--color-fg);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-image:
-      radial-gradient(ellipse 90% 50% at 50% -15%, rgba(201, 162, 39, 0.14), transparent 55%),
-      radial-gradient(ellipse 45% 35% at 100% 0%, rgba(2, 11, 38, 0.04), transparent);
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--color-amber) 35%, transparent);
+    background: color-mix(in oklab, var(--color-amber) 40%, transparent);
+    color: var(--color-navy);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    color: var(--color-fg);
+    letter-spacing: -0.02em;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -58,7 +84,6 @@
       transition-duration: 0.01ms !important;
     }
 
-    /* Contenu animé GSAP (opacity-0 initial) reste lisible */
     [data-trust-item],
     [data-how-heading],
     [data-how-item],
@@ -76,17 +101,68 @@
   }
 }
 
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+    font-family: var(--font-display);
+  }
+
+  .btn-primary {
+    @apply bg-navy text-white hover:bg-navy-soft;
+  }
+
+  .btn-secondary {
+    @apply border border-navy/20 bg-white text-navy hover:border-navy hover:bg-cream;
+  }
+
+  .btn-accent {
+    @apply bg-amber text-navy hover:bg-amber-dark;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-navy hover:bg-cream;
+  }
+
+  .section-title {
+    @apply font-display text-2xl font-semibold tracking-tight text-fg md:text-3xl;
+  }
+
+  .section-subtitle {
+    @apply mt-2 max-w-xl text-sm leading-relaxed text-muted md:text-base;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider;
+  }
+
+  .badge-new {
+    @apply inline-flex items-center rounded-md bg-navy px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white;
+  }
+
+  .badge-sale {
+    @apply inline-flex items-center rounded-md bg-amber px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-navy;
+  }
+
+  .badge-soldout {
+    @apply inline-flex items-center rounded-md bg-fg/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white;
+  }
+}
+
 @layer utilities {
   .safe-pb {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 
   .page-shell {
-    @apply mx-auto w-full max-w-lg px-0 md:max-w-6xl md:px-6 lg:max-w-7xl;
+    @apply mx-auto w-full max-w-lg px-4 md:max-w-6xl md:px-6 lg:max-w-7xl;
+  }
+
+  .content-shell {
+    @apply mx-auto w-full max-w-5xl px-4 md:px-6;
   }
 
   .shadow-card {
-    box-shadow: 0 1px 2px rgba(2, 11, 38, 0.04), 0 8px 24px rgba(2, 11, 38, 0.06);
+    box-shadow: var(--shadow-soft);
   }
 
   .text-balance {
@@ -96,9 +172,9 @@
   .hero-scrim {
     background: linear-gradient(
       to top,
-      rgba(2, 11, 38, 0.92) 0%,
-      rgba(2, 11, 38, 0.55) 42%,
-      rgba(2, 11, 38, 0.25) 100%
+      rgba(15, 45, 38, 0.88) 0%,
+      rgba(15, 45, 38, 0.45) 48%,
+      rgba(15, 45, 38, 0.2) 100%
     );
   }
 
@@ -118,12 +194,22 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  .gold-rule {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-amber),
+      transparent
+    );
+  }
 }
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -137,7 +223,7 @@
     opacity: 0;
   }
   70% {
-    transform: scale(1.15);
+    transform: scale(1.12);
   }
   100% {
     transform: scale(1);

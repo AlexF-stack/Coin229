@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Syne } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { ShopShell } from "@/components/layout/shop-shell";
 import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/components/seo/json-ld";
@@ -7,23 +7,25 @@ import { CookieBanner } from "@/components/legal/cookie-banner";
 import { PwaInstallPrompt } from "@/components/pwa/install-prompt";
 import { SITE } from "@/lib/site";
 
-const outfit = Outfit({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-inter",
   display: "swap",
+  weight: ["400", "500", "600"],
 });
 
-const syne = Syne({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-syne",
+  variable: "--font-poppins",
   display: "swap",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
     default: `${SITE.name} — ${SITE.tagline}`,
-    template: `%s · ${SITE.name}`,
+    template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
   applicationName: SITE.name,
@@ -97,8 +99,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#020b26" },
+    { media: "(prefers-color-scheme: light)", color: "#F6F3EC" },
+    { media: "(prefers-color-scheme: dark)", color: "#0F2D26" },
   ],
   viewportFit: "cover",
 };
@@ -109,7 +111,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr-BJ" className={`${outfit.variable} ${syne.variable}`}>
+    <html lang="fr-BJ" className={`${inter.variable} ${poppins.variable}`}>
       <body className="min-h-dvh bg-bg font-sans text-fg antialiased">
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <ShopShell>{children}</ShopShell>

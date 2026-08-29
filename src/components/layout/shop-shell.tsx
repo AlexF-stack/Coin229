@@ -5,7 +5,6 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import { FreeShippingBanner } from "@/components/layout/free-shipping-banner";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { TrustStrip } from "@/components/trust/trust-strip";
 import { ShopChatbot } from "@/components/chat/shop-chatbot";
 import { PageFade } from "@/components/motion/page-fade";
 
@@ -27,7 +26,6 @@ export function ShopShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       {!leanFunnel && <FreeShippingBanner />}
-      {!leanFunnel && <TrustStrip />}
       <SiteHeader />
       <main
         className={

@@ -17,12 +17,14 @@ export default function NotFound() {
         Ce lien n&apos;existe pas ou le produit a été retiré. Retourne à la
         boutique Coin229.
       </p>
-      <Link
-        href="/"
-        className="mt-6 rounded-full bg-amber px-5 py-3 text-sm font-semibold text-navy"
-      >
-        Retour à l&apos;accueil
-      </Link>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <Link href="/boutique" className="btn btn-primary">
+          Voir la boutique
+        </Link>
+        <Link href="/" className="btn btn-secondary">
+          Accueil
+        </Link>
+      </div>
     </div>
   );
 }

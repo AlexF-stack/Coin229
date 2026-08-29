@@ -3,6 +3,27 @@ import { DEMO_PRODUCTS, filterDemoProducts } from "@/lib/demo-data";
 import { allowDemoCatalog } from "@/lib/runtime-flags";
 import type { Categorie, Genre } from "@prisma/client";
 
+/** Évite que Prisma bloque indéfiniment les pages dynamiques si la DB est down. */
+const DB_QUERY_TIMEOUT_MS = 4_000;
+
+function withTimeout<T>(promise: Promise<T>, ms = DB_QUERY_TIMEOUT_MS): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`DB query timeout after ${ms}ms`));
+    }, ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
+}
+
 export function sortForCatalog<
   T extends {
     statut: string;
@@ -27,35 +48,53 @@ export async function fetchProducts(filters?: {
   categorie?: Categorie;
   genre?: Genre;
   q?: string;
+  /** en_stock = actifs avec stock > 0 */
+  enStock?: boolean;
+  sort?: "pertinence" | "nouveautes" | "prix_asc" | "prix_desc";
 }) {
   const query = filters?.q?.trim();
+  const sort = filters?.sort ?? "pertinence";
+
   try {
-    const products = await prisma.product.findMany({
-      where: {
-        statut: { in: ["actif", "rupture"] },
-        ...(filters?.categorie ? { categorie: filters.categorie } : {}),
-        ...(filters?.genre ? { genre: filters.genre } : {}),
-        ...(query
-          ? {
-              OR: [
-                { nom: { contains: query, mode: "insensitive" } },
-                { description: { contains: query, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      },
-      orderBy: { dateCreation: "desc" },
-    });
-    if (products.length > 0) {
-      return { products: sortForCatalog(products), source: "db" as const };
-    }
+    const products = await withTimeout(
+      prisma.product.findMany({
+        where: {
+          statut: { in: ["actif", "rupture"] },
+          ...(filters?.categorie ? { categorie: filters.categorie } : {}),
+          ...(filters?.genre ? { genre: filters.genre } : {}),
+          ...(filters?.enStock
+            ? { statut: "actif", stockQuantite: { gt: 0 } }
+            : {}),
+          ...(query
+            ? {
+                OR: [
+                  { nom: { contains: query, mode: "insensitive" } },
+                  { description: { contains: query, mode: "insensitive" } },
+                ],
+              }
+            : {}),
+        },
+        orderBy: { dateCreation: "desc" },
+      })
+    );
+    // DB joignable : même 0 résultat = vrai empty (ne pas masquer avec le démo)
+    return {
+      products: applyCatalogSort(products, sort),
+      source: "db" as const,
+    };
   } catch {
-    // DB indisponible
+    // DB indisponible / timeout → démo uniquement en local
   }
 
   if (allowDemoCatalog()) {
+    let products = filterDemoProducts(filters);
+    if (filters?.enStock) {
+      products = products.filter(
+        (p) => p.statut === "actif" && p.stockQuantite > 0
+      );
+    }
     return {
-      products: sortForCatalog(filterDemoProducts(filters)),
+      products: applyCatalogSort(products, sort),
       source: "demo" as const,
     };
   }
@@ -63,15 +102,46 @@ export async function fetchProducts(filters?: {
   return { products: [], source: "db" as const };
 }
 
+export function applyCatalogSort<
+  T extends {
+    statut: string;
+    stockQuantite: number;
+    prixPromo: number | null;
+    prix: number;
+    dateCreation: Date;
+  },
+>(
+  products: T[],
+  sort: "pertinence" | "nouveautes" | "prix_asc" | "prix_desc" = "pertinence"
+): T[] {
+  if (sort === "nouveautes") {
+    return [...products].sort(
+      (a, b) => b.dateCreation.getTime() - a.dateCreation.getTime()
+    );
+  }
+  if (sort === "prix_asc" || sort === "prix_desc") {
+    const dir = sort === "prix_asc" ? 1 : -1;
+    return [...products].sort((a, b) => {
+      const pa = a.prixPromo && a.prixPromo < a.prix ? a.prixPromo : a.prix;
+      const pb = b.prixPromo && b.prixPromo < b.prix ? b.prixPromo : b.prix;
+      return (pa - pb) * dir;
+    });
+  }
+  return sortForCatalog(products);
+}
+
 export async function fetchProductById(id: string) {
   try {
-    const product = await prisma.product.findUnique({
-      where: { id },
-      include: { vendor: true },
-    });
-    if (product) return { product, source: "db" as const };
+    const product = await withTimeout(
+      prisma.product.findUnique({
+        where: { id },
+        include: { vendor: true },
+      })
+    );
+    // DB joignable : null = produit vraiment absent
+    return { product, source: "db" as const };
   } catch {
-    // fallthrough
+    // DB indisponible / timeout
   }
 
   if (!allowDemoCatalog()) {
@@ -97,17 +167,18 @@ export async function fetchProductById(id: string) {
 
 export async function fetchSimilar(productId: string, categorie: Categorie) {
   try {
-    const products = await prisma.product.findMany({
-      where: {
-        id: { not: productId },
-        categorie,
-        statut: "actif",
-        stockQuantite: { gt: 0 },
-      },
-      take: 4,
-      orderBy: { dateCreation: "desc" },
-    });
-    if (products.length > 0) return products;
+    return await withTimeout(
+      prisma.product.findMany({
+        where: {
+          id: { not: productId },
+          categorie,
+          statut: "actif",
+          stockQuantite: { gt: 0 },
+        },
+        take: 4,
+        orderBy: { dateCreation: "desc" },
+      })
+    );
   } catch {
     // fallthrough
   }
@@ -121,10 +192,11 @@ export async function fetchSimilar(productId: string, categorie: Categorie) {
 export async function fetchProductsByIds(ids: string[]) {
   if (!ids.length) return [];
   try {
-    const products = await prisma.product.findMany({
-      where: { id: { in: ids } },
-    });
-    if (products.length > 0) return products;
+    return await withTimeout(
+      prisma.product.findMany({
+        where: { id: { in: ids } },
+      })
+    );
   } catch {
     // fallthrough
   }

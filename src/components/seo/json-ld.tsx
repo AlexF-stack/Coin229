@@ -41,7 +41,7 @@ export function websiteJsonLd() {
     inLanguage: "fr-BJ",
     potentialAction: {
       "@type": "SearchAction",
-      target: `${SITE.url}/recherche?q={search_term_string}`,
+      target: `${SITE.url}/boutique?q={search_term_string}`,
       "query-input": "required name=search_term_string",
     },
   };

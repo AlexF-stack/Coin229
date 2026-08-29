@@ -103,7 +103,7 @@ export function ShopChatbot() {
                     return (
                       <Link
                         key={chip}
-                        href="/"
+                        href="/boutique"
                         onClick={() => setOpen(false)}
                         className="rounded-full border border-border bg-bg px-3 py-1.5 text-xs font-medium text-fg hover:border-amber hover:text-amber"
                       >
