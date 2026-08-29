@@ -1,74 +1,146 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
-import { HomeHero } from "@/components/catalog/home-hero";
-import { CatalogFilters } from "@/components/catalog/catalog-filters";
-import { ProductGrid } from "@/components/catalog/product-grid";
-import { HowItWorks } from "@/components/trust/how-it-works";
+import type { Categorie } from "@prisma/client";
+import { HomeHero } from "@/components/home/home-hero";
+import { ReassuranceBar } from "@/components/home/reassurance-bar";
+import { BenefitChips } from "@/components/home/benefit-chips";
+import { CategoryShowcase } from "@/components/home/category-showcase";
+import { ProductRail } from "@/components/home/product-rail";
+import { EditorialBlock } from "@/components/home/editorial-block";
+import { WhyCoin229 } from "@/components/home/why-coin229";
+import { HomeClosingCta } from "@/components/home/home-closing-cta";
+import { StickyShopCta } from "@/components/home/sticky-shop-cta";
 import { Reveal } from "@/components/motion/reveal";
 import { fetchProducts } from "@/lib/catalog";
-import { CATEGORIES } from "@/lib/constants";
+import {
+  CATEGORIES,
+  type ProductCardData,
+} from "@/lib/constants";
 import { buildPageMetadata } from "@/lib/seo";
-import type { Categorie, Genre } from "@prisma/client";
 
 export const metadata: Metadata = buildPageMetadata({
   path: "/",
 });
 
-type SearchParams = Promise<{
-  categorie?: string;
-  genre?: string;
-}>;
+function toTime(value: Date | string | undefined): number {
+  if (!value) return 0;
+  const t = value instanceof Date ? value.getTime() : new Date(value).getTime();
+  return Number.isFinite(t) ? t : 0;
+}
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const params = await searchParams;
-  const categorie = params.categorie as Categorie | undefined;
-  const genre = params.genre as Genre | undefined;
+function pickNouveautes(products: ProductCardData[]): ProductCardData[] {
+  const hasDates = products.some((p) => toTime(p.dateCreation) > 0);
+  if (!hasDates) return products.slice(0, 4);
+  return [...products]
+    .sort((a, b) => toTime(b.dateCreation) - toTime(a.dateCreation))
+    .slice(0, 4);
+}
 
-  const { products } = await fetchProducts({
-    categorie:
-      categorie && CATEGORIES.includes(categorie) ? categorie : undefined,
-    genre:
-      genre && ["homme", "femme", "unisexe"].includes(genre)
-        ? genre
-        : undefined,
-  });
+function pickSelection(
+  products: ProductCardData[],
+  excludeIds: Set<string>
+): ProductCardData[] {
+  const pool = products.filter((p) => !excludeIds.has(p.id));
+  const withPromo = pool.filter(
+    (p) => p.prixPromo != null && p.prixPromo < p.prix
+  );
+  if (withPromo.length >= 4) return withPromo.slice(0, 4);
+  const rest = pool.filter((p) => !withPromo.some((x) => x.id === p.id));
+  return [...withPromo, ...rest].slice(0, 4);
+}
+
+function categoryImages(
+  products: ProductCardData[]
+): Partial<Record<Categorie, string>> {
+  const images: Partial<Record<Categorie, string>> = {};
+  for (const categorie of CATEGORIES) {
+    const match = products.find(
+      (p) => p.categorie === categorie && p.images[0]
+    );
+    if (match?.images[0]) images[categorie] = match.images[0];
+  }
+  return images;
+}
+
+function heroSlides(products: ProductCardData[]): string[] {
+  const seen = new Set<string>();
+  const slides: string[] = [];
+  for (const p of products) {
+    const src = p.images[0];
+    if (!src || seen.has(src)) continue;
+    seen.add(src);
+    slides.push(src);
+    if (slides.length >= 3) break;
+  }
+  return slides;
+}
+
+export default async function HomePage() {
+  const { products: allProducts } = await fetchProducts();
+
+  const nouveautes = pickNouveautes(allProducts);
+  const nouveauteIds = new Set(nouveautes.map((p) => p.id));
+  const selection = pickSelection(allProducts, nouveauteIds);
+  const images = categoryImages(allProducts);
+  const slides = heroSlides(allProducts);
+
+  const editorialImage =
+    images.bijou ??
+    images.montre ??
+    allProducts.find((p) => p.images[0])?.images[0];
 
   return (
     <div className="space-y-10 pb-4 md:space-y-14">
       <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
-        <HomeHero />
+        <HomeHero images={slides} />
       </div>
 
-      <HowItWorks />
+      <ReassuranceBar />
 
-      <div id="catalogue" className="scroll-mt-24 space-y-5">
+      <Reveal>
+        <BenefitChips />
+      </Reveal>
+
+      <Reveal>
+        <CategoryShowcase images={images} />
+      </Reveal>
+
+      <Reveal>
+        <ProductRail
+          id="nouveautes"
+          title="Nouveautés"
+          subtitle="Les dernières pièces arrivées chez Coin229."
+          products={nouveautes}
+          ctaHref="/boutique?sort=nouveautes"
+          ctaLabel="Voir toutes les nouveautés"
+        />
+      </Reveal>
+
+      {selection.length > 0 ? (
         <Reveal>
-          <div className="px-4 md:px-0">
-            <h2 className="font-display text-2xl font-bold tracking-tight text-navy md:text-3xl">
-              La sélection
-            </h2>
-            <p className="mt-1 text-sm text-muted">
-              Montres, bijoux, sacs & lunettes
-            </p>
-          </div>
+          <ProductRail
+            id="selection"
+            title="La sélection Coin229"
+            subtitle="Les pièces choisies pour compléter votre style au quotidien."
+            products={selection}
+            ctaHref="/boutique"
+            ctaLabel="Voir la boutique"
+          />
         </Reveal>
+      ) : null}
 
-        <Suspense fallback={<div className="h-20" />}>
-          <CatalogFilters />
-        </Suspense>
+      <Reveal>
+        <EditorialBlock image={editorialImage} />
+      </Reveal>
 
-        <ProductGrid products={products} />
+      <Reveal>
+        <WhyCoin229 />
+      </Reveal>
 
-        {!products.length && (
-          <p className="px-4 py-8 text-center text-sm text-muted md:px-0">
-            Aucun produit pour ces filtres.
-          </p>
-        )}
-      </div>
+      <Reveal>
+        <HomeClosingCta />
+      </Reveal>
+
+      <StickyShopCta />
     </div>
   );
 }

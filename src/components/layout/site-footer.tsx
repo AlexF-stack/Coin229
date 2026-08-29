@@ -5,123 +5,145 @@ import { SITE, whatsappHref } from "@/lib/site";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-12 border-t border-border bg-navy text-white">
-      <div className="page-shell grid gap-8 px-4 py-12 md:grid-cols-4 md:px-6">
-        <div className="md:col-span-2">
-          <BrandLogo variant="wordmark" height={44} onDark className="text-2xl" />
-          <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.22em] text-amber">
-            Accessoires. Style. Confiance.
+    <footer className="mt-16 bg-navy text-white">
+      <div className="page-shell grid gap-10 px-4 py-14 md:grid-cols-12 md:gap-8 md:px-6">
+        <div className="md:col-span-4">
+          <BrandLogo variant="wordmark" height={40} onDark />
+          <p className="mt-2 text-sm text-amber">Les détails qui changent tout.</p>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
+            Montres, bijoux, sacs et lunettes sélectionnés pour votre style —
+            livrés à {SITE.zones.join(", ")}.
           </p>
-          <p className="mt-3 max-w-md text-sm text-white/65">
-            Accessoires mode pour le Bénin — montres, bijoux, sacs et lunettes.
-            Livraison {SITE.zones.join(", ")}. Prix en FCFA. Paiement à la
-            livraison ou Mobile Money.
-          </p>
-          <ul className="mt-4 space-y-2 text-sm text-white/65">
-            <li>{SITE.legalName}</li>
-            <li>{SITE.address}</li>
-            <li>RCCM : {SITE.rccm}</li>
-            <li>IFU : {SITE.ifu}</li>
-          </ul>
-          <div className="mt-4 flex flex-wrap gap-3 text-sm">
-            <a
-              href={`mailto:${SITE.email}`}
-              className="inline-flex items-center gap-1.5 text-white/80 transition hover:text-amber"
-            >
-              <Mail className="h-4 w-4 stroke-[1.5]" />
-              {SITE.email}
-            </a>
-            <a
-              href={whatsappHref()}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-white/80 transition hover:text-amber"
-            >
-              <Phone className="h-4 w-4 stroke-[1.5]" />
-              {SITE.phoneDisplay}
-            </a>
-          </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-white">Boutique</p>
-          <ul className="mt-3 space-y-2 text-sm text-white/65">
+
+        <div className="md:col-span-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber">
+            Explorer
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-white/75">
             <li>
-              <Link href="/?categorie=montre" className="transition hover:text-amber">
-                Montres
+              <Link href="/boutique" className="hover:text-white">
+                Boutique
               </Link>
             </li>
             <li>
-              <Link href="/?categorie=bijou" className="transition hover:text-amber">
-                Bijoux
+              <Link href="/a-propos" className="hover:text-white">
+                À propos
               </Link>
             </li>
             <li>
-              <Link href="/?categorie=sac" className="transition hover:text-amber">
-                Sacs
-              </Link>
-            </li>
-            <li>
-              <Link href="/?categorie=lunette" className="transition hover:text-amber">
-                Lunettes
-              </Link>
-            </li>
-            <li>
-              <Link href="/livraison" className="transition hover:text-amber">
+              <Link href="/livraison" className="hover:text-white">
                 Livraison
               </Link>
             </li>
             <li>
-              <Link href="/retours" className="transition hover:text-amber">
+              <Link href="/retours" className="hover:text-white">
                 Retours
               </Link>
             </li>
           </ul>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-white">Informations légales</p>
-          <ul className="mt-3 space-y-2 text-sm text-white/65">
+
+        <div className="md:col-span-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber">
+            Catégories
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-white/75">
             <li>
-              <Link href="/mentions-legales" className="transition hover:text-amber">
-                Mentions légales
+              <Link href="/boutique?categorie=montre" className="hover:text-white">
+                Montres
               </Link>
             </li>
             <li>
-              <Link href="/cgv" className="transition hover:text-amber">
-                CGV
+              <Link href="/boutique?categorie=bijou" className="hover:text-white">
+                Bijoux
               </Link>
             </li>
             <li>
-              <Link href="/confidentialite" className="transition hover:text-amber">
-                Confidentialité
+              <Link href="/boutique?categorie=sac" className="hover:text-white">
+                Sacs
               </Link>
             </li>
             <li>
-              <Link href="/cookies" className="transition hover:text-amber">
-                Cookies
+              <Link
+                href="/boutique?categorie=lunette"
+                className="hover:text-white"
+              >
+                Lunettes
               </Link>
             </li>
+          </ul>
+        </div>
+
+        <div className="md:col-span-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber">
+            Contact
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-white/75">
             <li>
-              <Link href="/a-propos" className="transition hover:text-amber">
-                À propos
-              </Link>
+              <a
+                href={whatsappHref()}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-white"
+              >
+                WhatsApp
+              </a>
             </li>
             <li>
               <a
                 href={SITE.social.instagram}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 transition hover:text-amber"
+                className="inline-flex items-center gap-1.5 hover:text-white"
               >
-                <Instagram className="h-4 w-4 stroke-[1.5]" />
+                <Instagram className="h-3.5 w-3.5" />
                 Instagram
+              </a>
+            </li>
+            <li>
+              <a
+                href={`mailto:${SITE.email}`}
+                className="inline-flex items-center gap-1.5 hover:text-white"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                {SITE.email}
+              </a>
+            </li>
+            <li>
+              <a
+                href={`tel:${SITE.phoneDisplay.replace(/\s/g, "")}`}
+                className="inline-flex items-center gap-1.5 hover:text-white"
+              >
+                <Phone className="h-3.5 w-3.5" />
+                {SITE.phoneDisplay}
               </a>
             </li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/45 md:px-6">
-        © {new Date().getFullYear()} {SITE.name} · Prix en FCFA (XOF) · Droit
-        béninois
+
+      <div className="border-t border-white/10">
+        <div className="page-shell flex flex-col gap-3 px-4 py-6 text-xs text-white/50 md:flex-row md:items-center md:justify-between md:px-6">
+          <p>© {new Date().getFullYear()} Coin229</p>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/mentions-legales" className="hover:text-white">
+              Mentions légales
+            </Link>
+            <Link href="/confidentialite" className="hover:text-white">
+              Confidentialité
+            </Link>
+            <Link href="/cookies" className="hover:text-white">
+              Cookies
+            </Link>
+            <Link href="/cgv" className="hover:text-white">
+              CGV
+            </Link>
+          </div>
+        </div>
+        <div className="page-shell px-4 pb-8 text-[11px] text-white/35 md:px-6">
+          {SITE.legalName} · RCCM {SITE.rccm} · IFU {SITE.ifu} · {SITE.address}
+        </div>
       </div>
     </footer>
   );

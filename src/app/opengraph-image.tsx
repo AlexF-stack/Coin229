@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Coin229 — Accessoires. Style. Confiance.";
+export const alt = "Coin229 — Les détails qui changent tout.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -16,13 +16,13 @@ export default function OgImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: 72,
-          background: "#020b26",
+          background: "#0F2D26",
           color: "#ffffff",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ fontSize: 28, color: "#c9a227", letterSpacing: 6 }}>
-          ACCESSOIRES · STYLE · CONFIANCE
+        <div style={{ fontSize: 26, color: "#D4AF37", letterSpacing: 6 }}>
+          LES DÉTAILS QUI CHANGENT TOUT
         </div>
         <div
           style={{
@@ -32,10 +32,10 @@ export default function OgImage() {
             lineHeight: 1,
           }}
         >
-          Coin<span style={{ color: "#c9a227" }}>229</span>
+          Coin<span style={{ color: "#D4AF37" }}>229</span>
         </div>
         <div
-          style={{ marginTop: 28, fontSize: 32, color: "#e2ddd3", maxWidth: 800 }}
+          style={{ marginTop: 28, fontSize: 30, color: "#F6F3EC", maxWidth: 820 }}
         >
           Montres, bijoux, sacs & lunettes — livrés à Cotonou, Porto-Novo et
           Godomey.

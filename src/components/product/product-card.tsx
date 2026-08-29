@@ -2,7 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ProductCardData } from "@/lib/constants";
 import { CATEGORIE_LABELS } from "@/lib/constants";
-import { cn, formatPrice, getDiscountPercent, getEffectivePrice } from "@/lib/utils";
+import {
+  cn,
+  formatPrice,
+  getDiscountPercent,
+  getEffectivePrice,
+} from "@/lib/utils";
 import { AddToCartButton } from "@/components/product/add-to-cart-button";
 import { WishlistButton } from "@/components/product/wishlist-button";
 
@@ -11,23 +16,35 @@ type Props = {
   className?: string;
 };
 
+function isNewProduct(dateCreation: Date | string | undefined) {
+  if (!dateCreation) return false;
+  const t =
+    dateCreation instanceof Date
+      ? dateCreation.getTime()
+      : new Date(dateCreation).getTime();
+  if (!Number.isFinite(t)) return false;
+  const fourteenDays = 14 * 24 * 60 * 60 * 1000;
+  return Date.now() - t < fourteenDays;
+}
+
 export function ProductCard({ product, className }: Props) {
   const discount = getDiscountPercent(product.prix, product.prixPromo);
   const price = getEffectivePrice(product.prix, product.prixPromo);
   const outOfStock =
     product.statut === "rupture" || product.stockQuantite <= 0;
   const image = product.images[0] ?? "/placeholder-product.svg";
+  const isNew = !discount && isNewProduct(product.dateCreation);
 
   return (
     <article
       className={cn(
-        "group flex flex-col transition-transform duration-500 ease-out hover:-translate-y-1",
+        "group flex h-full flex-col rounded-[12px] bg-white",
         className
       )}
     >
       <Link
         href={`/produit/${product.id}`}
-        className="relative block aspect-[4/5] overflow-hidden rounded-xl border border-border/70 bg-surface shadow-[0_0_0_0_rgba(201,162,39,0)] transition-[box-shadow,border-color] duration-500 group-hover:border-amber/35 group-hover:shadow-[0_16px_40px_rgba(2,11,38,0.1)]"
+        className="relative block aspect-[4/5] overflow-hidden rounded-[12px] bg-cream"
       >
         <Image
           src={image}
@@ -35,54 +52,55 @@ export function ProductCard({ product, className }: Props) {
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 280px"
           className={cn(
-            "object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]",
+            "object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]",
             outOfStock && "opacity-50 grayscale"
           )}
         />
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/25 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          aria-hidden
-        />
         <WishlistButton
           productId={product.id}
-          className="absolute right-2 top-2 z-10 translate-y-0 opacity-100 transition duration-300 md:translate-y-1 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"
+          className="absolute right-2.5 top-2.5 z-10"
         />
-        {discount && (
-          <span className="absolute left-2 top-2 rounded-md bg-coral px-2 py-0.5 text-xs font-semibold text-white transition-transform duration-300 group-hover:scale-105">
+        {discount != null && (
+          <span className="badge-sale absolute left-2.5 top-2.5">
             -{discount}%
           </span>
         )}
+        {isNew && (
+          <span className="badge-new absolute left-2.5 top-2.5">Nouveau</span>
+        )}
         {outOfStock && (
-          <span className="absolute inset-x-0 bottom-0 bg-navy/80 py-1.5 text-center text-xs font-medium text-white">
-            Rupture de stock
+          <span className="absolute inset-x-0 bottom-0 bg-navy/85 py-1.5 text-center text-xs font-medium text-white">
+            Épuisé
           </span>
         )}
       </Link>
 
       <div className="flex flex-1 flex-col gap-2 pt-3">
-        <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-muted transition-colors group-hover:text-amber">
-            {CATEGORIE_LABELS[product.categorie]}
-          </p>
-          <Link href={`/produit/${product.id}`}>
-            <h3 className="truncate font-display text-sm font-semibold leading-snug text-navy transition-colors group-hover:text-navy md:text-base">
-              {product.nom}
-            </h3>
-          </Link>
-        </div>
+        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted">
+          {CATEGORIE_LABELS[product.categorie]}
+        </p>
+        <Link href={`/produit/${product.id}`}>
+          <h3 className="line-clamp-2 font-display text-sm font-semibold leading-snug text-fg transition-colors group-hover:text-navy md:text-[15px]">
+            {product.nom}
+          </h3>
+        </Link>
 
-        <div className="mt-auto flex items-end justify-between gap-2">
+        <div className="mt-auto space-y-3 pt-1">
           <div>
-            <p className="font-semibold text-amber">{formatPrice(price)}</p>
-            {product.prixPromo && product.prixPromo < product.prix && (
+            <p className="font-semibold text-fg">{formatPrice(price)}</p>
+            {product.prixPromo != null && product.prixPromo < product.prix && (
               <p className="text-xs text-muted line-through">
                 {formatPrice(product.prix)}
               </p>
             )}
           </div>
+
           {!outOfStock && (
-            <div className="transition-transform duration-300 group-hover:scale-105">
-              <AddToCartButton product={product} compact />
+            <div className="opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
+              <AddToCartButton
+                product={product}
+                className="btn btn-primary w-full !rounded-[10px] !py-2.5 text-xs"
+              />
             </div>
           )}
         </div>

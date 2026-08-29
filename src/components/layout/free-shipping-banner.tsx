@@ -12,8 +12,9 @@ export function FreeShippingBanner() {
         Livraison offerte dès {formatPrice(freeShippingThreshold)}
       </span>
       <span className="hidden md:inline">
-        Livraison gratuite dès {formatPrice(freeShippingThreshold)} · Cotonou,
-        Porto-Novo, Godomey
+        Livraison gratuite dès{" "}
+        <span className="text-amber">{formatPrice(freeShippingThreshold)}</span>{" "}
+        · Cotonou, Porto-Novo, Godomey
       </span>
     </div>
   );

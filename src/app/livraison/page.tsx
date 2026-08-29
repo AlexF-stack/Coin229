@@ -39,13 +39,13 @@ export default function LivraisonPage() {
           return (
             <div
               key={zone}
-              className="rounded-xl border border-border bg-card p-5"
+              className="rounded-[12px] bg-cream p-5"
             >
               <MapPin className="h-5 w-5 stroke-[1.5] text-amber" />
               <h2 className="mt-3 font-display text-lg font-semibold text-navy">
                 {ZONE_LABELS[zone]}
               </h2>
-              <p className="mt-1 text-2xl font-semibold text-amber">
+              <p className="mt-1 text-2xl font-semibold text-navy">
                 {formatPrice(fees[zone])}
               </p>
               <p className="mt-1 text-xs text-muted">{eta.label}</p>
@@ -54,18 +54,18 @@ export default function LivraisonPage() {
         })}
       </div>
 
-      <div className="flex items-start gap-3 rounded-xl border border-green/30 bg-green/10 p-5">
+      <div className="flex items-start gap-3 rounded-[12px] border border-green/25 bg-green/10 p-5">
         <Gift className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-green" />
         <div>
-          <p className="font-semibold text-green">Livraison gratuite</p>
-          <p className="mt-1 text-sm text-fg">
+          <p className="font-semibold text-navy">Livraison gratuite</p>
+          <p className="mt-1 text-sm text-muted">
             Dès {formatPrice(freeShippingThreshold)} d&apos;achat (hors frais déjà
             inclus selon zone).
           </p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-5">
+      <div className="rounded-[12px] bg-cream p-5">
         <div className="flex items-center gap-2">
           <Truck className="h-5 w-5 stroke-[1.5] text-amber" />
           <h2 className="font-display text-lg font-semibold text-navy">
@@ -73,21 +73,18 @@ export default function LivraisonPage() {
           </h2>
         </div>
         <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted">
-          <li>Tu commandes avec ton adresse et ta zone.</li>
-          <li>Tu paies en Mobile Money ou à la livraison.</li>
-          <li>On te contacte et on livre dans les délais indiqués.</li>
+          <li>Vous commandez avec votre adresse et votre zone.</li>
+          <li>Vous payez en Mobile Money ou à la livraison.</li>
+          <li>Nous vous contactons et livrons dans les délais indiqués.</li>
         </ol>
         <p className="mt-4 text-sm text-muted">
           Voir aussi{" "}
-          <Link href="/retours" className="font-medium text-amber">
+          <Link href="/retours" className="font-medium text-navy underline-offset-2 hover:underline">
             Retours & échanges
           </Link>
           .
         </p>
-        <Link
-          href="/"
-          className="mt-5 inline-flex rounded-full bg-amber px-5 py-3 text-sm font-semibold text-navy"
-        >
+        <Link href="/boutique" className="btn btn-primary mt-5">
           Voir la boutique
         </Link>
       </div>

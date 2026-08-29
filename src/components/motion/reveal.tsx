@@ -29,8 +29,11 @@ export function Reveal({
     () => {
       const el = ref.current;
       if (!el) return;
+
+      // Toujours visible par défaut — l'anim ne doit pas cacher le contenu.
+      gsap.set(el, { opacity: 1, y: 0 });
+
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        gsap.set(el, { clearProps: "all", opacity: 1 });
         return;
       }
 
@@ -43,12 +46,16 @@ export function Reveal({
           duration,
           delay,
           ease: "power3.out",
+          clearProps: "transform",
           scrollTrigger: {
             trigger: el,
-            start: "top 88%",
+            start: "top 92%",
             toggleActions: once
               ? "play none none none"
               : "play reverse play reverse",
+          },
+          onComplete: () => {
+            gsap.set(el, { clearProps: "opacity,transform" });
           },
         }
       );
@@ -87,8 +94,9 @@ export function StaggerReveal({
       const items = root.querySelectorAll(itemSelector);
       if (!items.length) return;
 
+      gsap.set(items, { opacity: 1, y: 0 });
+
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        gsap.set(items, { clearProps: "all", opacity: 1 });
         return;
       }
 
@@ -101,9 +109,10 @@ export function StaggerReveal({
           duration: 0.65,
           stagger,
           ease: "power3.out",
+          clearProps: "transform",
           scrollTrigger: {
             trigger: root,
-            start: "top 90%",
+            start: "top 92%",
             toggleActions: "play none none none",
           },
         }

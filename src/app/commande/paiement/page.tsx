@@ -42,7 +42,7 @@ export default async function PaymentPage({ searchParams }: Props) {
     return (
       <div className="px-6 py-16 text-center">
         <p className="text-muted">Commande introuvable.</p>
-        <Link href="/" className="mt-4 inline-block text-amber">
+        <Link href="/boutique" className="mt-4 inline-block text-amber">
           Boutique
         </Link>
       </div>
@@ -69,8 +69,8 @@ export default async function PaymentPage({ searchParams }: Props) {
           amount={order.montantTotal}
           phone={order.telephone.replace(/^\+229/, "")}
         />
-        <Link href={`/commande/confirmation?id=${order.id}`} className="block text-center text-sm text-muted">
-          Passer et voir la confirmation
+        <Link href="/panier" className="block text-center text-sm text-muted">
+          Retour au panier
         </Link>
       </div>
     );

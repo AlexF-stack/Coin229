@@ -13,7 +13,7 @@ type Props = {
 };
 
 /**
- * Identité Coin229 — navy + or.
+ * Identité Coin229 — Deep Green × Gold.
  * Prefer lockup image ; wordmark CSS en fallback compact.
  */
 export function BrandLogo({

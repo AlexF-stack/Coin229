@@ -7,16 +7,12 @@ import { QuantitySelector } from "./quantity-selector";
 import { AddToCartButton } from "./add-to-cart-button";
 import { useCartStore } from "@/lib/cart-store";
 import { formatPrice, getEffectivePrice } from "@/lib/utils";
-import { MessageCircle } from "lucide-react";
 
 type Props = {
   product: ProductCardData;
 };
 
-const WHATSAPP =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "") || "22990000000";
-
-/** CTA qui convertissent : panier + achat immédiat + WhatsApp */
+/** CTA qui convertissent : panier + achat immédiat */
 export function ProductPurchaseBar({ product }: Props) {
   const [qty, setQty] = useState(1);
   const max = Math.max(1, product.stockQuantite);
@@ -42,10 +38,6 @@ export function ProductPurchaseBar({ product }: Props) {
     router.push("/commande");
   }
 
-  const waHref = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-    `Bonjour Coin229 👋\nJe veux : ${product.nom}\nPrix : ${formatPrice(price)}\nQuantité : ${qty}`
-  )}`;
-
   return (
     <>
       <div className="space-y-3 max-md:pb-28">
@@ -54,33 +46,29 @@ export function ProductPurchaseBar({ product }: Props) {
           <QuantitySelector value={qty} max={max} onChange={setQty} />
         </div>
         <div className="hidden md:block">
-          <AddToCartButton product={product} quantity={qty} />
+          <AddToCartButton product={product} quantity={qty} variant="secondary" />
         </div>
         <button
           type="button"
           onClick={buyNow}
-          className="hidden w-full items-center justify-center rounded-full border border-amber bg-amber/10 py-3.5 font-semibold text-amber transition active:scale-[0.98] md:flex"
+          className="btn btn-primary hidden w-full md:inline-flex"
         >
           Acheter maintenant · {formatPrice(price * qty)}
         </button>
-        <a
-          href={waHref}
-          target="_blank"
-          rel="noreferrer"
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-white py-3 text-sm font-medium text-navy"
-        >
-          <MessageCircle className="h-4 w-4 stroke-[1.5] text-[#25D366]" />
-          Commander sur WhatsApp
-        </a>
       </div>
 
-      <div className="safe-pb fixed inset-x-0 bottom-0 z-40 border-t border-border bg-white/95 px-4 pt-3 shadow-[0_-8px_30px_rgba(2,11,38,0.08)] backdrop-blur-md md:hidden">
+      <div className="safe-pb fixed inset-x-0 bottom-0 z-40 border-t border-border bg-white/95 px-4 pt-3 shadow-[0_-8px_30px_rgba(15,45,38,0.08)] backdrop-blur-md md:hidden">
         <div className="mx-auto flex max-w-lg gap-2 pb-2">
-          <AddToCartButton product={product} quantity={qty} className="flex-1" />
+          <AddToCartButton
+            product={product}
+            quantity={qty}
+            variant="secondary"
+            className="flex-1"
+          />
           <button
             type="button"
             onClick={buyNow}
-            className="flex-1 rounded-full bg-navy py-3.5 text-sm font-semibold text-white"
+            className="btn btn-primary flex-1"
           >
             Acheter
           </button>

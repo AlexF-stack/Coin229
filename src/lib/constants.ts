@@ -12,6 +12,7 @@ export type ProductCardData = Pick<
   | "stockQuantite"
   | "statut"
   | "vendorId"
+  | "dateCreation"
 >;
 
 export const CATEGORIE_LABELS: Record<Categorie, string> = {
@@ -19,6 +20,13 @@ export const CATEGORIE_LABELS: Record<Categorie, string> = {
   bijou: "Bijoux",
   sac: "Sacs",
   lunette: "Lunettes",
+};
+
+export const CATEGORIE_TAGLINES: Record<Categorie, string> = {
+  montre: "Le temps, avec style.",
+  bijou: "Les détails qui comptent.",
+  sac: "Pratique, urbain, affirmé.",
+  lunette: "Cadrez votre look.",
 };
 
 export const CATEGORIES: Categorie[] = ["montre", "bijou", "sac", "lunette"];

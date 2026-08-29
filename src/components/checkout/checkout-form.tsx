@@ -148,26 +148,38 @@ export function CheckoutForm() {
     });
   }
 
+  const fieldClass =
+    "w-full rounded-[10px] border border-border bg-white px-3 py-3 text-fg outline-none transition focus:border-navy";
+
   return (
     <form
       onSubmit={onSubmit}
-      className="mx-auto max-w-xl space-y-5 px-4 py-4 pb-28 md:px-0 md:py-6 md:pb-6"
+      className="mx-auto max-w-xl space-y-6 px-4 py-4 pb-28 md:px-0 md:py-6 md:pb-6"
     >
-      <section className="space-y-3 rounded-[16px] bg-card p-4 shadow-card">
-        <h2 className="font-display text-lg font-semibold">Tes infos</h2>
+      <header className="space-y-1">
+        <p className="text-sm text-muted">
+          Zone : {ZONE_LABELS[zone]} · {shipping.etaLabel}
+          {shipping.isFree ? " · livraison offerte" : ""}
+        </p>
+      </header>
+
+      <section className="space-y-4 rounded-[12px] bg-cream p-5">
+        <h2 className="font-display text-base font-semibold text-navy">
+          Vos informations
+        </h2>
         <label className="block space-y-1.5 text-sm">
-          <span className="text-muted">Nom complet</span>
+          <span className="font-medium text-navy">Nom complet</span>
           <input
             required
             value={nom}
             onChange={(e) => setNom(e.target.value)}
             autoComplete="name"
-            className="w-full rounded-xl border border-border bg-bg px-3 py-3 outline-none focus:border-amber"
+            className={fieldClass}
             placeholder="Ex. Aïcha Dossou"
           />
         </label>
         <label className="block space-y-1.5 text-sm">
-          <span className="text-muted">Téléphone WhatsApp</span>
+          <span className="font-medium text-navy">Téléphone WhatsApp</span>
           <input
             required
             type="tel"
@@ -175,18 +187,20 @@ export function CheckoutForm() {
             value={telephone}
             onChange={(e) => setTelephone(e.target.value)}
             autoComplete="tel"
-            className="w-full rounded-xl border border-border bg-bg px-3 py-3 outline-none focus:border-amber"
+            className={fieldClass}
             placeholder="97 00 00 00"
           />
         </label>
         <label className="block space-y-1.5 text-sm">
-          <span className="text-muted">Adresse — {ZONE_LABELS[zone]}</span>
+          <span className="font-medium text-navy">
+            Adresse — {ZONE_LABELS[zone]}
+          </span>
           <textarea
             required
             rows={2}
             value={adresse}
             onChange={(e) => setAdresse(e.target.value)}
-            className="w-full resize-none rounded-xl border border-border bg-bg px-3 py-3 outline-none focus:border-amber"
+            className={cn(fieldClass, "resize-none")}
             placeholder="Quartier, rue, repère…"
           />
         </label>
@@ -199,20 +213,22 @@ export function CheckoutForm() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-display text-lg font-semibold">Paiement</h2>
+        <h2 className="font-display text-base font-semibold text-navy">
+          Mode de paiement
+        </h2>
         <button
           type="button"
           onClick={() => setMode("livraison")}
           className={cn(
-            "flex w-full items-start gap-3 rounded-[16px] border p-4 text-left transition-colors",
+            "flex w-full items-start gap-3 rounded-[12px] border p-4 text-left transition-colors",
             mode === "livraison"
-              ? "border-amber bg-amber/10"
-              : "border-border bg-card"
+              ? "border-navy bg-cream"
+              : "border-border bg-white hover:border-navy/30"
           )}
         >
           <Banknote className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-green" />
           <div>
-            <p className="font-medium">Paiement à la livraison</p>
+            <p className="font-medium text-navy">Paiement à la livraison</p>
             <p className="text-xs text-muted">Le plus simple — recommandé</p>
           </div>
         </button>
@@ -220,22 +236,24 @@ export function CheckoutForm() {
           type="button"
           onClick={() => setMode("mobile_money")}
           className={cn(
-            "flex w-full items-start gap-3 rounded-[16px] border p-4 text-left transition-colors",
+            "flex w-full items-start gap-3 rounded-[12px] border p-4 text-left transition-colors",
             mode === "mobile_money"
-              ? "border-amber bg-amber/10"
-              : "border-border bg-card"
+              ? "border-navy bg-cream"
+              : "border-border bg-white hover:border-navy/30"
           )}
         >
           <Smartphone className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-amber" />
           <div>
-            <p className="font-medium">Mobile Money</p>
+            <p className="font-medium text-navy">Mobile Money</p>
             <p className="text-xs text-muted">MTN MoMo ou Moov Money</p>
           </div>
         </button>
       </section>
 
-      <section className="space-y-2 rounded-[16px] bg-card p-4 text-sm shadow-card">
-        <h2 className="mb-2 font-display text-lg font-semibold">Total</h2>
+      <section className="space-y-2 rounded-[12px] border border-border bg-white p-5 text-sm">
+        <h2 className="mb-3 font-display text-base font-semibold text-navy">
+          Récapitulatif
+        </h2>
         {items.map((i) => (
           <div key={i.productId} className="flex justify-between text-muted">
             <span className="truncate pr-2">
@@ -246,29 +264,40 @@ export function CheckoutForm() {
             </span>
           </div>
         ))}
-        <div className="flex justify-between border-t border-border pt-2 text-base font-semibold">
-          <span>À payer</span>
-          <span className="text-amber">{formatPrice(total)}</span>
+        <div className="flex justify-between border-t border-border pt-2 text-muted">
+          <span>Livraison</span>
+          <span>
+            {shipping.isFree ? "Offerte" : formatPrice(shipping.fee)}
+          </span>
+        </div>
+        <div className="flex justify-between pt-1 text-base font-semibold text-navy">
+          <span>Total</span>
+          <span>{formatPrice(total)}</span>
         </div>
       </section>
 
       {error && (
-        <p className="rounded-xl bg-coral/15 px-3 py-2 text-sm text-coral">
+        <p className="rounded-[10px] bg-coral/15 px-3 py-2 text-sm text-coral">
           {error}
         </p>
       )}
 
-      <label className="flex items-start gap-3 rounded-xl border border-border bg-card p-3 text-sm">
+      <label className="flex items-start gap-3 rounded-[12px] border border-border bg-cream/60 p-4 text-sm">
         <input
           type="checkbox"
           checked={acceptCgv}
           onChange={(e) => setAcceptCgv(e.target.checked)}
-          className="mt-1 h-4 w-4 accent-[var(--color-amber)]"
+          className="mt-1 h-4 w-4 accent-[var(--color-navy)]"
           required
         />
         <span className="text-muted">
           J&apos;ai lu et j&apos;accepte les{" "}
-          <a href="/cgv" target="_blank" rel="noreferrer" className="font-medium text-amber">
+          <a
+            href="/cgv"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium text-navy underline-offset-2 hover:underline"
+          >
             Conditions générales de vente
           </a>{" "}
           et la{" "}
@@ -276,7 +305,7 @@ export function CheckoutForm() {
             href="/confidentialite"
             target="_blank"
             rel="noreferrer"
-            className="font-medium text-amber"
+            className="font-medium text-navy underline-offset-2 hover:underline"
           >
             Politique de confidentialité
           </a>
@@ -284,11 +313,11 @@ export function CheckoutForm() {
         </span>
       </label>
 
-      <div className="safe-pb fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg-elevated/95 px-4 pt-3 backdrop-blur-md md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+      <div className="safe-pb fixed inset-x-0 bottom-0 z-40 border-t border-border bg-white/95 px-4 pt-3 backdrop-blur-md md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <button
           type="submit"
           disabled={pending || !acceptCgv}
-          className="mx-auto flex w-full max-w-xl items-center justify-center gap-2 rounded-full bg-amber py-3.5 font-semibold text-navy shadow-[0_8px_20px_rgba(201,162,39,0.25)] disabled:opacity-60 md:mx-0"
+          className="btn btn-primary mx-auto w-full max-w-xl md:mx-0"
         >
           {pending ? (
             <>

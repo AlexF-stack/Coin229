@@ -22,7 +22,7 @@ export default function AboutPage() {
         <p className="mt-3 leading-relaxed text-muted">
           {SITE.name} est une boutique en ligne basée à Cotonou. Nous sélectionnons
           montres, bijoux, sacs et lunettes pour un look net au quotidien —
-          livrés chez toi à {SITE.zones.join(", ")}.
+          livrés chez vous à {SITE.zones.join(", ")}.
         </p>
       </header>
 
@@ -34,7 +34,7 @@ export default function AboutPage() {
           },
           {
             title: "Livraison claire",
-            text: "Zones, délais et frais affichés avant paiement. Tu sais exactement ce que tu paies en FCFA.",
+            text: "Zones, délais et frais affichés avant paiement. Vous savez exactement ce que vous payez en FCFA.",
           },
           {
             title: "Paiement de confiance",
@@ -43,7 +43,7 @@ export default function AboutPage() {
         ].map((item) => (
           <div
             key={item.title}
-            className="border-t border-border pt-4 md:border md:rounded-xl md:border-border md:p-5"
+            className="rounded-[12px] bg-cream p-5"
           >
             <h2 className="font-display text-lg font-semibold text-navy">
               {item.title}
@@ -53,39 +53,41 @@ export default function AboutPage() {
         ))}
       </div>
 
-      <section className="max-w-2xl space-y-2 text-sm text-muted">
+      <section className="max-w-2xl rounded-[12px] bg-cream p-5 text-sm text-muted">
         <h2 className="font-display text-lg font-semibold text-navy">Contact</h2>
-        <p>
+        <p className="mt-2">
           {SITE.legalName} · {SITE.address}
         </p>
-        <p>
-          <a href={`mailto:${SITE.email}`} className="text-amber">
+        <p className="mt-1">
+          <a href={`mailto:${SITE.email}`} className="font-medium text-navy">
             {SITE.email}
           </a>{" "}
           ·{" "}
-          <a href={whatsappHref()} className="text-amber" target="_blank" rel="noreferrer">
+          <a
+            href={whatsappHref()}
+            className="font-medium text-navy"
+            target="_blank"
+            rel="noreferrer"
+          >
             WhatsApp {SITE.phoneDisplay}
           </a>
         </p>
-        <p>
-          <Link href="/mentions-legales" className="text-amber">
+        <p className="mt-3">
+          <Link href="/mentions-legales" className="text-navy underline-offset-2 hover:underline">
             Mentions légales
           </Link>
           {" · "}
-          <Link href="/cgv" className="text-amber">
+          <Link href="/cgv" className="text-navy underline-offset-2 hover:underline">
             CGV
           </Link>
           {" · "}
-          <Link href="/confidentialite" className="text-amber">
+          <Link href="/confidentialite" className="text-navy underline-offset-2 hover:underline">
             Confidentialité
           </Link>
         </p>
       </section>
 
-      <Link
-        href="/"
-        className="inline-flex rounded-full bg-amber px-5 py-3 text-sm font-semibold text-navy"
-      >
+      <Link href="/boutique" className="btn btn-primary">
         Voir la boutique
       </Link>
     </div>

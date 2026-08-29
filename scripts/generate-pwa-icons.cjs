@@ -2,8 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 
-const GOLD = "#c9a227";
-const NAVY = "#020b26";
+const GOLD = "#d4af37";
+const NAVY = "#0f2d26";
 
 function c2Svg(size, { bg = NAVY, c = "#ffffff", two = GOLD, pad = 0 } = {}) {
   const s = size;

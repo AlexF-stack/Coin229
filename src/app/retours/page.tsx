@@ -13,6 +13,7 @@ export const metadata: Metadata = buildPageMetadata({
 export default function RetoursPage() {
   return (
     <LegalPage title="Retours & échanges" updated="27 août 2026">
+      {/* TODO: validate return policy legally */}
       <p>
         Nous voulons que tu sois satisfait·e. Voici les règles claires
         applicables aux commandes {SITE.name} livrées au Bénin.

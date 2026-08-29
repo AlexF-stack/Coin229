@@ -3,15 +3,15 @@ import { SITE } from "@/lib/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE.name} — Accessoires. Style. Confiance.`,
+    name: `${SITE.name} — ${SITE.tagline}`,
     short_name: SITE.name,
     description: SITE.description,
     start_url: "/",
     scope: "/",
     display: "standalone",
     orientation: "portrait-primary",
-    background_color: "#020b26",
-    theme_color: "#c9a227",
+    background_color: "#0F2D26",
+    theme_color: "#0F2D26",
     lang: "fr-BJ",
     dir: "ltr",
     categories: ["shopping", "lifestyle"],
@@ -39,7 +39,7 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         name: "Boutique",
         short_name: "Boutique",
-        url: "/",
+        url: "/boutique",
         icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }],
       },
       {

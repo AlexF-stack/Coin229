@@ -281,7 +281,7 @@ export function AccountView() {
               Tes achats apparaîtront ici après validation.
             </p>
             <Link
-              href="/"
+              href="/boutique"
               className="mt-4 inline-flex rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-navy"
             >
               Explorer la boutique
