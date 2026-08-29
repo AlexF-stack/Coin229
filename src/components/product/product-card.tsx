@@ -51,6 +51,8 @@ export function ProductCard({ product, className }: Props) {
           alt={product.nom}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 280px"
+          loading="lazy"
+          decoding="async"
           className={cn(
             "object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]",
             outOfStock && "opacity-50 grayscale"

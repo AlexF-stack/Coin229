@@ -1,12 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { FreeShippingBanner } from "@/components/layout/free-shipping-banner";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { ShopChatbot } from "@/components/chat/shop-chatbot";
 import { PageFade } from "@/components/motion/page-fade";
+import { OfflineBanner } from "@/components/pwa/offline-banner";
+
+const ShopChatbot = dynamic(
+  () =>
+    import("@/components/chat/shop-chatbot").then((m) => m.ShopChatbot),
+  { ssr: false }
+);
 
 /** Chrome boutique — allégé sur fiche produit & tunnel (conversion) */
 export function ShopShell({ children }: { children: React.ReactNode }) {
@@ -17,7 +24,8 @@ export function ShopShell({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/commande") && !pathname.includes("confirmation");
   const leanFunnel = isProduct || isCheckout;
   const isCart = pathname.startsWith("/panier");
-  const hideChat = leanFunnel || isCart;
+  const isOffline = pathname.startsWith("/offline");
+  const hideChat = leanFunnel || isCart || isOffline;
 
   if (isAdmin) {
     return <>{children}</>;
@@ -25,20 +33,21 @@ export function ShopShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {!leanFunnel && <FreeShippingBanner />}
-      <SiteHeader />
+      <OfflineBanner />
+      {!leanFunnel && !isOffline && <FreeShippingBanner />}
+      {!isOffline && <SiteHeader />}
       <main
         className={
-          leanFunnel
+          leanFunnel || isOffline
             ? "page-shell min-h-[70dvh] pb-8"
             : "page-shell min-h-[70dvh] pb-24 md:pb-8"
         }
       >
         <PageFade>{children}</PageFade>
       </main>
-      {!leanFunnel && <SiteFooter />}
+      {!leanFunnel && !isOffline && <SiteFooter />}
       {!hideChat && <ShopChatbot />}
-      {!leanFunnel && <BottomNav />}
+      {!leanFunnel && !isOffline && <BottomNav />}
     </>
   );
 }

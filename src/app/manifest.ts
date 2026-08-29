@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: `${SITE.name} — ${SITE.tagline}`,
     short_name: SITE.name,
     description: SITE.description,
-    start_url: "/",
+    start_url: "/?source=pwa",
     scope: "/",
     display: "standalone",
     orientation: "portrait-primary",

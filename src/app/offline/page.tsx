@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { SITE } from "@/lib/site";
+import { OfflineActions } from "@/components/pwa/offline-actions";
 
 export const metadata: Metadata = {
   title: "Hors ligne",
@@ -16,17 +15,11 @@ export default function OfflinePage() {
       <h1 className="mt-6 font-display text-2xl font-bold text-navy">
         Tu es hors ligne
       </h1>
-      <p className="mt-3 max-w-sm text-sm text-muted">
-        Vérifie ta connexion pour parcourir la boutique. Les pages déjà visitées
-        peuvent rester accessibles.
+      <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">
+        Vérifie ta connexion mobile. Les pages déjà ouvertes (accueil, boutique,
+        panier) restent utilisables grâce au mode hors ligne.
       </p>
-      <Link
-        href="/"
-        className="mt-8 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-navy"
-      >
-        Réessayer
-      </Link>
-      <p className="mt-6 text-xs text-muted">{SITE.name} · PWA</p>
+      <OfflineActions />
     </div>
   );
 }

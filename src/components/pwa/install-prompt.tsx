@@ -87,7 +87,7 @@ export function PwaInstallPrompt() {
       aria-label="Installer Coin229"
       className="safe-pb fixed inset-x-0 bottom-20 z-[55] px-4 md:bottom-6 md:left-auto md:right-6 md:max-w-sm"
     >
-      <div className="rounded-2xl border border-border bg-white p-4 shadow-[0_16px_50px_rgba(2,11,38,0.15)]">
+      <div className="rounded-2xl border border-border bg-white p-4 shadow-[0_16px_50px_rgba(15,45,38,0.15)]">
         <div className="flex items-start gap-3">
           <Image
             src="/icons/icon-192.png"

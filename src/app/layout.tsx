@@ -12,6 +12,8 @@ const inter = Inter({
   variable: "--font-inter",
   display: "swap",
   weight: ["400", "500", "600"],
+  preload: true,
+  adjustFontFallback: true,
 });
 
 const poppins = Poppins({
@@ -19,6 +21,8 @@ const poppins = Poppins({
   variable: "--font-poppins",
   display: "swap",
   weight: ["500", "600", "700"],
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -113,6 +117,13 @@ export default function RootLayout({
   return (
     <html lang="fr-BJ" className={`${inter.variable} ${poppins.variable}`}>
       <body className="min-h-dvh bg-bg font-sans text-fg antialiased">
+        {/* Hints réseau mobile — images produits */}
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link
+          rel="preconnect"
+          href="https://images.unsplash.com"
+          crossOrigin="anonymous"
+        />
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <ShopShell>{children}</ShopShell>
         <CookieBanner />
