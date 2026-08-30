@@ -9,18 +9,16 @@ import { checkoutSchema } from "@/lib/checkout-schema";
 import { requireAdmin } from "@/lib/assert-admin";
 import { allowDemoCatalog } from "@/lib/runtime-flags";
 import {
-  createPhoneSessionToken,
   normalizeBjPhone,
   phoneCookieName,
-  phoneCookieOptions,
   readPhoneFromToken,
 } from "@/lib/phone-session";
 import {
   createOrderConfirmToken,
   orderConfirmCookieName,
   orderConfirmCookieOptions,
-  readOrderConfirmToken,
 } from "@/lib/order-confirm";
+import { canAccessOrder } from "@/lib/order-access";
 import { fetchProductsByIds } from "@/lib/catalog";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -318,10 +316,7 @@ export async function createOrder(input: {
       orderConfirmCookieOptions()
     );
   }
-  const phoneToken = await createPhoneSessionToken(telephone);
-  if (phoneToken) {
-    jar.set(phoneCookieName(), phoneToken, phoneCookieOptions());
-  }
+  // Ne PAS émettre coin229_phone ici — uniquement après OTP (/api/auth/phone-session).
 
   revalidatePath("/");
   revalidatePath("/compte");
@@ -490,13 +485,9 @@ export async function getOrderForConfirmation(orderId: string) {
     return { demo: true as const, order: null };
   }
   try {
-    const jar = await cookies();
-    const sessionPhone = await readPhoneFromToken(
-      jar.get(phoneCookieName())?.value
-    );
-    const confirmOrderId = readOrderConfirmToken(
-      jar.get(orderConfirmCookieName())?.value
-    );
+    if (!(await canAccessOrder(orderId))) {
+      return { demo: false as const, order: null };
+    }
 
     const order = await prisma.order.findUnique({
       where: { id: orderId },
@@ -505,33 +496,6 @@ export async function getOrderForConfirmation(orderId: string) {
       },
     });
     if (!order) return { demo: false as const, order: null };
-
-    let allowed = confirmOrderId === order.id;
-    if (
-      !allowed &&
-      sessionPhone &&
-      normalizeBjPhone(order.telephone) === sessionPhone
-    ) {
-      allowed = true;
-    }
-
-    if (!allowed && isSupabaseConfigured()) {
-      const supabase = await createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const client = await prisma.client.findFirst({
-          where: { authId: user.id },
-          select: { id: true },
-        });
-        if (client && client.id === order.clientId) {
-          allowed = true;
-        }
-      }
-    }
-
-    if (!allowed) return { demo: false as const, order: null };
     return { demo: false as const, order };
   } catch {
     return { demo: false as const, order: null };

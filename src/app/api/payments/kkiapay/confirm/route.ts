@@ -5,8 +5,12 @@ import {
   isKkiaSuccess,
 } from "@/lib/payment-confirm";
 import { verifyKkiaTransaction } from "@/lib/payment";
+import { canAccessOrder } from "@/lib/order-access";
 
-/** Confirmation côté client après succès widget KkiaPay — vérifie toujours l’API + montant. */
+/**
+ * Confirmation côté client après succès widget KkiaPay.
+ * Exige cookie confirm / session + vérif API + binding partnerId/data.
+ */
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
     orderId?: string;
@@ -15,6 +19,10 @@ export async function POST(request: Request) {
 
   if (!body?.orderId || !body.transactionId) {
     return NextResponse.json({ ok: false }, { status: 400 });
+  }
+
+  if (!(await canAccessOrder(body.orderId))) {
+    return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
   }
 
   const remote = await verifyKkiaTransaction(body.transactionId);

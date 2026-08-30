@@ -17,14 +17,20 @@ export async function POST(request: Request) {
 
   const body = (await request.json().catch(() => null)) as {
     transactionId?: string;
-    stateData?: { order_id?: string };
+    data?: string;
+    partnerId?: string;
+    stateData?: { order_id?: string; orderId?: string };
   } | null;
 
   if (!body?.transactionId) {
     return NextResponse.json({ ok: true, ignored: true });
   }
 
-  let orderId = body.stateData?.order_id;
+  let orderId =
+    body.stateData?.order_id ||
+    body.stateData?.orderId ||
+    (typeof body.data === "string" ? body.data : undefined) ||
+    (typeof body.partnerId === "string" ? body.partnerId : undefined);
   if (!orderId) {
     const byRef = await prisma.order.findFirst({
       where: { paymentRef: body.transactionId, statut: "en_attente" },

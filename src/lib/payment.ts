@@ -237,6 +237,9 @@ export async function verifyKkiaTransaction(transactionId: string) {
     status?: string;
     amount?: number;
     state?: string;
+    partnerId?: string;
+    data?: string;
+    transactionId?: string;
   };
 }
 

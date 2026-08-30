@@ -59,6 +59,7 @@ export function KkiaPayCheckout({ orderId, amount, phone, email }: Props) {
       phone,
       email,
       data: orderId,
+      partnerId: orderId,
       theme: "#ef9f27",
     });
   }, [ready, publicKey, amount, phone, email, orderId, router, sandbox]);

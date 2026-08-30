@@ -1,4 +1,5 @@
 import { KkiaPayCheckout } from "@/components/checkout/kkiapay-checkout";
+import { canAccessOrder } from "@/lib/order-access";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -12,6 +13,22 @@ export const metadata = { title: "Paiement Mobile Money" };
 export default async function PaymentPage({ searchParams }: Props) {
   const { id } = await searchParams;
   if (!id) redirect("/panier");
+
+  const allowed = await canAccessOrder(id);
+  if (!allowed) {
+    return (
+      <div className="px-6 py-16 text-center">
+        <p className="font-display text-lg font-semibold">Accès refusé</p>
+        <p className="mt-2 text-sm text-muted">
+          Cette page de paiement n’est disponible que depuis ton parcours de
+          commande.
+        </p>
+        <Link href="/boutique" className="mt-4 inline-block text-amber">
+          Boutique
+        </Link>
+      </div>
+    );
+  }
 
   let order: {
     id: string;
@@ -58,16 +75,18 @@ export default async function PaymentPage({ searchParams }: Props) {
   }
 
   if (order.paymentProvider === "kkiapay") {
+    const phoneDisplay = order.telephone.replace(/^\+229/, "");
     return (
       <div className="mx-auto max-w-md space-y-4 px-4 py-10">
         <h1 className="font-display text-2xl font-bold">Paiement Mobile Money</h1>
         <p className="text-sm text-muted">
-          Commande {order.id.slice(0, 8)}… · {order.montantTotal.toLocaleString("fr-BJ")} FCFA
+          Commande {order.id.slice(0, 8)}… ·{" "}
+          {order.montantTotal.toLocaleString("fr-BJ")} FCFA
         </p>
         <KkiaPayCheckout
           orderId={order.id}
           amount={order.montantTotal}
-          phone={order.telephone.replace(/^\+229/, "")}
+          phone={phoneDisplay}
         />
         <Link href="/panier" className="block text-center text-sm text-muted">
           Retour au panier

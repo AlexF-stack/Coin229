@@ -108,6 +108,18 @@ export async function confirmOrderPaid(opts: {
     return { ok: false, reason: "amount_mismatch" };
   }
 
+  // Une même tx ne peut confirmer qu’une seule commande
+  const refTaken = await prisma.order.findFirst({
+    where: {
+      paymentRef: opts.paymentRef,
+      NOT: { id: opts.orderId },
+    },
+    select: { id: true },
+  });
+  if (refTaken) {
+    return { ok: false, reason: "ref_already_used" };
+  }
+
   if (opts.provider === "fedapay") {
     const remote = await verifyFedapayTransaction(opts.paymentRef);
     if (!isFedapayApproved(remote)) {
@@ -139,16 +151,30 @@ export async function confirmOrderPaid(opts: {
     ) {
       return { ok: false, reason: "remote_amount_mismatch" };
     }
+
+    // Binding widget : si partnerId/data présents, ils doivent matcher orderId
+    const binding = String(remote?.partnerId || remote?.data || "").trim();
+    if (binding && binding !== opts.orderId) {
+      return { ok: false, reason: "order_binding_mismatch" };
+    }
+
+    if (order.paymentRef && order.paymentRef !== opts.paymentRef) {
+      return { ok: false, reason: "ref_mismatch" };
+    }
   }
 
-  await prisma.order.updateMany({
-    where: { id: opts.orderId, statut: "en_attente" },
-    data: {
-      statut: "confirmee",
-      paymentRef: opts.paymentRef,
-      paymentProvider: opts.provider,
-    },
-  });
+  try {
+    await prisma.order.updateMany({
+      where: { id: opts.orderId, statut: "en_attente" },
+      data: {
+        statut: "confirmee",
+        paymentRef: opts.paymentRef,
+        paymentProvider: opts.provider,
+      },
+    });
+  } catch {
+    return { ok: false, reason: "update_failed" };
+  }
 
   return { ok: true };
 }
