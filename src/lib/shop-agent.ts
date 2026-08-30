@@ -299,7 +299,7 @@ export async function runShopAgent(input: {
     return {
       text:
         (ctx ? ctx + "\n\n" : "") +
-        "Salut ! Je suis l’assistant Coin229. Je te guide selon ton budget et ton style, ou je réponds sur livraison / paiement.",
+        "Hello — je t’aide à choisir. Budget, style, livraison ou paiement : par où on commence ?",
       quickReplies: CHAT_STARTERS,
       products: [],
       prefs,
