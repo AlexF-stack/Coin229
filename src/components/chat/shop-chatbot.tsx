@@ -360,10 +360,10 @@ export function ShopChatbot() {
 
       {!open && nudge && (
         <div
-          className="fixed bottom-[5.75rem] right-4 z-50 flex max-w-[min(100vw-5.5rem,16.5rem)] animate-[fab-in_0.45s_ease-out_both] flex-col items-end gap-1.5 md:bottom-28 md:right-8"
+          className="fixed bottom-[5.75rem] right-4 z-[60] flex w-[min(100vw-5.25rem,18rem)] animate-[fab-in_0.45s_ease-out_both] flex-col items-end md:bottom-28 md:right-8"
           role="status"
         >
-          <div className="relative rounded-2xl rounded-br-md border border-[#0F2D26]/12 bg-white px-3.5 py-3 shadow-[0_12px_32px_rgba(15,45,38,0.14)]">
+          <div className="relative w-full rounded-2xl rounded-br-md border border-[#0F2D26]/12 bg-white px-3.5 py-3 shadow-[0_12px_32px_rgba(15,45,38,0.14)]">
             <button
               type="button"
               onClick={dismissNudge}
@@ -375,21 +375,17 @@ export function ShopChatbot() {
             <button
               type="button"
               onClick={openChat}
-              className="block w-full text-left"
+              className="block w-full pr-1 text-left"
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]">
                 Assistant Coin229
               </p>
-              <p className="mt-1 text-sm font-semibold leading-snug text-[#0F2D26]">
-                Hello — je t&apos;aide à choisir
+              <p className="mt-1 text-[15px] font-semibold leading-snug text-[#0F2D26]">
+                Hello — je t&apos;aide
               </p>
               <p className="mt-1 text-xs leading-relaxed text-muted">
-                Budget, style, livraison… pose ta question.
+                Budget, style, livraison… Discuter →
               </p>
-              <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-amber">
-                Discuter
-                <Sparkles className="h-3 w-3 stroke-[1.5]" />
-              </span>
             </button>
           </div>
         </div>
