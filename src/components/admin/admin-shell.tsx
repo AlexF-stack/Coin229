@@ -8,6 +8,7 @@ import {
   ShoppingCart,
   ExternalLink,
   Boxes,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,7 @@ const links = [
   { href: "/admin", label: "Tableau de bord", icon: LayoutDashboard, exact: true },
   { href: "/admin/produits", label: "Produits", icon: Package },
   { href: "/admin/commandes", label: "Commandes", icon: ShoppingCart },
+  { href: "/admin/notifications", label: "Notifications", icon: Bell },
 ];
 
 type Props = {

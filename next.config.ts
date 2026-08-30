@@ -9,8 +9,11 @@ import withPWAInit from "@ducanh2912/next-pwa";
  */
 const withPWA = withPWAInit({
   dest: "public",
-  disable: process.env.NODE_ENV === "development",
+  disable:
+    process.env.NODE_ENV === "development" &&
+    process.env.ENABLE_PWA_DEV !== "1",
   register: true,
+  customWorkerSrc: "worker",
   fallbacks: {
     document: "/offline",
   },

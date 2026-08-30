@@ -92,15 +92,32 @@ model Product {
 }
 
 model Client {
-  id        String    @id @default(cuid())
-  nom       String
-  telephone String?   @unique
-  email     String?   @unique
-  authId    String?   @unique @map("auth_id")
-  adresses  Address[]
-  orders    Order[]
+  id                 String             @id @default(cuid())
+  nom                String
+  telephone          String?            @unique
+  email              String?            @unique
+  authId             String?            @unique @map("auth_id")
+  adresses           Address[]
+  orders             Order[]
+  pushSubscriptions  PushSubscription[]
 
   @@map("clients")
+}
+
+/** Abonnements Web Push (opt-in navigateur). */
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?  @map("user_agent")
+  clientId  String?  @map("client_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  @@index([clientId])
+  @@map("push_subscriptions")
 }
 
 model Address {

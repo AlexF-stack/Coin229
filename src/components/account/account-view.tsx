@@ -23,6 +23,7 @@ import { formatPrice, cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { InstallAppCard } from "@/components/pwa/install-app-card";
+import { PushOptInCard } from "@/components/pwa/push-opt-in-card";
 
 type ClientData = NonNullable<Awaited<ReturnType<typeof getMyOrders>>>;
 
@@ -163,6 +164,8 @@ export function AccountView() {
             description="Sans créer de compte tout de suite — ajoute Coin229 à ton écran d’accueil."
           />
 
+          <PushOptInCard />
+
           <p className="text-center text-xs text-muted">
             Tu peux aussi{" "}
             <Link href="/" className="font-medium text-amber hover:underline">
@@ -268,6 +271,8 @@ export function AccountView() {
         title="Installer l’app Coin229"
         description="Sur ton écran d’accueil : commandes, favoris et panier en un tap."
       />
+
+      <PushOptInCard />
 
       <section id="commandes" className="scroll-mt-24 space-y-3">
         <div className="flex items-center justify-between">
