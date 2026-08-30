@@ -84,7 +84,8 @@ const withPWA = withPWAInit({
         urlPattern: /\/(icons|brand|favicon)\//i,
         handler: "CacheFirst",
         options: {
-          cacheName: "brand-icons",
+          // bump name = invalide l’ancien cache (ex. ancien C bleu)
+          cacheName: "brand-icons-c2",
           expiration: {
             maxEntries: 32,
             maxAgeSeconds: 60 * 60 * 24 * 90,

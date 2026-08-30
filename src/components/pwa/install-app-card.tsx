@@ -163,7 +163,7 @@ function CardBody({
     <>
       <div className="flex items-start gap-3">
         <Image
-          src="/icons/icon-192.png"
+          src="/icons/c2/icon-192.png"
           alt=""
           width={compact ? 40 : 48}
           height={compact ? 40 : 48}

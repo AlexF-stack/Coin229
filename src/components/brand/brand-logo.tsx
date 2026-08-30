@@ -13,7 +13,7 @@ type Props = {
 };
 
 /** Même fichier que le manifeste PWA / icône d’installation APK. */
-export const BRAND_APP_ICON = "/icons/icon-192.png";
+export const BRAND_APP_ICON = "/icons/c2/icon-192.png";
 
 /**
  * Identité Coin229 — Deep Green × Gold, monogramme C2 de l’APK.

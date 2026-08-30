@@ -17,19 +17,19 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["shopping", "lifestyle"],
     icons: [
       {
-        src: "/icons/icon-192.png",
+        src: "/icons/c2/icon-192.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/icon-512.png",
+        src: "/icons/c2/icon-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/icon-512-maskable.png",
+        src: "/icons/c2/icon-512-maskable.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
@@ -40,19 +40,19 @@ export default function manifest(): MetadataRoute.Manifest {
         name: "Boutique",
         short_name: "Boutique",
         url: "/boutique",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }],
+        icons: [{ src: "/icons/c2/icon-192.png", sizes: "192x192" }],
       },
       {
         name: "Panier",
         short_name: "Panier",
         url: "/panier",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }],
+        icons: [{ src: "/icons/c2/icon-192.png", sizes: "192x192" }],
       },
       {
         name: "Compte",
         short_name: "Compte",
         url: "/compte",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }],
+        icons: [{ src: "/icons/c2/icon-192.png", sizes: "192x192" }],
       },
     ],
   };

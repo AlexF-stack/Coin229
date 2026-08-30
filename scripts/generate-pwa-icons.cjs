@@ -61,13 +61,15 @@ async function makeMaskable(size, file) {
 }
 
 async function main() {
-  const dir = path.join(__dirname, "..", "public", "icons");
+  // Dossier versionné : Android/Chrome figent l’icône à l’install ;
+  // un nouveau chemin force le refresh après réinstall (évite CacheFirst SW).
+  const dir = path.join(__dirname, "..", "public", "icons", "c2");
   fs.mkdirSync(dir, { recursive: true });
   await fromSourceOrSvg(192, path.join(dir, "icon-192.png"), { radiusRatio: 0.22 });
   await fromSourceOrSvg(512, path.join(dir, "icon-512.png"), { radiusRatio: 0.22 });
   await makeMaskable(512, path.join(dir, "icon-512-maskable.png"));
   await fromSourceOrSvg(180, path.join(dir, "apple-touch-icon.png"), { radiusRatio: 0.2 });
-  console.log("PWA icons generated in public/icons");
+  console.log("PWA icons generated in public/icons/c2");
 }
 
 main().catch((e) => {
