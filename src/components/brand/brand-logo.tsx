@@ -2,7 +2,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  /** lockup = monogramme + Coin229 ; mark = C2 seul ; wordmark = texte seul */
+  /** lockup = monogramme + Coin229 ; mark = icône APK C2 ; wordmark = texte seul */
   variant?: "lockup" | "mark" | "wordmark";
   className?: string;
   /** Hauteur approximative en px (largeur auto) */
@@ -12,9 +12,11 @@ type Props = {
   onDark?: boolean;
 };
 
+/** Même fichier que le manifeste PWA / icône d’installation APK. */
+export const BRAND_APP_ICON = "/icons/icon-192.png";
+
 /**
- * Identité Coin229 — Deep Green × Gold.
- * Prefer lockup image ; wordmark CSS en fallback compact.
+ * Identité Coin229 — Deep Green × Gold, monogramme C2 de l’APK.
  */
 export function BrandLogo({
   variant = "lockup",
@@ -26,13 +28,13 @@ export function BrandLogo({
   if (variant === "mark") {
     return (
       <Image
-        src="/brand/mark-c2.svg"
+        src={BRAND_APP_ICON}
         alt="Coin229"
         width={height}
         height={height}
-        className={cn("shrink-0", className)}
+        className={cn("shrink-0 rounded-[22%] object-cover", className)}
+        style={{ width: height, height }}
         priority={priority}
-        unoptimized
       />
     );
   }

@@ -80,7 +80,7 @@ function HeaderInner() {
       <div className="page-shell flex items-center gap-3 py-3 md:gap-6 md:py-3.5">
         <button
           type="button"
-          className="rounded-[10px] p-2 text-navy md:hidden"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-navy md:hidden"
           aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((v) => !v)}
@@ -97,8 +97,9 @@ function HeaderInner() {
           className="flex shrink-0 items-center gap-2"
           aria-label="Coin229 — Accueil"
         >
-          <BrandLogo variant="mark" height={30} priority />
-          <BrandLogo variant="wordmark" height={32} />
+          {/* Icône = même asset que l’APK / PWA */}
+          <BrandLogo variant="mark" height={36} priority />
+          <BrandLogo variant="wordmark" height={34} />
         </Link>
 
         <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
@@ -140,7 +141,7 @@ function HeaderInner() {
         <div className="ml-auto flex items-center gap-0.5 md:ml-0">
           <button
             type="button"
-            className="rounded-[10px] p-2 text-navy lg:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-navy lg:hidden"
             aria-label="Rechercher"
             onClick={() => setSearchOpen((v) => !v)}
           >
@@ -158,7 +159,7 @@ function HeaderInner() {
           </Link>
           <Link
             href="/panier"
-            className="relative rounded-[10px] p-2 text-navy transition hover:bg-white"
+            className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-navy transition hover:bg-white"
             aria-label={`Panier${cartCount ? `, ${cartCount} article(s)` : ""}`}
           >
             <ShoppingBag className="h-5 w-5 stroke-[1.5]" />

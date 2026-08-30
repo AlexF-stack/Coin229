@@ -11,7 +11,7 @@ type Props = {
 
 export function QuantitySelector({ value, min = 1, max, onChange }: Props) {
   return (
-    <div className="inline-flex items-center gap-3 rounded-[16px] bg-card px-2 py-1.5">
+    <div className="inline-flex items-center gap-1.5 rounded-[16px] bg-card px-1.5 py-1 sm:gap-3 sm:px-2 sm:py-1.5">
       <button
         type="button"
         aria-label="Diminuer"
@@ -21,7 +21,9 @@ export function QuantitySelector({ value, min = 1, max, onChange }: Props) {
       >
         <Minus className="h-4 w-4 stroke-[1.5]" />
       </button>
-      <span className="min-w-6 text-center font-semibold tabular-nums">{value}</span>
+      <span className="min-w-5 text-center text-sm font-semibold tabular-nums sm:min-w-6 sm:text-base">
+        {value}
+      </span>
       <button
         type="button"
         aria-label="Augmenter"

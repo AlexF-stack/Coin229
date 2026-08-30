@@ -8,7 +8,10 @@ export function SiteFooter() {
     <footer className="mt-16 bg-navy text-white">
       <div className="page-shell grid gap-10 px-4 py-14 md:grid-cols-12 md:gap-8 md:px-6">
         <div className="md:col-span-4">
-          <BrandLogo variant="wordmark" height={40} onDark />
+          <div className="flex items-center gap-2.5">
+            <BrandLogo variant="mark" height={40} />
+            <BrandLogo variant="wordmark" height={40} onDark />
+          </div>
           <p className="mt-2 text-sm text-amber">Les détails qui changent tout.</p>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
             Montres, bijoux, sacs et lunettes sélectionnés pour votre style —

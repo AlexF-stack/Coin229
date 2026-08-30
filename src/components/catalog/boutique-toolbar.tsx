@@ -89,12 +89,12 @@ export function BoutiqueToolbar({ resultCount }: Props) {
         </label>
       </form>
 
-      <div className="hide-scrollbar flex gap-2 overflow-x-auto px-4 md:px-0">
+      <div className="hide-scrollbar -mx-4 flex max-w-[100vw] gap-1.5 overflow-x-auto overscroll-x-contain px-4 md:mx-0 md:max-w-none md:gap-2 md:px-0">
         <button
           type="button"
           onClick={() => setParam("categorie", "")}
           className={cn(
-            "shrink-0 rounded-[10px] px-3.5 py-2 text-sm font-medium transition",
+            "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
             !categorie
               ? "bg-navy text-white"
               : "border border-border bg-white text-muted hover:text-navy"
@@ -108,7 +108,7 @@ export function BoutiqueToolbar({ resultCount }: Props) {
             type="button"
             onClick={() => setParam("categorie", c)}
             className={cn(
-              "shrink-0 rounded-[10px] px-3.5 py-2 text-sm font-medium transition",
+              "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
               categorie === c
                 ? "bg-navy text-white"
                 : "border border-border bg-white text-muted hover:text-navy"
@@ -119,15 +119,15 @@ export function BoutiqueToolbar({ resultCount }: Props) {
         ))}
       </div>
 
-      <div className="flex items-center justify-between gap-3 px-4 md:px-0">
-        <p className="text-sm text-muted">
+      <div className="flex items-center justify-between gap-2 px-4 md:gap-3 md:px-0">
+        <p className="shrink-0 text-sm text-muted">
           {resultCount} produit{resultCount !== 1 ? "s" : ""}
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 max-w-full items-center justify-end gap-2">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-[10px] border border-border bg-white px-3 py-2 text-sm font-medium text-navy md:hidden"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[10px] border border-border bg-white px-2.5 py-2 text-sm font-medium text-navy md:hidden"
           >
             <Filter className="h-4 w-4" />
             Filtrer
@@ -150,7 +150,7 @@ export function BoutiqueToolbar({ resultCount }: Props) {
           <select
             value={sort}
             onChange={(e) => setParam("sort", e.target.value)}
-            className="rounded-[10px] border border-border bg-white px-3 py-2 text-sm outline-none focus:border-navy md:hidden"
+            className="min-w-0 max-w-[9.5rem] rounded-[10px] border border-border bg-white px-2 py-2 text-sm outline-none focus:border-navy md:hidden"
             aria-label="Trier par"
           >
             {sorts.map((s) => (

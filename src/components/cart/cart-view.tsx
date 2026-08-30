@@ -248,13 +248,13 @@ export function CartView({ suggestions }: Props) {
                       )}
                     </div>
 
-                    <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+                    <div className="mt-auto flex flex-wrap items-end justify-between gap-x-2 gap-y-2 pt-3">
                       <QuantitySelector
                         value={item.quantite}
                         max={item.stockQuantite}
                         onChange={(q) => updateQuantity(item.productId, q)}
                       />
-                      <div className="text-right">
+                      <div className="ml-auto shrink-0 text-right">
                         <p className="text-sm font-semibold text-navy">
                           {formatPrice(line)}
                         </p>

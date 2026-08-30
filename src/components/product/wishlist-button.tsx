@@ -29,7 +29,7 @@ export function WishlistButton({ productId, className }: Props) {
         toggle(productId);
       }}
       className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-white/90 text-navy shadow-sm backdrop-blur-md transition active:scale-95",
+        "flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-white/90 text-navy shadow-sm backdrop-blur-md transition active:scale-95",
         active && "border-rose/30 text-rose",
         className
       )}

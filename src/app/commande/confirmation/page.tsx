@@ -3,6 +3,7 @@ import { CheckCircle2, MessageCircle, XCircle } from "lucide-react";
 import { getOrderForConfirmation } from "@/lib/actions";
 import { formatPrice } from "@/lib/utils";
 import { SITE, whatsappHref } from "@/lib/site";
+import { ConfirmationInstallCard } from "@/components/pwa/confirmation-install-card";
 
 type Props = {
   searchParams: Promise<{ id?: string }>;
@@ -109,6 +110,8 @@ export default async function ConfirmationPage({ searchParams }: Props) {
           Besoin d&apos;aide ? WhatsApp
         </a>
       </div>
+
+      <ConfirmationInstallCard />
 
       <p className="mt-6 text-xs text-muted">
         {SITE.name} · {SITE.zones.join(", ")}

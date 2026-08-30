@@ -1,0 +1,1701 @@
+{
+  "base": "http://localhost:3010",
+  "startedAt": "2026-08-29T20:04:27.994Z",
+  "devices": [
+    {
+      "name": "Tiny-320",
+      "width": 320,
+      "height": 568,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "title": "",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 9,
+            "tinyTouch": 3,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 16,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique",
+          "status": 200,
+          "title": "Boutique | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 7,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 42,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique?categorie=montre",
+          "status": 200,
+          "title": "Montres | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 10,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/produit/prod_montre_recta",
+          "status": 200,
+          "title": "Recta Gold Slim | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 8,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 8,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/panier",
+          "status": 200,
+          "title": "Panier | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 9,
+            "tinyTouch": 1,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 2,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/commande",
+          "status": 200,
+          "title": "Commande | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/favoris",
+          "status": 200,
+          "title": "Coin229 — Les détails qui changent tout.",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/compte",
+          "status": 200,
+          "title": "Mon compte | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/offline",
+          "status": 200,
+          "title": "Hors ligne | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 0,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/a-propos",
+          "status": 200,
+          "title": "À propos | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/livraison",
+          "status": 200,
+          "title": "Livraison & frais | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/retours",
+          "status": 200,
+          "title": "Retours & échanges | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        },
+        {
+          "path": "/page-introuvable-qa-xyz",
+          "status": 404,
+          "title": "Page introuvable | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 1280,
+            "vh": 720
+          },
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "Galaxy-S8",
+      "width": 360,
+      "height": 740,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "title": "",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 3,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 16,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique",
+          "status": 200,
+          "title": "Boutique | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 42,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique?categorie=montre",
+          "status": 200,
+          "title": "Montres | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 10,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/produit/prod_montre_recta",
+          "status": 200,
+          "title": "Recta Gold Slim | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 3,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 8,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/panier",
+          "status": 200,
+          "title": "Panier | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 1,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 2,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/commande",
+          "status": 200,
+          "title": "Commande | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/favoris",
+          "status": 200,
+          "title": "Coin229 — Les détails qui changent tout.",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/compte",
+          "status": 200,
+          "title": "Mon compte | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/offline",
+          "status": 200,
+          "title": "Hors ligne | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 0,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/a-propos",
+          "status": 200,
+          "title": "À propos | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/livraison",
+          "status": 200,
+          "title": "Livraison & frais | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/retours",
+          "status": 200,
+          "title": "Retours & échanges | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/page-introuvable-qa-xyz",
+          "status": 404,
+          "title": "Page introuvable | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 360,
+            "vh": 740
+          },
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "iPhone-SE",
+      "width": 320,
+      "height": 568,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "title": "",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 3,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 16,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique",
+          "status": 200,
+          "title": "Boutique | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 42,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique?categorie=montre",
+          "status": 200,
+          "title": "Montres | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 10,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/produit/prod_montre_recta",
+          "status": 200,
+          "title": "Recta Gold Slim | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 3,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 8,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/panier",
+          "status": 200,
+          "title": "Panier | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 1,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 2,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/commande",
+          "status": 200,
+          "title": "Commande | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/favoris",
+          "status": 200,
+          "title": "Coin229 — Les détails qui changent tout.",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/compte",
+          "status": 200,
+          "title": "Mon compte | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/offline",
+          "status": 200,
+          "title": "Hors ligne | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 0,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/a-propos",
+          "status": 200,
+          "title": "À propos | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/livraison",
+          "status": 200,
+          "title": "Livraison & frais | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/retours",
+          "status": 200,
+          "title": "Retours & échanges | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        },
+        {
+          "path": "/page-introuvable-qa-xyz",
+          "status": 404,
+          "title": "Page introuvable | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 320,
+            "vh": 568
+          },
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "iPhone-13",
+      "width": 390,
+      "height": 664,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "title": "",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 3,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 16,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique",
+          "status": 200,
+          "title": "Boutique | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 42,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique?categorie=montre",
+          "status": 200,
+          "title": "Montres | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 10,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/produit/prod_montre_recta",
+          "status": 200,
+          "title": "Recta Gold Slim | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 3,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 8,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/panier",
+          "status": 200,
+          "title": "Panier | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 1,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 2,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/commande",
+          "status": 200,
+          "title": "Commande | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/favoris",
+          "status": 200,
+          "title": "Coin229 — Les détails qui changent tout.",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/compte",
+          "status": 200,
+          "title": "Mon compte | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/offline",
+          "status": 200,
+          "title": "Hors ligne | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 0,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/a-propos",
+          "status": 200,
+          "title": "À propos | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/livraison",
+          "status": 200,
+          "title": "Livraison & frais | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/retours",
+          "status": 200,
+          "title": "Retours & échanges | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        },
+        {
+          "path": "/page-introuvable-qa-xyz",
+          "status": 404,
+          "title": "Page introuvable | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 390,
+            "vh": 664
+          },
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "iPhone-14-Pro-Max",
+      "width": 430,
+      "height": 740,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "title": "",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 3,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 16,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique",
+          "status": 200,
+          "title": "Boutique | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 42,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique?categorie=montre",
+          "status": 200,
+          "title": "Montres | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 10,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/produit/prod_montre_recta",
+          "status": 200,
+          "title": "Recta Gold Slim | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 3,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 8,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/panier",
+          "status": 200,
+          "title": "Panier | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 1,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 2,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/commande",
+          "status": 200,
+          "title": "Commande | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/favoris",
+          "status": 200,
+          "title": "Coin229 — Les détails qui changent tout.",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/compte",
+          "status": 200,
+          "title": "Mon compte | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/offline",
+          "status": 200,
+          "title": "Hors ligne | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 0,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/a-propos",
+          "status": 200,
+          "title": "À propos | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/livraison",
+          "status": 200,
+          "title": "Livraison & frais | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/retours",
+          "status": 200,
+          "title": "Retours & échanges | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        },
+        {
+          "path": "/page-introuvable-qa-xyz",
+          "status": 404,
+          "title": "Page introuvable | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 430,
+            "vh": 740
+          },
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "Pixel-7",
+      "width": 412,
+      "height": 839,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "title": "",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 3,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 16,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique",
+          "status": 200,
+          "title": "Boutique | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 42,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique?categorie=montre",
+          "status": 200,
+          "title": "Montres | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 10,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/produit/prod_montre_recta",
+          "status": 200,
+          "title": "Recta Gold Slim | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 3,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 8,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/panier",
+          "status": 200,
+          "title": "Panier | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 4,
+            "tinyTouch": 1,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 2,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/commande",
+          "status": 200,
+          "title": "Commande | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/favoris",
+          "status": 200,
+          "title": "Coin229 — Les détails qui changent tout.",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/compte",
+          "status": 200,
+          "title": "Mon compte | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/offline",
+          "status": 200,
+          "title": "Hors ligne | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 0,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/a-propos",
+          "status": 200,
+          "title": "À propos | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/livraison",
+          "status": 200,
+          "title": "Livraison & frais | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/retours",
+          "status": 200,
+          "title": "Retours & échanges | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        },
+        {
+          "path": "/page-introuvable-qa-xyz",
+          "status": 404,
+          "title": "Page introuvable | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 1,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 412,
+            "vh": 839
+          },
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "iPad-Mini",
+      "width": 768,
+      "height": 1024,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "title": "",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 9,
+            "tinyTouch": 3,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 16,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique",
+          "status": 200,
+          "title": "Boutique | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 42,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/boutique?categorie=montre",
+          "status": 200,
+          "title": "Montres | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 10,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/produit/prod_montre_recta",
+          "status": 200,
+          "title": "Recta Gold Slim | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 8,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 8,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/panier",
+          "status": 200,
+          "title": "Panier | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 9,
+            "tinyTouch": 1,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 2,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/commande",
+          "status": 200,
+          "title": "Commande | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/favoris",
+          "status": 200,
+          "title": "Coin229 — Les détails qui changent tout.",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/compte",
+          "status": 200,
+          "title": "Mon compte | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/offline",
+          "status": 200,
+          "title": "Hors ligne | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 0,
+            "tinyTouch": 0,
+            "bottomNav": false,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/a-propos",
+          "status": 200,
+          "title": "À propos | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/livraison",
+          "status": 200,
+          "title": "Livraison & frais | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/retours",
+          "status": 200,
+          "title": "Retours & échanges | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        },
+        {
+          "path": "/page-introuvable-qa-xyz",
+          "status": 404,
+          "title": "Page introuvable | Coin229",
+          "issues": [],
+          "metrics": {
+            "overflowX": 0,
+            "smallTouch": 6,
+            "tinyTouch": 0,
+            "bottomNav": true,
+            "dialogs": 1,
+            "mainOpacity": 1,
+            "productLinks": 0,
+            "vw": 768,
+            "vh": 1024
+          },
+          "ok": true
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "pass": 91,
+    "fail": 0,
+    "p0": 0,
+    "p1": 0,
+    "p2": 0
+  },
+  "finishedAt": "2026-08-29T20:08:08.468Z"
+}

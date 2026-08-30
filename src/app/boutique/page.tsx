@@ -77,8 +77,8 @@ export default async function BoutiquePage({
   return (
     <div className="space-y-6 py-5 md:space-y-8 md:py-8">
       {categorie ? (
-        <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen border-b border-border bg-navy">
-          <div className="page-shell px-4 py-8 md:px-6 md:py-10">
+        <div className="-mx-4 border-b border-border bg-navy md:-mx-6">
+          <div className="px-4 py-8 md:px-6 md:py-10">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-amber">
               Collection
             </p>
