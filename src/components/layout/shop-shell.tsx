@@ -23,9 +23,8 @@ export function ShopShell({ children }: { children: React.ReactNode }) {
   const isCheckout =
     pathname.startsWith("/commande") && !pathname.includes("confirmation");
   const leanFunnel = isProduct || isCheckout;
-  const isCart = pathname.startsWith("/panier");
   const isOffline = pathname.startsWith("/offline");
-  const hideChat = leanFunnel || isCart || isOffline;
+  const hideChat = isOffline;
 
   if (isAdmin) {
     return <>{children}</>;
