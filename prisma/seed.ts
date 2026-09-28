@@ -3,6 +3,16 @@ import { randomBytes, scryptSync } from "crypto";
 
 const prisma = new PrismaClient();
 
+function requiredSecret(name: string) {
+  const value = process.env[name]?.trim();
+  if (!value || value.length < 8) {
+    throw new Error(
+      `${name} est obligatoire (8 caractères minimum). Aucun mot de passe par défaut.`
+    );
+  }
+  return value;
+}
+
 function hashPassword(password: string) {
   const salt = randomBytes(16);
   const hash = scryptSync(password, salt, 64);
@@ -31,10 +41,8 @@ async function main() {
     },
   });
 
-  const passMontres =
-    process.env.VENDOR_MONTRES_PASSWORD?.trim() || "Montres229!";
-  const passChaussures =
-    process.env.VENDOR_CHAUSSURES_PASSWORD?.trim() || "Chaussures229!";
+  const passMontres = requiredSecret("VENDOR_MONTRES_PASSWORD");
+  const passChaussures = requiredSecret("VENDOR_CHAUSSURES_PASSWORD");
 
   async function ensureVendor(opts: {
     id: string;

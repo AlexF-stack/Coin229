@@ -8,9 +8,18 @@ const { randomBytes, scryptSync } = require("crypto");
 
 const prisma = new PrismaClient();
 
-const PASS_MONTRES = process.env.VENDOR_MONTRES_PASSWORD || "Montres229!";
-const PASS_CHAUSSURES =
-  process.env.VENDOR_CHAUSSURES_PASSWORD || "Chaussures229!";
+function requiredSecret(name) {
+  const value = process.env[name]?.trim();
+  if (!value || value.length < 8) {
+    throw new Error(
+      `${name} est obligatoire (8 caractères minimum). Aucun mot de passe par défaut.`
+    );
+  }
+  return value;
+}
+
+const PASS_MONTRES = requiredSecret("VENDOR_MONTRES_PASSWORD");
+const PASS_CHAUSSURES = requiredSecret("VENDOR_CHAUSSURES_PASSWORD");
 
 function hashPassword(password) {
   const salt = randomBytes(16);

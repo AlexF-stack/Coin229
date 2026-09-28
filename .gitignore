@@ -31,6 +31,16 @@ yarn-error.log*
 # env files
 .env
 .env*.local
+.env.vercel*
+.env.vercel.check
+.env.vercel.pull
+
+# scripts ops locaux (secrets, dumps Vercel)
+scripts/configure-ops-env.js
+scripts/peek-*.js
+
+# captures back-office (données clients)
+docs/guides/captures/
 
 # vercel
 .vercel

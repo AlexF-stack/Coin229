@@ -27,7 +27,7 @@ async function check(name, fn) {
 
 async function main() {
   const email = `ready-vendeur-${stamp}@coin229.test`;
-  const password = "ReadyVendor1!";
+  const password = randomBytes(12).toString("base64url");
   const boutique = `Ready Marque ${stamp}`;
   const results = [];
 
@@ -318,9 +318,16 @@ async function main() {
     })
   );
 
-  // —— Compte démo durable (pour tests manuels)
+  // Compte démo uniquement si un mot de passe est fourni hors du dépôt.
   const demoEmail = "demo.vendeur@coin229.bj";
-  const demoPass = "Coin229Vendor!";
+  const demoPass = process.env.DEMO_VENDOR_PASSWORD?.trim();
+  if (!demoPass || demoPass.length < 8) {
+    results.push({
+      name: "seed compte démo durable",
+      ok: true,
+      skipped: "DEMO_VENDOR_PASSWORD absent",
+    });
+  } else {
   results.push(
     await check("seed compte démo durable", async () => {
       const salt = randomBytes(16);
@@ -376,6 +383,7 @@ async function main() {
       return { slug: v.slug, email: demoEmail };
     })
   );
+  }
 
   const failed = results.filter((r) => !r.ok);
   const soft = results.filter((r) => r.name === "footer CTA vendeur" && r.ok && !r.hasCta);
@@ -388,12 +396,13 @@ async function main() {
         total: results.length,
         failed,
         softWarnings: soft,
-        demoAccount: {
-          email: demoEmail,
-          password: demoPass,
-          login: `${BASE}/vendeur/login`,
-          store: `${BASE}/vendeur/demo-marque`,
-        },
+        demoAccount: demoPass
+          ? {
+              email: demoEmail,
+              login: `${BASE}/vendeur/login`,
+              store: `${BASE}/vendeur/demo-marque`,
+            }
+          : null,
         results,
       },
       null,
