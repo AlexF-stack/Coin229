@@ -1,22 +1,27 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductPurchaseBar } from "@/components/product/product-purchase-bar";
 import { ProductCard } from "@/components/product/product-card";
 import { WishlistButton } from "@/components/product/wishlist-button";
+import { ProductShareLink } from "@/components/product/product-share-link";
+import { VendorUtmTracker } from "@/components/product/vendor-utm-tracker";
+import { ContactVendorButton } from "@/components/messaging/contact-vendor-button";
 import {
   JsonLd,
   breadcrumbJsonLd,
   productJsonLd,
 } from "@/components/seo/json-ld";
 import { fetchProductById, fetchSimilar } from "@/lib/catalog";
+import { assertClient } from "@/lib/assert-client";
 import {
   CATEGORIE_LABELS,
   GENRE_LABELS,
   isProductAvailable,
+  nicheLabel,
 } from "@/lib/constants";
 import { SITE } from "@/lib/site";
 import {
@@ -100,9 +105,13 @@ export default async function ProductPage({ params }: Props) {
   const savings = hasPromo ? product.prix - product.prixPromo! : 0;
   const inStock = isProductAvailable(product.statut, product.stockQuantite);
   const similar = await fetchSimilar(product.id, product.categorie);
+  const clientSession = await assertClient();
 
   return (
     <div className="pb-8 md:pb-12 md:pt-6">
+      <Suspense fallback={null}>
+        <VendorUtmTracker />
+      </Suspense>
       <JsonLd
         data={[
           productJsonLd(product),
@@ -138,15 +147,47 @@ export default async function ProductPage({ params }: Props) {
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-amber">
               <Link
-                href={`/boutique?categorie=${product.categorie}`}
+                href={
+                  product.niche
+                    ? `/boutique?niche=${encodeURIComponent(product.niche)}`
+                    : `/boutique?categorie=${product.categorie}`
+                }
                 className="hover:underline"
               >
-                {CATEGORIE_LABELS[product.categorie]}
+                {nicheLabel(product.niche) ||
+                  CATEGORIE_LABELS[product.categorie]}
               </Link>
             </p>
             <h1 className="mt-1 font-display text-2xl font-bold leading-tight text-navy md:text-4xl">
               {product.nom}
             </h1>
+
+            {"vendor" in product && product.vendor && (
+              <div className="mt-2 space-y-1">
+                <p className="text-sm text-muted">
+                  Marque{" "}
+                  {product.vendor.slug ? (
+                    <Link
+                      href={`/vendeur/${product.vendor.slug}`}
+                      className="font-medium text-navy hover:underline"
+                    >
+                      {product.vendor.nomBoutique}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-navy">
+                      {product.vendor.nomBoutique}
+                    </span>
+                  )}
+                </p>
+                <ContactVendorButton
+                  vendorId={product.vendorId}
+                  productId={product.id}
+                  productName={product.nom}
+                  vendorName={product.vendor.nomBoutique}
+                  loggedIn={clientSession.ok}
+                />
+              </div>
+            )}
 
             <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <span className="text-2xl font-semibold text-navy md:text-3xl">
@@ -188,8 +229,16 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           {inStock && (
-            <div className="md:max-w-md">
+            <div className="md:max-w-md space-y-3">
               <ProductPurchaseBar product={product} />
+              {"vendor" in product &&
+                product.vendor?.slug && (
+                  <ProductShareLink
+                    productId={product.id}
+                    productName={product.nom}
+                    campaignSlug={product.vendor.slug}
+                  />
+                )}
             </div>
           )}
 

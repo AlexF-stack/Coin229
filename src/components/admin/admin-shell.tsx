@@ -9,6 +9,8 @@ import {
   ExternalLink,
   Boxes,
   Bell,
+  Store,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +18,8 @@ const links = [
   { href: "/admin", label: "Tableau de bord", icon: LayoutDashboard, exact: true },
   { href: "/admin/produits", label: "Produits", icon: Package },
   { href: "/admin/commandes", label: "Commandes", icon: ShoppingCart },
+  { href: "/admin/vendeurs", label: "Vendeurs", icon: Store },
+  { href: "/admin/payouts", label: "Reversements", icon: Wallet },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
 ];
 

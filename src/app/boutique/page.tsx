@@ -3,14 +3,15 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { ProductGrid } from "@/components/catalog/product-grid";
 import { BoutiqueToolbar } from "@/components/catalog/boutique-toolbar";
-import { fetchProducts } from "@/lib/catalog";
-import { CATEGORIES, CATEGORIE_LABELS } from "@/lib/constants";
+import { fetchActiveNiches, fetchProducts } from "@/lib/catalog";
+import { CATEGORIES, CATEGORIE_LABELS, nicheLabel } from "@/lib/constants";
 import { buildPageMetadata } from "@/lib/seo";
 import type { Categorie, Genre } from "@prisma/client";
 
 type SearchParams = Promise<{
   q?: string;
   categorie?: string;
+  niche?: string;
   genre?: string;
   sort?: string;
   enStock?: string;
@@ -30,6 +31,14 @@ export async function generateMetadata({
       path: `/boutique?categorie=${cat}`,
     });
   }
+  if (params.niche?.trim()) {
+    const label = nicheLabel(params.niche.trim()) || params.niche.trim();
+    return buildPageMetadata({
+      title: label,
+      description: `${label} sur Coin229 — prix en FCFA.`,
+      path: `/boutique?niche=${encodeURIComponent(params.niche.trim())}`,
+    });
+  }
   return buildPageMetadata({
     title: "Boutique",
     description:
@@ -45,8 +54,11 @@ export default async function BoutiquePage({
 }) {
   const params = await searchParams;
   const q = params.q?.trim() ?? "";
+  const niche = params.niche?.trim() || undefined;
   const categorie =
-    params.categorie && CATEGORIES.includes(params.categorie as Categorie)
+    !niche &&
+    params.categorie &&
+    CATEGORIES.includes(params.categorie as Categorie)
       ? (params.categorie as Categorie)
       : undefined;
   const genre =
@@ -61,26 +73,36 @@ export default async function BoutiquePage({
   ) as "pertinence" | "nouveautes" | "prix_asc" | "prix_desc";
   const enStock = params.enStock === "1";
 
-  const { products } = await fetchProducts({
-    q: q || undefined,
-    categorie,
-    genre,
-    sort,
-    enStock: enStock || undefined,
-  });
+  const [{ products }, niches] = await Promise.all([
+    fetchProducts({
+      q: q || undefined,
+      categorie,
+      niche,
+      genre,
+      sort,
+      enStock: enStock || undefined,
+    }),
+    fetchActiveNiches(24, categorie),
+  ]);
 
-  const heading = categorie ? CATEGORIE_LABELS[categorie] : "Boutique";
-  const sub = categorie
-    ? "Sélection filtrée — affinez avec la recherche et le tri."
-    : "Tous les accessoires, au même endroit.";
+  const heading = niche
+    ? nicheLabel(niche) || niche
+    : categorie
+      ? CATEGORIE_LABELS[categorie]
+      : "Boutique";
+  const sub = niche
+    ? "Sélection niche — affinez avec la recherche et le tri."
+    : categorie
+      ? "Sélection filtrée — affinez avec la recherche et le tri."
+      : "Montres, bijoux et chaussures — classés pour trouver vite.";
 
   return (
     <div className="space-y-6 py-5 md:space-y-8 md:py-8">
-      {categorie ? (
+      {categorie || niche ? (
         <div className="-mx-4 border-b border-border bg-navy md:-mx-6">
           <div className="px-4 py-8 md:px-6 md:py-10">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-amber">
-              Collection
+              {niche ? "Niche" : "Collection"}
             </p>
             <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-white md:text-3xl">
               {heading}
@@ -104,7 +126,7 @@ export default async function BoutiquePage({
       )}
 
       <Suspense fallback={<div className="h-24" />}>
-        <BoutiqueToolbar resultCount={products.length} />
+        <BoutiqueToolbar resultCount={products.length} niches={niches} />
       </Suspense>
 
       {products.length > 0 ? (

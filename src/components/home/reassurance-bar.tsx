@@ -40,18 +40,23 @@ export function ReassuranceBar() {
   return (
     <section
       aria-label="Avantages Coin229"
-      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen border-y border-border bg-cream"
+      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen border-y border-border/80 bg-cream"
     >
-      <ul className="page-shell grid grid-cols-2 gap-4 px-4 py-5 md:grid-cols-4 md:gap-6 md:px-6 md:py-6">
-        {items.map(({ icon: Icon, title, text }) => (
-          <li key={title} className="flex gap-2.5">
-            <Icon
-              className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-amber"
-              aria-hidden
-            />
-            <div>
-              <p className="text-sm font-semibold text-navy">{title}</p>
-              <p className="text-xs leading-snug text-muted">{text}</p>
+      <ul className="page-shell grid grid-cols-2 gap-x-4 gap-y-5 px-4 py-6 md:grid-cols-4 md:gap-6 md:px-6 md:py-7">
+        {items.map(({ icon: Icon, title, text }, i) => (
+          <li key={title} className="flex gap-3">
+            <span className="mt-0.5 font-display text-[10px] font-semibold tracking-[0.14em] text-amber">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Icon
+                  className="h-4 w-4 shrink-0 stroke-[1.5] text-navy"
+                  aria-hidden
+                />
+                <p className="text-sm font-semibold text-navy">{title}</p>
+              </div>
+              <p className="mt-0.5 text-xs leading-snug text-muted">{text}</p>
             </div>
           </li>
         ))}

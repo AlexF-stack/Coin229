@@ -56,7 +56,7 @@ export function AdminLoginForm() {
             Back-office
           </p>
         </div>
-        <h1 className="text-xl font-semibold text-white">Connexion vendeur</h1>
+        <h1 className="text-xl font-semibold text-white">Connexion admin</h1>
         <label className="block space-y-1.5 text-sm">
           <span className="text-white/45">Mot de passe</span>
           <input

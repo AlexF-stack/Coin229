@@ -1,358 +1,127 @@
 import { PrismaClient } from "@prisma/client";
+import { randomBytes, scryptSync } from "crypto";
 
 const prisma = new PrismaClient();
 
+function hashPassword(password: string) {
+  const salt = randomBytes(16);
+  const hash = scryptSync(password, salt, 64);
+  return `scrypt$${salt.toString("hex")}$${hash.toString("hex")}`;
+}
+
+/**
+ * Seed minimal : plateforme + 2 vendeurs métier + config livraison.
+ * Pas de catalogue fictif Unsplash — produits via espace vendeur / scripts métier.
+ */
 async function main() {
-  const vendor = await prisma.vendor.upsert({
+  const platform = await prisma.vendor.upsert({
     where: { id: "vendor_coin229_local" },
     update: {
       nomBoutique: "Coin229 Boutique",
       contact: "+22990000000",
       statut: "actif",
+      slug: "coin229",
     },
     create: {
       id: "vendor_coin229_local",
       nomBoutique: "Coin229 Boutique",
       contact: "+22990000000",
       statut: "actif",
+      slug: "coin229",
     },
   });
 
-  const products = [
-    {
-      id: "prod_montre_aurora",
-      nom: "Montre Aurora Gold",
-      description:
-        "Cadran minimal, bracelet acier doré. Look premium pour soirées et contenus Insta.",
-      categorie: "montre" as const,
-      genre: "femme" as const,
-      prix: 28000,
-      prixPromo: 22900,
-      stockQuantite: 12,
-      images: [
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
-        "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_montre_noir",
-      nom: "Chrono Noir Mat",
-      description:
-        "Chronographe sport chic, finition mate. Pièce signature homme Coin229.",
-      categorie: "montre" as const,
-      genre: "homme" as const,
-      prix: 32000,
-      prixPromo: null as number | null,
-      stockQuantite: 8,
-      images: [
-        "https://images.unsplash.com/photo-1522312346375-d1a52e194b6a?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_bijou_chain",
-      nom: "Chaîne Cubaine Argent",
-      description:
-        "Mailles cubaines brillantes — layering street / soirée. Unisexe.",
-      categorie: "bijou" as const,
-      genre: "unisexe" as const,
-      prix: 18000,
-      prixPromo: 14900,
-      stockQuantite: 20,
-      images: [
-        "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_bijou_creoles",
-      nom: "Créoles Rose Éclat",
-      description:
-        "Créoles saturées rose-doré. Accessoire viral TikTok-ready — restock Cotonou.",
-      categorie: "bijou" as const,
-      genre: "femme" as const,
-      prix: 9500,
-      prixPromo: null,
-      stockQuantite: 24,
-      images: [
-        "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_sac_mini",
-      nom: "Mini Bag Corail",
-      description:
-        "Petit sac structuré, couleur corail vive. Parfait pour sorties Cotonou.",
-      categorie: "sac" as const,
-      genre: "femme" as const,
-      prix: 24500,
-      prixPromo: 19900,
-      stockQuantite: 6,
-      images: [
-        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_sac_cross",
-      nom: "Sacoche Cross Urban",
-      description:
-        "Bandoulière réglable, compartiments pratiques. Style quotidien.",
-      categorie: "sac" as const,
-      genre: "homme" as const,
-      prix: 21000,
-      prixPromo: null,
-      stockQuantite: 15,
-      images: [
-        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_montre_mesh",
-      nom: "Mesh Silver Slim",
-      description:
-        "Bracelet mesh ultra fin, cadran argenté. Look clean pour le quotidien.",
-      categorie: "montre" as const,
-      genre: "unisexe" as const,
-      prix: 19500,
-      prixPromo: 16900,
-      stockQuantite: 14,
-      images: [
-        "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_bijou_bague",
-      nom: "Bague Statement Ambre",
-      description: "Pièce signature ambre — layering ou solo. Touche premium.",
-      categorie: "bijou" as const,
-      genre: "femme" as const,
-      prix: 12500,
-      prixPromo: null,
-      stockQuantite: 9,
-      images: [
-        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_sac_tote",
-      nom: "Tote Canvas Noir",
-      description:
-        "Grand tote pratique, toile résistante. Idéal campus / marchés Cotonou.",
-      categorie: "sac" as const,
-      genre: "unisexe" as const,
-      prix: 16500,
-      prixPromo: 13900,
-      stockQuantite: 18,
-      images: [
-        "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_montre_sport",
-      nom: "Sport Digital Ember",
-      description: "Digital rétro avec accents ambre. Vibes TikTok street.",
-      categorie: "montre" as const,
-      genre: "homme" as const,
-      prix: 14200,
-      prixPromo: null,
-      stockQuantite: 11,
-      images: [
-        "https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_lunette_aviator",
-      nom: "Aviator Or Night",
-      description:
-        "Pilote doré, verres fumés. Look soirée Cotonou / clips Insta.",
-      categorie: "lunette" as const,
-      genre: "unisexe" as const,
-      prix: 19500,
-      prixPromo: 15900,
-      stockQuantite: 14,
-      images: [
-        "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&q=80",
-        "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_lunette_cat",
-      nom: "Cat-Eye Rouge Soleil",
-      description:
-        "Monture cat-eye vive. Accessoire signature femmes — stock limité.",
-      categorie: "lunette" as const,
-      genre: "femme" as const,
-      prix: 16800,
-      prixPromo: null,
-      stockQuantite: 10,
-      images: [
-        "https://images.unsplash.com/photo-1577803645773-f96470509666?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_lunette_square",
-      nom: "Square Noir Mat",
-      description:
-        "Carré mat anti-reflet. Street clean homme — résiste au soleil Atlantique.",
-      categorie: "lunette" as const,
-      genre: "homme" as const,
-      prix: 17500,
-      prixPromo: 14900,
-      stockQuantite: 16,
-      images: [
-        "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_lunette_shield",
-      nom: "Shield Noir Fidjrossè",
-      description:
-        "Masque oversized UV. Plage Fidjrossè, balades soleil, clips WhatsApp.",
-      categorie: "lunette" as const,
-      genre: "unisexe" as const,
-      prix: 18900,
-      prixPromo: 15500,
-      stockQuantite: 18,
-      images: [
-        "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_lunette_clear",
-      nom: "Clear Frame Urban",
-      description:
-        "Monture transparente tendance. Bureau, campus, look clean Cotonou.",
-      categorie: "lunette" as const,
-      genre: "femme" as const,
-      prix: 16500,
-      prixPromo: null,
-      stockQuantite: 14,
-      images: [
-        "https://images.unsplash.com/photo-1577803645773-f96470509666?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_sac_banane",
-      nom: "Banane Zip City",
-      description:
-        "Banane zip sécurisée. Mains libres en zémidjan — quotidien urbain.",
-      categorie: "sac" as const,
-      genre: "homme" as const,
-      prix: 17900,
-      prixPromo: 14900,
-      stockQuantite: 20,
-      images: [
-        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_sac_seau",
-      nom: "Seau Soft Nude",
-      description:
-        "Sac seau soft nude. Sorties, église, événements — look premium accessible.",
-      categorie: "sac" as const,
-      genre: "femme" as const,
-      prix: 22500,
-      prixPromo: 18900,
-      stockQuantite: 12,
-      images: [
-        "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_bijou_hoops",
-      nom: "Hoops XL Or",
-      description:
-        "Créoles XXL dorées. Impulse gift / layering soirée — ticket bas.",
-      categorie: "bijou" as const,
-      genre: "femme" as const,
-      prix: 11500,
-      prixPromo: null,
-      stockQuantite: 28,
-      images: [
-        "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_bijou_cauri",
-      nom: "Bracelet Stack Cauri",
-      description:
-        "Stack perles & cauri. Identité locale soft + street unisexe.",
-      categorie: "bijou" as const,
-      genre: "unisexe" as const,
-      prix: 9900,
-      prixPromo: null,
-      stockQuantite: 30,
-      images: [
-        "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_bijou_bar",
-      nom: "Collier Bar Minimal",
-      description:
-        "Barre fine dorée. Quotidien layering — simple et photo-ready.",
-      categorie: "bijou" as const,
-      genre: "femme" as const,
-      prix: 12900,
-      prixPromo: 10900,
-      stockQuantite: 22,
-      images: [
-        "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80",
-      ],
-    },
-    {
-      id: "prod_montre_recta",
-      nom: "Recta Gold Slim",
-      description:
-        "Cadran rectangle doré slim. Signature soirée / Insta femme.",
-      categorie: "montre" as const,
-      genre: "femme" as const,
-      prix: 24500,
-      prixPromo: 19900,
-      stockQuantite: 10,
-      images: [
-        "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=800&q=80",
-      ],
-    },
-  ];
+  const passMontres =
+    process.env.VENDOR_MONTRES_PASSWORD?.trim() || "Montres229!";
+  const passChaussures =
+    process.env.VENDOR_CHAUSSURES_PASSWORD?.trim() || "Chaussures229!";
 
-  for (const p of products) {
-    const statut =
-      "statut" in p && typeof p.statut === "string"
-        ? (p.statut as "actif" | "rupture" | "archive")
-        : p.stockQuantite > 0
-          ? ("actif" as const)
-          : ("rupture" as const);
-
-    await prisma.product.upsert({
-      where: { id: p.id },
+  async function ensureVendor(opts: {
+    id: string;
+    slug: string;
+    nomBoutique: string;
+    email: string;
+    contact: string;
+    description: string;
+    password: string;
+  }) {
+    const existing = await prisma.vendor.findUnique({ where: { id: opts.id } });
+    const passwordHash =
+      existing?.passwordHash && existing.passwordHash.startsWith("scrypt$")
+        ? existing.passwordHash
+        : hashPassword(opts.password);
+    return prisma.vendor.upsert({
+      where: { id: opts.id },
       update: {
-        nom: p.nom,
-        description: p.description,
-        categorie: p.categorie,
-        genre: p.genre,
-        prix: p.prix,
-        prixPromo: p.prixPromo,
-        stockQuantite: p.stockQuantite,
-        images: p.images,
-        source: "local",
-        statut,
-        vendorId: vendor.id,
+        nomBoutique: opts.nomBoutique,
+        slug: opts.slug,
+        contact: opts.contact,
+        email: opts.email,
+        statut: "actif",
+        description: opts.description,
+        ...(existing?.passwordHash ? {} : { passwordHash }),
       },
       create: {
-        id: p.id,
-        vendorId: vendor.id,
-        nom: p.nom,
-        description: p.description,
-        categorie: p.categorie,
-        genre: p.genre,
-        prix: p.prix,
-        prixPromo: p.prixPromo,
-        stockQuantite: p.stockQuantite,
-        images: p.images,
-        source: "local",
-        statut,
+        id: opts.id,
+        nomBoutique: opts.nomBoutique,
+        slug: opts.slug,
+        contact: opts.contact,
+        email: opts.email,
+        statut: "actif",
+        description: opts.description,
+        passwordHash,
       },
     });
+  }
+
+  await ensureVendor({
+    id: "vendor_atelier_montres",
+    slug: "atelier-montres",
+    nomBoutique: "Atelier Montres",
+    email: "montres@coin229.bj",
+    contact: "+22991000001",
+    description:
+      "Montres et bijoux sélectionnés — vitrine indépendante sur Coin229.",
+    password: passMontres,
+  });
+
+  await ensureVendor({
+    id: "vendor_maison_chaussures",
+    slug: "maison-chaussures",
+    nomBoutique: "Maison Chaussures",
+    email: "chaussures@coin229.bj",
+    contact: "+22991000002",
+    description:
+      "Sandales et chaussures — vitrine indépendante sur Coin229.",
+    password: passChaussures,
+  });
+
+  const fake = await prisma.product.findMany({
+    where: {
+      OR: [
+        { id: { startsWith: "prod_" } },
+        { nom: { contains: "Démo", mode: "insensitive" } },
+        { nom: { contains: "Demo", mode: "insensitive" } },
+      ],
+    },
+    select: { id: true, images: true },
+  });
+  const unsplashIds = (
+    await prisma.product.findMany({
+      select: { id: true, images: true },
+    })
+  )
+    .filter((p) => (p.images || []).some((u) => /unsplash\.com/i.test(u)))
+    .map((p) => p.id);
+
+  const ids = [...new Set([...fake.map((p) => p.id), ...unsplashIds])];
+  if (ids.length) {
+    await prisma.orderItem.deleteMany({ where: { productId: { in: ids } } });
+    await prisma.conversation.updateMany({
+      where: { productId: { in: ids } },
+      data: { productId: null },
+    });
+    await prisma.product.deleteMany({ where: { id: { in: ids } } });
   }
 
   await prisma.appConfig.upsert({
@@ -364,7 +133,30 @@ async function main() {
     },
   });
 
-  console.log(`Seed OK — vendeur ${vendor.nomBoutique}, ${products.length} produits`);
+  await prisma.appConfig.upsert({
+    where: { cle: "MARKETPLACE_COMMISSION_PCT" },
+    update: {},
+    create: {
+      cle: "MARKETPLACE_COMMISSION_PCT",
+      valeur: process.env.MARKETPLACE_COMMISSION_PCT ?? "10",
+    },
+  });
+
+  const countMontres = await prisma.product.count({
+    where: {
+      vendorId: "vendor_atelier_montres",
+      statut: { in: ["actif", "rupture"] },
+    },
+  });
+  const countChaussures = await prisma.product.count({
+    where: {
+      vendorId: "vendor_maison_chaussures",
+      statut: { in: ["actif", "rupture"] },
+    },
+  });
+  console.log(
+    `Seed OK — plateforme ${platform.nomBoutique}, Atelier Montres : ${countMontres}, Maison Chaussures : ${countChaussures}, faux retirés : ${ids.length}`
+  );
 }
 
 main()

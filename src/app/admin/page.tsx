@@ -105,6 +105,12 @@ export default async function AdminDashboardPage() {
           >
             Voir les commandes
           </Link>
+          <Link
+            href="/admin/vendeurs"
+            className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/10"
+          >
+            Valider vendeurs
+          </Link>
         </div>
       </div>
     </AdminShell>

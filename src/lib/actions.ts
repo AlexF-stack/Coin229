@@ -160,10 +160,23 @@ export async function createOrder(input: {
   if (vendorIds.size > 1) {
     return {
       success: false as const,
-      error: "Panier multi-vendeurs non supporté pour l’instant.",
+      error:
+        "Ton panier contient déjà des articles d’une autre marque — vide ou commande d’abord.",
     };
   }
   const vendorId = products[0]!.vendorId;
+
+  const vendor = await prisma.vendor.findUnique({
+    where: { id: vendorId },
+    select: { id: true, statut: true, nomBoutique: true, contact: true },
+  });
+  if (!vendor || vendor.statut !== "actif") {
+    return {
+      success: false as const,
+      error:
+        "Cette boutique n’accepte pas de commandes pour le moment. Choisis une autre marque.",
+    };
+  }
 
   const lineItems = data.items.map((item) => {
     const product = products.find((p) => p.id === item.productId)!;
@@ -182,6 +195,15 @@ export async function createOrder(input: {
   const subtotal = lineItems.reduce((s, l) => s + l.lineTotal, 0);
   const shipping = calculateShippingFee({ zone: data.zone, subtotal });
   const montantTotal = subtotal + shipping.fee;
+
+  const { getMarketplaceCommissionPct, splitOrderAmounts } = await import(
+    "@/lib/marketplace-finance"
+  );
+  const commissionPct = await getMarketplaceCommissionPct();
+  const { commissionAmount, vendorNet } = splitOrderAmounts(
+    subtotal,
+    commissionPct
+  );
 
   const existing = await prisma.client.findUnique({
     where: { telephone },
@@ -246,6 +268,9 @@ export async function createOrder(input: {
           zoneLivraison: data.zone,
           fraisLivraison: shipping.fee,
           montantTotal,
+          commissionPct,
+          commissionAmount,
+          vendorNet,
           telephone,
           nomClient: data.nom,
           adresseLivraison: data.adresse,
@@ -321,6 +346,22 @@ export async function createOrder(input: {
   revalidatePath("/");
   revalidatePath("/compte");
   revalidatePath("/admin");
+  revalidatePath("/vendeur/espace");
+  revalidatePath("/vendeur/espace/commandes");
+
+  void import("@/lib/order-notify")
+    .then(({ notifyNewOrder }) =>
+      notifyNewOrder({
+        orderId: order.id,
+        vendorId: vendor.id,
+        vendorName: vendor.nomBoutique,
+        vendorContact: vendor.contact,
+        montantTotal,
+        nomClient: data.nom,
+        telephone,
+      })
+    )
+    .catch(() => {});
 
   return {
     success: true as const,
@@ -520,6 +561,7 @@ export async function getWishlistProducts(
       prixPromo: p.prixPromo,
       images: p.images,
       categorie: p.categorie,
+      niche: p.niche,
       genre: p.genre,
       stockQuantite: p.stockQuantite,
       statut: p.statut,
@@ -653,8 +695,227 @@ export async function getDefaultVendor() {
   } catch {
     return null;
   }
+  const preferredId = process.env.COIN229_VENDOR_ID?.trim();
+  if (preferredId) {
+    const preferred = await prisma.vendor.findUnique({
+      where: { id: preferredId },
+    });
+    if (preferred) return preferred;
+  }
+  const bySlug = await prisma.vendor.findFirst({
+    where: { slug: "coin229" },
+  });
+  if (bySlug) return bySlug;
+  const byLocalId = await prisma.vendor.findUnique({
+    where: { id: "vendor_coin229_local" },
+  });
+  if (byLocalId) return byLocalId;
   return prisma.vendor.findFirst({
     where: { statut: "actif" },
     orderBy: { dateCreation: "asc" },
   });
+}
+
+export async function listMarketplaceVendors() {
+  try {
+    await requireAdmin();
+  } catch {
+    return [];
+  }
+  return prisma.vendor.findMany({
+    orderBy: [{ statut: "asc" }, { dateCreation: "desc" }],
+    include: {
+      _count: { select: { products: true, orders: true } },
+    },
+  });
+}
+
+export async function listAdminPayoutData() {
+  try {
+    await requireAdmin();
+  } catch {
+    return { unpaidVendors: [], recentPayouts: [] };
+  }
+
+  const unpaidOrders = await prisma.order.findMany({
+    where: {
+      statut: { in: ["livree", "confirmee"] },
+      payoutId: null,
+      vendorNet: { gt: 0 },
+    },
+    include: { vendor: { select: { id: true, nomBoutique: true, email: true } } },
+  });
+
+  const byVendor = new Map<
+    string,
+    {
+      vendorId: string;
+      nomBoutique: string;
+      email: string | null;
+      orderCount: number;
+      vendorNet: number;
+    }
+  >();
+  for (const o of unpaidOrders) {
+    const cur = byVendor.get(o.vendorId) ?? {
+      vendorId: o.vendorId,
+      nomBoutique: o.vendor.nomBoutique,
+      email: o.vendor.email,
+      orderCount: 0,
+      vendorNet: 0,
+    };
+    cur.orderCount += 1;
+    cur.vendorNet += o.vendorNet;
+    byVendor.set(o.vendorId, cur);
+  }
+
+  const recentPayouts = await prisma.vendorPayout.findMany({
+    orderBy: { dateCreation: "desc" },
+    take: 30,
+    include: {
+      vendor: { select: { nomBoutique: true } },
+      _count: { select: { orders: true } },
+    },
+  });
+
+  return {
+    unpaidVendors: [...byVendor.values()].sort((a, b) => b.vendorNet - a.vendorNet),
+    recentPayouts,
+  };
+}
+
+export async function setVendorStatus(
+  vendorId: string,
+  statut: "actif" | "en_attente" | "suspendu"
+) {
+  try {
+    await requireAdmin();
+  } catch {
+    return { success: false as const, error: "Non autorisé" };
+  }
+  await prisma.vendor.update({
+    where: { id: vendorId },
+    data: { statut },
+  });
+
+  // Activation : publier les produits préparés (archive → actif si stock)
+  if (statut === "actif") {
+    await prisma.product.updateMany({
+      where: {
+        vendorId,
+        statut: "archive",
+        stockQuantite: { gt: 0 },
+      },
+      data: { statut: "actif" },
+    });
+  }
+  if (statut === "suspendu") {
+    await prisma.product.updateMany({
+      where: { vendorId, statut: "actif" },
+      data: { statut: "archive" },
+    });
+  }
+
+  revalidatePath("/admin/vendeurs");
+  revalidatePath("/admin");
+  revalidatePath("/boutique");
+  revalidatePath(`/vendeur`);
+  return { success: true as const };
+}
+
+/** Reverse manuel : regroupe les commandes unpaid livrées/confirmées. */
+export async function createVendorPayout(vendorId: string, note?: string) {
+  try {
+    await requireAdmin();
+  } catch {
+    return { success: false as const, error: "Non autorisé" };
+  }
+
+  const orders = await prisma.order.findMany({
+    where: {
+      vendorId,
+      payoutId: null,
+      statut: { in: ["livree", "confirmee", "en_livraison"] },
+      vendorNet: { gt: 0 },
+    },
+  });
+  if (!orders.length) {
+    return { success: false as const, error: "Rien à reverser" };
+  }
+  const amount = orders.reduce((s, o) => s + o.vendorNet, 0);
+  const payout = await prisma.$transaction(async (tx) => {
+    const p = await tx.vendorPayout.create({
+      data: {
+        vendorId,
+        amount,
+        statut: "paid",
+        note: note?.trim().slice(0, 200) || "Reverse manuel",
+        datePaid: new Date(),
+      },
+    });
+    await tx.order.updateMany({
+      where: { id: { in: orders.map((o) => o.id) } },
+      data: { payoutId: p.id },
+    });
+    return p;
+  });
+
+  revalidatePath("/admin/payouts");
+  revalidatePath("/admin/vendeurs");
+  revalidatePath("/vendeur/espace/finances");
+  return { success: true as const, payoutId: payout.id, amount };
+}
+
+export async function listPayoutQueue() {
+  try {
+    await requireAdmin();
+  } catch {
+    return { vendors: [], payouts: [] };
+  }
+  const vendors = await prisma.vendor.findMany({
+    where: { statut: "actif" },
+    orderBy: { nomBoutique: "asc" },
+  });
+  const unpaid = await prisma.order.groupBy({
+    by: ["vendorId"],
+    where: {
+      payoutId: null,
+      statut: { in: ["livree", "confirmee", "en_livraison"] },
+      vendorNet: { gt: 0 },
+    },
+    _sum: { vendorNet: true },
+    _count: true,
+  });
+  const byId = new Map(unpaid.map((u) => [u.vendorId, u]));
+  const queue = vendors
+    .map((v) => {
+      const u = byId.get(v.id);
+      return {
+        vendor: v,
+        pendingAmount: u?._sum.vendorNet ?? 0,
+        orderCount: u?._count ?? 0,
+      };
+    })
+    .filter((r) => r.pendingAmount > 0);
+
+  const payouts = await prisma.vendorPayout.findMany({
+    include: { vendor: true },
+    orderBy: { dateCreation: "desc" },
+    take: 40,
+  });
+  return { vendors: queue, payouts };
+}
+
+export async function markOrderRefundDone(orderId: string) {
+  try {
+    await requireAdmin();
+  } catch {
+    return { success: false as const, error: "Non autorisé" };
+  }
+  await prisma.order.update({
+    where: { id: orderId },
+    data: { refundStatus: "done" },
+  });
+  revalidatePath("/admin");
+  return { success: true as const };
 }

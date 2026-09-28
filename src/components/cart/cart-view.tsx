@@ -143,11 +143,20 @@ export function CartView({ suggestions }: Props) {
 
   const total = subtotal + (selectedItems.length ? shipping.fee : 0);
   const canCheckout = selectedItems.length > 0;
+  const multiVendor =
+    new Set(items.map((i) => i.vendorId)).size > 1;
 
   return (
     <div className="pb-28 md:pb-8">
       <div className="space-y-5 px-4 py-4 md:grid md:grid-cols-[1.45fr_0.85fr] md:items-start md:gap-8 md:space-y-0 md:px-0 md:py-6">
         <div className="space-y-4">
+          {multiVendor && (
+            <p className="rounded-xl border border-coral/30 bg-coral/10 px-3 py-2.5 text-sm text-navy">
+              Ton panier contient déjà des articles d’une autre marque — vide ou
+              commande d’abord.
+            </p>
+          )}
+
           <FreeShippingProgress
             amountToFreeShipping={shipping.amountToFreeShipping}
             isFree={shipping.isFree}

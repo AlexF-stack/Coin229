@@ -100,23 +100,35 @@ export function StaggerReveal({
         return;
       }
 
-      gsap.fromTo(
+      // Ne jamais laisser les items à opacity:0 si le trigger a déjà été passé
+      // (grille boutique souvent above-the-fold).
+      const tween = gsap.fromTo(
         items,
-        { opacity: 0, y },
+        { opacity: 0.001, y },
         {
           opacity: 1,
           y: 0,
           duration: 0.65,
           stagger,
           ease: "power3.out",
-          clearProps: "transform",
+          clearProps: "opacity,transform",
+          immediateRender: false,
           scrollTrigger: {
             trigger: root,
-            start: "top 92%",
+            start: "top 95%",
             toggleActions: "play none none none",
+          },
+          onInterrupt: () => {
+            gsap.set(items, { clearProps: "opacity,transform" });
           },
         }
       );
+
+      // Sécurité : si ScrollTrigger ne joue pas sous 1.2s, forcer visible.
+      window.setTimeout(() => {
+        gsap.set(items, { clearProps: "opacity,transform" });
+        tween.scrollTrigger?.kill();
+      }, 1200);
     },
     { scope: ref, dependencies: [children] }
   );

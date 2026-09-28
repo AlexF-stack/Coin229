@@ -11,7 +11,7 @@ const bodySchema = z.object({
       budgetMax: z.number().int().positive().max(5_000_000).optional(),
       budgetMin: z.number().int().positive().max(5_000_000).optional(),
       categorie: z
-        .enum(["montre", "bijou", "sac", "lunette"])
+        .enum(["montre", "bijou", "sac", "lunette", "chaussure"])
         .optional(),
       genre: z.enum(["homme", "femme", "unisexe"]).optional(),
       mode: z.enum(["guide"]).nullable().optional(),

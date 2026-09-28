@@ -36,6 +36,18 @@ export const useCartStore = create<CartState>()(
       zone: "cotonou",
       checkoutIds: null,
       addItem: (item, qty = 1) => {
+        const state = get();
+        if (
+          state.items.length > 0 &&
+          state.items.some((i) => i.vendorId !== item.vendorId)
+        ) {
+          if (typeof window !== "undefined") {
+            window.alert(
+              "Ton panier contient déjà des articles d’une autre marque — vide ou commande d’abord."
+            );
+          }
+          return;
+        }
         set((state) => {
           const existing = state.items.find((i) => i.productId === item.productId);
           if (existing) {

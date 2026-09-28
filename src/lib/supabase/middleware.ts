@@ -4,6 +4,10 @@ import {
   adminCookieName,
   verifyAdminSessionToken,
 } from "@/lib/admin-auth";
+import {
+  vendorCookieName,
+  verifyVendorSessionTokenEdge,
+} from "@/lib/vendor-auth-edge";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export async function updateSession(request: NextRequest) {
@@ -16,6 +20,16 @@ export async function updateSession(request: NextRequest) {
     const ok = await verifyAdminSessionToken(session);
     if (!ok) {
       const login = new URL("/admin/login", request.url);
+      login.searchParams.set("next", pathname);
+      return NextResponse.redirect(login);
+    }
+  }
+
+  if (pathname.startsWith("/vendeur/espace")) {
+    const session = request.cookies.get(vendorCookieName())?.value;
+    const vendorId = await verifyVendorSessionTokenEdge(session);
+    if (!vendorId) {
+      const login = new URL("/vendeur/login", request.url);
       login.searchParams.set("next", pathname);
       return NextResponse.redirect(login);
     }

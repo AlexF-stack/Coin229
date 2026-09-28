@@ -56,7 +56,7 @@ export function ShopChatbot() {
     } catch {
       // ignore
     }
-    const t = window.setTimeout(() => setNudge(true), 1600);
+    const t = window.setTimeout(() => setNudge(true), 900);
     return () => window.clearTimeout(t);
   }, []);
 

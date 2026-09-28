@@ -238,6 +238,22 @@ function HeaderInner() {
                 Livraison
               </Link>
             </li>
+            <li>
+              <Link
+                href="/vendeur/inscription"
+                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-navy hover:bg-cream"
+              >
+                Vendre sur Coin229
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/vendeur/login"
+                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-navy hover:bg-cream"
+              >
+                Espace vendeur
+              </Link>
+            </li>
           </ul>
         </nav>
       )}

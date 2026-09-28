@@ -1,10 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { DEMO_PRODUCTS, filterDemoProducts } from "@/lib/demo-data";
 import { allowDemoCatalog } from "@/lib/runtime-flags";
+import {
+  CATEGORIE_SORT_ORDER,
+  NICHES_BY_CATEGORIE,
+} from "@/lib/constants";
 import type { Categorie, Genre } from "@prisma/client";
 
 /** Évite que Prisma bloque indéfiniment les pages dynamiques si la DB est down. */
-const DB_QUERY_TIMEOUT_MS = 4_000;
+const DB_QUERY_TIMEOUT_MS = 8_000;
 
 function withTimeout<T>(promise: Promise<T>, ms = DB_QUERY_TIMEOUT_MS): Promise<T> {
   return new Promise<T>((resolve, reject) => {
@@ -24,6 +28,19 @@ function withTimeout<T>(promise: Promise<T>, ms = DB_QUERY_TIMEOUT_MS): Promise<
   });
 }
 
+function nicheSortKey(niche: string | null | undefined): number {
+  const key = (niche ?? "").trim().toLowerCase();
+  const priority = [
+    "montre luxe",
+    "montre",
+    "bijou",
+    "sandale luxe",
+    "sandale",
+  ];
+  const idx = priority.indexOf(key);
+  return idx === -1 ? 50 : idx;
+}
+
 export function sortForCatalog<
   T extends {
     statut: string;
@@ -31,15 +48,33 @@ export function sortForCatalog<
     prixPromo: number | null;
     prix: number;
     dateCreation: Date;
+    categorie?: Categorie;
+    niche?: string;
+    nom?: string;
   },
 >(products: T[]): T[] {
   return [...products].sort((a, b) => {
     const aOk = a.statut === "actif" && a.stockQuantite > 0 ? 0 : 1;
     const bOk = b.statut === "actif" && b.stockQuantite > 0 ? 0 : 1;
     if (aOk !== bOk) return aOk - bOk;
-    const aPromo = a.prixPromo && a.prixPromo < a.prix ? 0 : 1;
-    const bPromo = b.prixPromo && b.prixPromo < b.prix ? 0 : 1;
-    if (aPromo !== bPromo) return aPromo - bPromo;
+
+    const aCat = a.categorie
+      ? (CATEGORIE_SORT_ORDER[a.categorie] ?? 99)
+      : 99;
+    const bCat = b.categorie
+      ? (CATEGORIE_SORT_ORDER[b.categorie] ?? 99)
+      : 99;
+    if (aCat !== bCat) return aCat - bCat;
+
+    const aNiche = nicheSortKey(a.niche);
+    const bNiche = nicheSortKey(b.niche);
+    if (aNiche !== bNiche) return aNiche - bNiche;
+
+    const byName = (a.nom ?? "").localeCompare(b.nom ?? "", "fr", {
+      sensitivity: "base",
+    });
+    if (byName !== 0) return byName;
+
     return b.dateCreation.getTime() - a.dateCreation.getTime();
   });
 }
@@ -47,12 +82,14 @@ export function sortForCatalog<
 export async function fetchProducts(filters?: {
   categorie?: Categorie;
   genre?: Genre;
+  niche?: string;
   q?: string;
   /** en_stock = actifs avec stock > 0 */
   enStock?: boolean;
   sort?: "pertinence" | "nouveautes" | "prix_asc" | "prix_desc";
 }) {
   const query = filters?.q?.trim();
+  const niche = filters?.niche?.trim();
   const sort = filters?.sort ?? "pertinence";
 
   try {
@@ -60,8 +97,12 @@ export async function fetchProducts(filters?: {
       prisma.product.findMany({
         where: {
           statut: { in: ["actif", "rupture"] },
+          vendor: { statut: "actif" },
           ...(filters?.categorie ? { categorie: filters.categorie } : {}),
           ...(filters?.genre ? { genre: filters.genre } : {}),
+          ...(niche
+            ? { niche: { equals: niche, mode: "insensitive" } }
+            : {}),
           ...(filters?.enStock
             ? { statut: "actif", stockQuantite: { gt: 0 } }
             : {}),
@@ -70,6 +111,7 @@ export async function fetchProducts(filters?: {
                 OR: [
                   { nom: { contains: query, mode: "insensitive" } },
                   { description: { contains: query, mode: "insensitive" } },
+                  { niche: { contains: query, mode: "insensitive" } },
                 ],
               }
             : {}),
@@ -109,6 +151,9 @@ export function applyCatalogSort<
     prixPromo: number | null;
     prix: number;
     dateCreation: Date;
+    categorie?: Categorie;
+    niche?: string;
+    nom?: string;
   },
 >(
   products: T[],
@@ -138,6 +183,9 @@ export async function fetchProductById(id: string) {
         include: { vendor: true },
       })
     );
+    if (product && product.vendor.statut !== "actif") {
+      return { product: null, source: "db" as const };
+    }
     // DB joignable : null = produit vraiment absent
     return { product, source: "db" as const };
   } catch {
@@ -157,12 +205,61 @@ export async function fetchProductById(id: string) {
         id: demo.vendorId,
         nomBoutique: "Coin229 Boutique",
         contact: "+22990000000",
+        email: null,
+        passwordHash: null,
+        slug: "coin229",
+        description: null,
+        logoUrl: null,
         statut: "actif" as const,
         dateCreation: new Date(),
       },
     },
     source: "demo" as const,
   };
+}
+
+export async function fetchActiveNiches(
+  limit = 24,
+  categorie?: Categorie
+): Promise<string[]> {
+  try {
+    const rows = await withTimeout(
+      prisma.product.findMany({
+        where: {
+          statut: { in: ["actif", "rupture"] },
+          vendor: { statut: "actif" },
+          niche: { not: "" },
+          ...(categorie ? { categorie } : {}),
+        },
+        select: { niche: true },
+      })
+    );
+    const seen = new Set<string>();
+    for (const r of rows) {
+      const n = r.niche.trim();
+      if (n) seen.add(n);
+    }
+
+    const preferred = categorie
+      ? NICHES_BY_CATEGORIE[categorie] ?? []
+      : Object.values(NICHES_BY_CATEGORIE).flat();
+
+    const ordered: string[] = [];
+    for (const n of preferred) {
+      const match = [...seen].find((s) => s.toLowerCase() === n.toLowerCase());
+      if (match) ordered.push(match);
+    }
+    for (const n of [...seen].sort((a, b) => a.localeCompare(b, "fr"))) {
+      if (!ordered.some((o) => o.toLowerCase() === n.toLowerCase())) {
+        ordered.push(n);
+      }
+    }
+    return ordered.slice(0, limit);
+  } catch {
+    // Fallback statique pour ne jamais laisser le filtre niches vide en prod
+    if (categorie) return NICHES_BY_CATEGORIE[categorie] ?? [];
+    return Object.values(NICHES_BY_CATEGORIE).flat();
+  }
 }
 
 export async function fetchSimilar(productId: string, categorie: Categorie) {
@@ -174,6 +271,7 @@ export async function fetchSimilar(productId: string, categorie: Categorie) {
           categorie,
           statut: "actif",
           stockQuantite: { gt: 0 },
+          vendor: { statut: "actif" },
         },
         take: 4,
         orderBy: { dateCreation: "desc" },

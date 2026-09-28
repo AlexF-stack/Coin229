@@ -28,8 +28,16 @@ export function ProductGallery({ images, alt }: Props) {
                 fill
                 priority={i === 0}
                 sizes="(max-width: 512px) 100vw, 512px"
+                unoptimized={src.startsWith("/uploads/")}
                 className="object-cover"
                 draggable={false}
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  if (img.src && !img.src.includes("placeholder-product")) {
+                    img.srcset = "";
+                    img.src = "/placeholder-product.svg";
+                  }
+                }}
                 onTouchStart={(e) => {
                   const startX = e.touches[0].clientX;
                   const onEnd = (ev: TouchEvent) => {

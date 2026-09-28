@@ -34,9 +34,12 @@ export function ProductRail({
             className="font-display text-2xl font-bold tracking-tight text-navy md:text-3xl"
           >
             {title}
+            <span className="text-amber" aria-hidden>
+              .
+            </span>
           </h2>
           {subtitle ? (
-            <p className="mt-1 max-w-xl text-sm text-muted md:text-base">
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted md:text-base">
               {subtitle}
             </p>
           ) : null}

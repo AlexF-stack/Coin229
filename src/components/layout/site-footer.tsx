@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Instagram, Mail, Phone } from "lucide-react";
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { CATEGORIES, CATEGORIE_LABELS } from "@/lib/constants";
 import { SITE, whatsappHref } from "@/lib/site";
 
 export function SiteFooter() {
@@ -12,10 +13,10 @@ export function SiteFooter() {
             <BrandLogo variant="mark" height={40} />
             <BrandLogo variant="wordmark" height={40} onDark />
           </div>
-          <p className="mt-2 text-sm text-amber">Les détails qui changent tout.</p>
+          <p className="mt-2 text-sm text-amber">{SITE.tagline}</p>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
-            Montres, bijoux, sacs et lunettes sélectionnés pour votre style —
-            livrés à {SITE.zones.join(", ")}.
+            Montres, bijoux, sacs, lunettes et chaussures sélectionnés pour
+            votre style — livrés à {SITE.zones.join(", ")}.
           </p>
         </div>
 
@@ -44,6 +45,16 @@ export function SiteFooter() {
                 Retours
               </Link>
             </li>
+            <li>
+              <Link href="/vendeur/inscription" className="hover:text-white">
+                Vendre sur Coin229
+              </Link>
+            </li>
+            <li>
+              <Link href="/vendeur/login" className="hover:text-white">
+                Espace vendeur
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -52,29 +63,16 @@ export function SiteFooter() {
             Catégories
           </p>
           <ul className="mt-4 space-y-2 text-sm text-white/75">
-            <li>
-              <Link href="/boutique?categorie=montre" className="hover:text-white">
-                Montres
-              </Link>
-            </li>
-            <li>
-              <Link href="/boutique?categorie=bijou" className="hover:text-white">
-                Bijoux
-              </Link>
-            </li>
-            <li>
-              <Link href="/boutique?categorie=sac" className="hover:text-white">
-                Sacs
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/boutique?categorie=lunette"
-                className="hover:text-white"
-              >
-                Lunettes
-              </Link>
-            </li>
+            {CATEGORIES.map((categorie) => (
+              <li key={categorie}>
+                <Link
+                  href={`/boutique?categorie=${categorie}`}
+                  className="hover:text-white"
+                >
+                  {CATEGORIE_LABELS[categorie]}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 

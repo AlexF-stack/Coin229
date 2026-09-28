@@ -19,6 +19,7 @@ enum Categorie {
   bijou
   sac
   lunette
+  chaussure
 }
 
 enum Genre {
@@ -58,13 +59,26 @@ enum PaymentMode {
 }
 
 model Vendor {
-  id            String       @id @default(cuid())
-  nomBoutique   String       @map("nom_boutique")
-  contact       String
-  statut        VendorStatus @default(en_attente)
-  dateCreation  DateTime     @default(now()) @map("date_creation")
-  products      Product[]
-  orders        Order[]
+  id                String           @id @default(cuid())
+  nomBoutique       String           @map("nom_boutique")
+  contact           String
+  email             String?          @unique
+  passwordHash      String?          @map("password_hash")
+  slug              String?          @unique
+  description       String?
+  logoUrl           String?          @map("logo_url")
+  ifu               String?
+  rccm              String?
+  mobileMoney       String?          @map("mobile_money")
+  termsAcceptedAt   DateTime?        @map("terms_accepted_at")
+  resetTokenHash    String?          @map("reset_token_hash")
+  resetTokenExpires DateTime?        @map("reset_token_expires")
+  statut            VendorStatus     @default(en_attente)
+  dateCreation      DateTime         @default(now()) @map("date_creation")
+  products          Product[]
+  orders            Order[]
+  conversations     Conversation[]
+  payouts           VendorPayout[]
 
   @@map("vendors")
 }
@@ -75,6 +89,7 @@ model Product {
   nom            String
   description    String
   categorie      Categorie
+  niche          String        @default("")
   genre          Genre
   prix           Int
   prixPromo      Int?          @map("prix_promo")
@@ -85,9 +100,11 @@ model Product {
   dateCreation   DateTime      @default(now()) @map("date_creation")
   vendor         Vendor        @relation(fields: [vendorId], references: [id])
   orderItems     OrderItem[]
+  conversations  Conversation[]
 
   @@index([vendorId])
   @@index([categorie, genre, statut])
+  @@index([niche])
   @@map("products")
 }
 
@@ -100,6 +117,7 @@ model Client {
   adresses           Address[]
   orders             Order[]
   pushSubscriptions  PushSubscription[]
+  conversations      Conversation[]
 
   @@map("clients")
 }
@@ -133,29 +151,117 @@ model Address {
 }
 
 model Order {
-  id               String       @id @default(cuid())
-  clientId         String       @map("client_id")
-  vendorId         String       @map("vendor_id")
-  statut           OrderStatus  @default(en_attente)
-  modePaiement     PaymentMode  @map("mode_paiement")
-  zoneLivraison    DeliveryZone @map("zone_livraison")
-  fraisLivraison   Int          @map("frais_livraison")
-  montantTotal     Int          @map("montant_total")
+  id               String        @id @default(cuid())
+  clientId         String        @map("client_id")
+  vendorId         String        @map("vendor_id")
+  statut           OrderStatus   @default(en_attente)
+  modePaiement     PaymentMode   @map("mode_paiement")
+  zoneLivraison    DeliveryZone  @map("zone_livraison")
+  fraisLivraison   Int           @map("frais_livraison")
+  montantTotal     Int           @map("montant_total")
+  commissionPct    Int           @default(10) @map("commission_pct")
+  commissionAmount Int           @default(0) @map("commission_amount")
+  vendorNet        Int           @default(0) @map("vendor_net")
+  refundStatus     String?       @map("refund_status")
+  payoutId         String?       @map("payout_id")
   telephone        String
-  nomClient        String       @map("nom_client")
-  adresseLivraison String       @map("adresse_livraison")
-  paymentProvider  String?      @map("payment_provider")
-  paymentRef       String?      @unique @map("payment_ref")
-  paymentUrl       String?      @map("payment_url")
-  dateCreation     DateTime     @default(now()) @map("date_creation")
-  client           Client       @relation(fields: [clientId], references: [id])
-  vendor           Vendor       @relation(fields: [vendorId], references: [id])
+  nomClient        String        @map("nom_client")
+  adresseLivraison String        @map("adresse_livraison")
+  paymentProvider  String?       @map("payment_provider")
+  paymentRef       String?       @unique @map("payment_ref")
+  paymentUrl       String?       @map("payment_url")
+  dateCreation     DateTime      @default(now()) @map("date_creation")
+  client           Client        @relation(fields: [clientId], references: [id])
+  vendor           Vendor        @relation(fields: [vendorId], references: [id])
+  payout           VendorPayout? @relation(fields: [payoutId], references: [id])
   items            OrderItem[]
+  conversations    Conversation[]
 
   @@index([clientId])
   @@index([vendorId])
   @@index([statut])
+  @@index([payoutId])
   @@map("orders")
+}
+
+enum PayoutStatus {
+  pending
+  paid
+  cancelled
+}
+
+/** Reverse plateforme → vendeur (manuel ou batch). */
+model VendorPayout {
+  id           String       @id @default(cuid())
+  vendorId     String       @map("vendor_id")
+  amount       Int
+  statut       PayoutStatus @default(pending)
+  note         String?
+  dateCreation DateTime     @default(now()) @map("date_creation")
+  datePaid     DateTime?    @map("date_paid")
+  vendor       Vendor       @relation(fields: [vendorId], references: [id])
+  orders       Order[]
+
+  @@index([vendorId, statut])
+  @@map("vendor_payouts")
+}
+
+/** Rate-limit partagé multi-instance (Vercel). */
+model RateLimitBucket {
+  key         String   @id
+  count       Int      @default(0)
+  windowStart DateTime @map("window_start")
+
+  @@map("rate_limit_buckets")
+}
+
+enum MessageSender {
+  client
+  vendor
+}
+
+/** Discussion 1:1 client ↔ vendeur (inbox marketplace). */
+model Conversation {
+  id             String    @id @default(cuid())
+  vendorId       String    @map("vendor_id")
+  clientId       String    @map("client_id")
+  productId      String?   @map("product_id")
+  orderId        String?   @map("order_id")
+  subject        String?
+  lastMessageAt  DateTime  @default(now()) @map("last_message_at")
+  clientUnread   Int       @default(0) @map("client_unread")
+  vendorUnread   Int       @default(0) @map("vendor_unread")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  vendor         Vendor    @relation(fields: [vendorId], references: [id])
+  client         Client    @relation(fields: [clientId], references: [id])
+  product        Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  order          Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  messages       Message[]
+
+  @@unique([vendorId, clientId])
+  @@index([vendorId, lastMessageAt])
+  @@index([clientId, lastMessageAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String          @id @default(cuid())
+  conversationId String          @map("conversation_id")
+  sender         MessageSender
+  body           String
+  createdAt      DateTime        @default(now()) @map("created_at")
+  conversation   Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+model AppConfig {
+  id    String @id @default(cuid())
+  cle   String @unique
+  valeur String
+
+  @@map("app_config")
 }
 
 model OrderItem {
@@ -170,12 +276,4 @@ model OrderItem {
   @@index([orderId])
   @@index([productId])
   @@map("order_items")
-}
-
-model AppConfig {
-  id    String @id @default(cuid())
-  cle   String @unique
-  valeur String
-
-  @@map("app_config")
 }

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import type { Categorie } from "@prisma/client";
 import { HomeHero } from "@/components/home/home-hero";
 import { ReassuranceBar } from "@/components/home/reassurance-bar";
-import { BenefitChips } from "@/components/home/benefit-chips";
 import { CategoryShowcase } from "@/components/home/category-showcase";
 import { ProductRail } from "@/components/home/product-rail";
 import { EditorialBlock } from "@/components/home/editorial-block";
@@ -64,7 +63,12 @@ function categoryImages(
 function heroSlides(products: ProductCardData[]): string[] {
   const seen = new Set<string>();
   const slides: string[] = [];
-  for (const p of products) {
+  // Priorité aux montres pour un hero premium
+  const ordered = [
+    ...products.filter((p) => p.categorie === "montre"),
+    ...products.filter((p) => p.categorie !== "montre"),
+  ];
+  for (const p of ordered) {
     const src = p.images[0];
     if (!src || seen.has(src)) continue;
     seen.add(src);
@@ -89,16 +93,12 @@ export default async function HomePage() {
     allProducts.find((p) => p.images[0])?.images[0];
 
   return (
-    <div className="space-y-10 pb-4 md:space-y-14">
+    <div className="space-y-12 pb-4 md:space-y-20">
       <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
         <HomeHero images={slides} />
       </div>
 
       <ReassuranceBar />
-
-      <Reveal>
-        <BenefitChips />
-      </Reveal>
 
       <Reveal>
         <CategoryShowcase images={images} />

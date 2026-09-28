@@ -1,7 +1,10 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { ProductCardData } from "@/lib/constants";
-import { CATEGORIE_LABELS } from "@/lib/constants";
+import { CATEGORIE_LABELS, nicheLabel } from "@/lib/constants";
 import {
   cn,
   formatPrice,
@@ -27,13 +30,24 @@ function isNewProduct(dateCreation: Date | string | undefined) {
   return Date.now() - t < fourteenDays;
 }
 
+function isLocalUpload(src: string) {
+  return src.startsWith("/uploads/");
+}
+
 export function ProductCard({ product, className }: Props) {
   const discount = getDiscountPercent(product.prix, product.prixPromo);
   const price = getEffectivePrice(product.prix, product.prixPromo);
   const outOfStock =
     product.statut === "rupture" || product.stockQuantite <= 0;
-  const image = product.images[0] ?? "/placeholder-product.svg";
+  const primary = product.images[0] ?? "/placeholder-product.svg";
+  const [image, setImage] = useState(primary);
   const isNew = !discount && isNewProduct(product.dateCreation);
+  const niche = nicheLabel(product.niche);
+  const categoryLabel = CATEGORIE_LABELS[product.categorie];
+  const eyebrow =
+    niche && niche.toLowerCase() !== categoryLabel.toLowerCase()
+      ? niche
+      : categoryLabel;
 
   return (
     <article
@@ -53,6 +67,12 @@ export function ProductCard({ product, className }: Props) {
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 280px"
           loading="lazy"
           decoding="async"
+          unoptimized={isLocalUpload(image)}
+          onError={() => {
+            if (image !== "/placeholder-product.svg") {
+              setImage("/placeholder-product.svg");
+            }
+          }}
           className={cn(
             "object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]",
             outOfStock && "opacity-50 grayscale"
@@ -79,7 +99,7 @@ export function ProductCard({ product, className }: Props) {
 
       <div className="flex flex-1 flex-col gap-2 pt-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted">
-          {CATEGORIE_LABELS[product.categorie]}
+          {eyebrow}
         </p>
         <Link href={`/produit/${product.id}`}>
           <h3 className="line-clamp-2 font-display text-sm font-semibold leading-snug text-fg transition-colors group-hover:text-navy md:text-[15px]">

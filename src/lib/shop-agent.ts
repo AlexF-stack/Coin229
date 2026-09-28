@@ -8,6 +8,7 @@ export type AgentPrefs = {
   budgetMax?: number;
   budgetMin?: number;
   categorie?: Categorie;
+  niche?: string;
   genre?: Genre;
   mode?: "guide" | null;
 };
@@ -110,6 +111,19 @@ export function parseCategorie(q: string): Categorie | undefined {
   if (/bijou|bague|collier|bracelet|boucle/.test(q)) return "bijou";
   if (/sac|sacoche|pochett/.test(q)) return "sac";
   if (/lunette|soleil|opticien/.test(q)) return "lunette";
+  if (/chaussure|sandale|claquette|mule|slipper/.test(q)) return "chaussure";
+  return undefined;
+}
+
+/** Niches libres fréquentes (marketplace) — hors des 4 catégories mode. */
+export function parseNicheHint(q: string): string | undefined {
+  if (/cosmet|cosmétique|beauté|maquillage|skincare/.test(q))
+    return "cosmétique";
+  if (/electro|électronique|phone|téléphone|gadget/.test(q))
+    return "électronique";
+  if (/\bkids\b|enfant|bébé|jouet/.test(q)) return "kids";
+  if (/maison|déco|cuisine/.test(q)) return "maison";
+  if (/sport|fitness/.test(q)) return "sport";
   return undefined;
 }
 
@@ -151,6 +165,7 @@ function pageContextHint(pathname?: string): string | null {
 async function recommend(prefs: AgentPrefs, limit = 4): Promise<ChatProductCard[]> {
   const { products } = await fetchProducts({
     categorie: prefs.categorie,
+    niche: prefs.niche,
     genre: prefs.genre,
     enStock: true,
     sort: "pertinence",
@@ -184,7 +199,15 @@ function mergePrefs(base: AgentPrefs, q: string): AgentPrefs {
   if (budget?.max) next.budgetMax = budget.max;
   if (budget?.min) next.budgetMin = budget.min;
   const cat = parseCategorie(q);
-  if (cat) next.categorie = cat;
+  if (cat) {
+    next.categorie = cat;
+    next.niche = undefined;
+  }
+  const niche = parseNicheHint(q);
+  if (niche && !cat) {
+    next.niche = niche;
+    next.categorie = undefined;
+  }
   const genre = parseGenre(q);
   if (genre) next.genre = genre;
   if (/aide.?moi|choisir|conseille|idée|recommande|quoi acheter|guide/.test(q)) {
@@ -196,6 +219,7 @@ function mergePrefs(base: AgentPrefs, q: string): AgentPrefs {
 function prefsSummary(prefs: AgentPrefs): string {
   const bits: string[] = [];
   if (prefs.categorie) bits.push(prefs.categorie + "s");
+  if (prefs.niche) bits.push(prefs.niche);
   if (prefs.genre) bits.push(`pour ${prefs.genre}`);
   if (prefs.budgetMax) bits.push(`≤ ${formatPrice(prefs.budgetMax)}`);
   if (prefs.budgetMin && !prefs.budgetMax) bits.push(`≥ ${formatPrice(prefs.budgetMin)}`);
@@ -323,7 +347,7 @@ export async function runShopAgent(input: {
     /aide.?moi|choisir|conseille|idée|recommande|quoi acheter|guide|cadeau/.test(
       q
     ) ||
-    Boolean(prefs.budgetMax || prefs.categorie || prefs.genre || style);
+    Boolean(prefs.budgetMax || prefs.categorie || prefs.niche || prefs.genre || style);
 
   if (wantsGuide) {
     prefs = { ...prefs, mode: "guide" };
@@ -411,7 +435,7 @@ export async function runShopAgent(input: {
   }
 
   // Direct catalog keywords without guide mode
-  if (/montre|bijou|sac|lunette|catalogue|produit|promo|acheter|boutique/.test(q)) {
+  if (/montre|bijou|sac|lunette|chaussure|sandale|claquette|catalogue|produit|promo|acheter|boutique/.test(q)) {
     prefs = mergePrefs(prefs, q);
     const products = await recommend(
       { ...prefs, mode: "guide" },

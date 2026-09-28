@@ -19,6 +19,10 @@ const ShopChatbot = dynamic(
 export function ShopShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
+  const isVendorPortal =
+    pathname.startsWith("/vendeur/espace") ||
+    pathname.startsWith("/vendeur/login") ||
+    pathname.startsWith("/vendeur/inscription");
   const isProduct = pathname.startsWith("/produit/");
   const isCheckout =
     pathname.startsWith("/commande") && !pathname.includes("confirmation");
@@ -26,7 +30,7 @@ export function ShopShell({ children }: { children: React.ReactNode }) {
   const isOffline = pathname.startsWith("/offline");
   const hideChat = isOffline;
 
-  if (isAdmin) {
+  if (isAdmin || isVendorPortal) {
     return <>{children}</>;
   }
 

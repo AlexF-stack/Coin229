@@ -3,12 +3,13 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { Filter, Search, SlidersHorizontal, X } from "lucide-react";
-import { CATEGORIES, CATEGORIE_LABELS } from "@/lib/constants";
+import { CATEGORIES, CATEGORIE_LABELS, nicheLabel } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Categorie, Genre } from "@prisma/client";
 
 type Props = {
   resultCount: number;
+  niches?: string[];
 };
 
 const genres: { value: Genre | ""; label: string }[] = [
@@ -19,13 +20,13 @@ const genres: { value: Genre | ""; label: string }[] = [
 ];
 
 const sorts = [
-  { value: "pertinence", label: "Pertinence" },
+  { value: "pertinence", label: "Classement" },
   { value: "nouveautes", label: "Nouveautés" },
   { value: "prix_asc", label: "Prix croissant" },
   { value: "prix_desc", label: "Prix décroissant" },
 ];
 
-export function BoutiqueToolbar({ resultCount }: Props) {
+export function BoutiqueToolbar({ resultCount, niches = [] }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -37,6 +38,7 @@ export function BoutiqueToolbar({ resultCount }: Props) {
   }, [params]);
 
   const categorie = (params.get("categorie") ?? "") as Categorie | "";
+  const niche = params.get("niche") ?? "";
   const genre = (params.get("genre") ?? "") as Genre | "";
   const sort = params.get("sort") ?? "pertinence";
   const enStock = params.get("enStock") === "1";
@@ -50,6 +52,15 @@ export function BoutiqueToolbar({ resultCount }: Props) {
     const next = new URLSearchParams(params.toString());
     if (!value) next.delete(key);
     else next.set(key, value);
+    if (key === "categorie" && value) next.delete("niche");
+    if (key === "niche" && value) next.delete("categorie");
+    pushParams(next);
+  }
+
+  function clearCategoryFilters() {
+    const next = new URLSearchParams(params.toString());
+    next.delete("categorie");
+    next.delete("niche");
     pushParams(next);
   }
 
@@ -72,7 +83,14 @@ export function BoutiqueToolbar({ resultCount }: Props) {
     setDrawerOpen(false);
   }
 
-  const hasAdvancedFilters = Boolean(categorie || genre || enStock || (sort && sort !== "pertinence") || q);
+  const hasAdvancedFilters = Boolean(
+    categorie ||
+      niche ||
+      genre ||
+      enStock ||
+      (sort && sort !== "pertinence") ||
+      q
+  );
 
   return (
     <div className="space-y-4">
@@ -83,40 +101,65 @@ export function BoutiqueToolbar({ resultCount }: Props) {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Rechercher une montre, un sac, une chaîne…"
+            placeholder="Rechercher une montre, un bijou, une sandale…"
             className="w-full rounded-[10px] border border-border bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-navy"
           />
         </label>
       </form>
 
-      <div className="hide-scrollbar -mx-4 flex max-w-[100vw] gap-1.5 overflow-x-auto overscroll-x-contain px-4 md:mx-0 md:max-w-none md:gap-2 md:px-0">
-        <button
-          type="button"
-          onClick={() => setParam("categorie", "")}
-          className={cn(
-            "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
-            !categorie
-              ? "bg-navy text-white"
-              : "border border-border bg-white text-muted hover:text-navy"
-          )}
-        >
-          Toutes
-        </button>
-        {CATEGORIES.map((c) => (
+      <div className="space-y-2 px-4 md:px-0">
+        <div className="hide-scrollbar -mx-4 flex max-w-[100vw] gap-1.5 overflow-x-auto overscroll-x-contain px-4 md:mx-0 md:max-w-none md:gap-2 md:px-0">
           <button
-            key={c}
             type="button"
-            onClick={() => setParam("categorie", c)}
+            onClick={clearCategoryFilters}
             className={cn(
               "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
-              categorie === c
+              !categorie && !niche
                 ? "bg-navy text-white"
                 : "border border-border bg-white text-muted hover:text-navy"
             )}
           >
-            {CATEGORIE_LABELS[c]}
+            Toutes
           </button>
-        ))}
+          {CATEGORIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setParam("categorie", c)}
+              className={cn(
+                "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
+                categorie === c
+                  ? "bg-navy text-white"
+                  : "border border-border bg-white text-muted hover:text-navy"
+              )}
+            >
+              {CATEGORIE_LABELS[c]}
+            </button>
+          ))}
+        </div>
+
+        {niches.length > 0 ? (
+          <div className="hide-scrollbar -mx-4 flex max-w-[100vw] gap-1.5 overflow-x-auto overscroll-x-contain px-4 md:mx-0 md:max-w-none md:gap-2 md:px-0">
+            <span className="flex h-8 shrink-0 items-center text-[10px] font-semibold uppercase tracking-[0.16em] text-muted md:h-9">
+              Collections
+            </span>
+            {niches.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setParam("niche", n)}
+                className={cn(
+                  "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
+                  niche.toLowerCase() === n.toLowerCase()
+                    ? "bg-amber text-navy"
+                    : "border border-border bg-white text-muted hover:text-navy"
+                )}
+              >
+                {nicheLabel(n)}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className="flex items-center justify-between gap-2 px-4 md:gap-3 md:px-0">

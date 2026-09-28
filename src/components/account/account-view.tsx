@@ -7,6 +7,7 @@ import {
   Heart,
   LogOut,
   MapPin,
+  MessageCircle,
   Package,
   ShoppingBag,
   Sparkles,
@@ -185,6 +186,12 @@ export function AccountView() {
       icon: Package,
     },
     {
+      href: "/compte/messages",
+      label: "Messages",
+      hint: "Marques",
+      icon: MessageCircle,
+    },
+    {
       href: "/favoris",
       label: "Favoris",
       hint: String(favCount),
@@ -195,12 +202,6 @@ export function AccountView() {
       label: "Panier",
       hint: String(cartCount),
       icon: ShoppingBag,
-    },
-    {
-      href: "/livraison",
-      label: "Livraison",
-      hint: "Zones",
-      icon: Truck,
     },
   ];
 
