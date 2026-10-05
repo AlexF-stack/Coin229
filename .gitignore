@@ -61,3 +61,7 @@ public/workbox-*.js.map
 public/swe-worker-*.js
 public/swe-worker-*.js.map
 public/fallback-*.js
+
+# audit — détails sécurité hors dépôt
+.audit-private/
+.claude/
