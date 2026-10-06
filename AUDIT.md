@@ -18,7 +18,7 @@
 |---|---|
 | Audit | ✅ |
 | Corrections P0 | ✅ (5/5) |
-| Corrections P1 | ⬜ |
+| Corrections P1 | 🔄 (1/16) |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
 | Build production | ⬜ |
@@ -92,7 +92,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 
 | ID | Statut | Problème | Où | Correction recommandée |
 |---|---|---|---|---|
-| P1-1 | ⬜ | Confirmation « Commande confirmée ! » même si le paiement Mobile Money n'a pas eu lieu ✅ | `commande/confirmation/page.tsx`, `payment.ts`, `kkiapay-checkout.tsx` | Afficher le vrai statut + bouton « Réessayer le paiement » ; `paymentUrl` absent = échec |
+| P1-1 | ✅ | Confirmation « Commande confirmée ! » même si le paiement Mobile Money n'a pas eu lieu | `src/lib/order-confirmation-state.ts` (nouveau), `commande/confirmation/page.tsx`, `payment.ts`, `actions.ts` | **Corrigé** : la page affiche l'état réel — « Paiement en attente » (+ « Finaliser le paiement » si relance possible, « J'ai payé — actualiser »), « Paiement reçu », « Commande reçue » (livraison), « Commande annulée ». Logique indépendante du prestataire (prête pour FeexPay). Fedapay sans lien de paiement = échec (commande annulée, stock rendu). Commandes `demo_…` refusées en production. Vérifié : 11 tests + commande Mobile Money réelle en local (en attente → payée → annulée). |
 | P1-2 | ⬜ | Stock bloqué indéfiniment par les commandes non payées ; création de commandes sans limite de débit ✅ | `src/lib/actions.ts` (`createOrder`) | Rate limit IP + téléphone ; cron d'annulation des commandes non payées avec restitution du stock |
 | P1-3 | ⬜ | Le vendeur peut fixer n'importe quel statut de commande (impayée → livrée → reversement) 🔎 | `src/lib/vendor-actions.ts` (`updateMyOrderStatus`) | Machine à états + statut de paiement séparé ; interdire de quitter `annulee` |
 | P1-4 | ⬜ | Reversements : montant affiché ≠ montant enregistré ; double reversement possible 🔎 | `src/lib/actions.ts` (`listAdminPayoutData`, `createVendorPayout`) | Filtre partagé (livrée / payée) ; `payoutId: null` vérifié dans la transaction |
@@ -167,6 +167,8 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 
 ## 12. Décisions en attente
 
+- ⏸️ **FeexPay** : intégration prévue à la place de Fedapay / KkiaPay (à détailler plus tard). La page de confirmation (P1-1) est déjà indépendante du prestataire ; à prévoir : création de transaction, webhook signé, vérification du montant, test sandbox.
+
 - ⏸️ **Paiement à la livraison** : qui encaisse — la plateforme ou le vendeur ? (impacte les reversements, P1-3 / P1-4)
 - ⏸️ **Clés de test** : Fedapay / KkiaPay sandbox + projet Supabase de test pour valider paiement et connexion.
 
@@ -196,4 +198,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 06/10/2026 | P0-2 | `d50b605` | Champs secrets vendeur exclus par défaut (Prisma `omit`), fiche produit limitée aux champs publics |
 | 06/10/2026 | P0-3 | `e0857a1` | Numéros béninois 10 chiffres : fonction unique + migration des données existantes |
 | 06/10/2026 | P0-5 | `1f44253` | JSON-LD échappé : plus d'injection de script via les noms / descriptions produits |
-| 06/10/2026 | P0-4 | voir `git log` | Notifications push ciblées par rôle (client / admin / vendeur) — **tous les P0 sont corrigés**, build production OK |
+| 06/10/2026 | P0-4 | `7536f9d` | Notifications push ciblées par rôle (client / admin / vendeur) — **tous les P0 sont corrigés**, build production OK |
+| 06/10/2026 | P1-1 | voir `git log` | Page de confirmation selon l'état réel de la commande et du paiement |

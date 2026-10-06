@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { CheckCircle2, MessageCircle, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, MessageCircle, XCircle } from "lucide-react";
 import { getOrderForConfirmation } from "@/lib/actions";
+import { getConfirmationState } from "@/lib/order-confirmation-state";
 import { formatPrice } from "@/lib/utils";
 import { SITE, whatsappHref } from "@/lib/site";
 import { ConfirmationInstallCard } from "@/components/pwa/confirmation-install-card";
@@ -51,15 +52,48 @@ export default async function ConfirmationPage({ searchParams }: Props) {
       : "Bonjour Coin229, j'ai une question sur ma commande."
   );
 
+  // État réel de la commande (le mode démo n'a pas de commande en base)
+  const state = order
+    ? getConfirmationState(order)
+    : {
+        kind: "cod_received" as const,
+        title: "Commande reçue !",
+        message: "Merci. Notre équipe vous contacte bientôt pour la livraison.",
+        canRetryPayment: false,
+      };
+
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center">
-      <CheckCircle2 className="h-16 w-16 stroke-[1.25] text-green" />
+      {state.kind === "cancelled" ? (
+        <XCircle className="h-16 w-16 stroke-[1.25] text-coral" />
+      ) : state.kind === "payment_pending" ? (
+        <Clock className="h-16 w-16 stroke-[1.25] text-amber" />
+      ) : (
+        <CheckCircle2 className="h-16 w-16 stroke-[1.25] text-green" />
+      )}
       <h1 className="mt-4 font-display text-2xl font-bold text-navy md:text-3xl">
-        Commande confirmée&nbsp;!
+        {state.title}
       </h1>
-      <p className="mt-2 text-sm text-muted">
-        Merci. Notre équipe vous contacte bientôt pour la livraison.
-      </p>
+      <p className="mt-2 text-sm text-muted">{state.message}</p>
+
+      {state.kind === "payment_pending" && (
+        <div className="mt-6 flex w-full flex-col gap-3">
+          {state.canRetryPayment && (
+            <Link
+              href={`/commande/paiement?id=${encodeURIComponent(id)}`}
+              className="btn btn-primary w-full"
+            >
+              Finaliser le paiement
+            </Link>
+          )}
+          <Link
+            href={`/commande/confirmation?id=${encodeURIComponent(id)}`}
+            className="btn btn-secondary w-full"
+          >
+            J’ai payé — actualiser
+          </Link>
+        </div>
+      )}
 
       <p className="mt-4 rounded-full bg-cream px-4 py-1.5 text-xs font-medium text-navy">
         N° {id}

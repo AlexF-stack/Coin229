@@ -515,8 +515,12 @@ export async function getClientOrders(telephone: string) {
 }
 
 export async function getOrderForConfirmation(orderId: string) {
-  if (!orderId || orderId.startsWith("demo_")) {
-    return { demo: true as const, order: null };
+  if (!orderId) return { demo: false as const, order: null };
+  // Commandes fantômes du mode démo : jamais en production
+  if (orderId.startsWith("demo_")) {
+    return allowDemoCatalog()
+      ? { demo: true as const, order: null }
+      : { demo: false as const, order: null };
   }
   try {
     if (!(await canAccessOrder(orderId))) {

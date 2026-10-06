@@ -122,6 +122,18 @@ async function createFedapayTransaction(
     paymentUrl = `https://checkout.fedapay.com/${token}`;
   }
 
+  // Sans lien de paiement, le client ne peut pas payer : c'est un échec
+  if (!paymentUrl) {
+    return {
+      success: false,
+      transactionId: String(txId),
+      status: "failed",
+      message:
+        "Le paiement Mobile Money est momentanément indisponible. Réessaie ou choisis le paiement à la livraison.",
+      provider: "fedapay",
+    };
+  }
+
   return {
     success: true,
     transactionId: String(txId),
