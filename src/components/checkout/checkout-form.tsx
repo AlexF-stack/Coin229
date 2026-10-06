@@ -39,6 +39,8 @@ export function CheckoutForm() {
   const [mounted, setMounted] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // Commande créée : on affiche la redirection au lieu du panier vidé
+  const [redirecting, setRedirecting] = useState(false);
   const [mode, setMode] = useState<PaymentMode>("livraison");
   const [nom, setNom] = useState("");
   const [telephone, setTelephone] = useState("");
@@ -87,6 +89,18 @@ export function CheckoutForm() {
   const total = subtotal + shipping.fee;
 
   if (!mounted) return null;
+
+  if (redirecting) {
+    return (
+      <div className="flex flex-col items-center px-4 py-16 text-center">
+        <Loader2 className="h-8 w-8 animate-spin stroke-[1.5] text-navy" />
+        <p className="mt-4 font-display text-lg font-semibold text-navy">
+          Commande enregistrée
+        </p>
+        <p className="mt-1 text-sm text-muted">Redirection…</p>
+      </div>
+    );
+  }
 
   if (!items.length) {
     return (
@@ -155,6 +169,9 @@ export function CheckoutForm() {
         return;
       }
 
+      // La commande existe (stock réservé) : on retire les articles commandés
+      // du panier pour éviter une double commande, sans afficher le panier vide
+      setRedirecting(true);
       // Retire seulement les articles commandés (sélection partielle type Shein)
       if (checkoutIds?.length && checkoutIds.length < allItems.length) {
         checkoutIds.forEach((id) => removeItem(id));

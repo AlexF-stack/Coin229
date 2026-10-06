@@ -90,8 +90,8 @@ export default async function PaymentPage({ searchParams }: Props) {
           amount={order.montantTotal}
           phone={phoneDisplay}
         />
-        <Link href="/panier" className="block text-center text-sm text-muted">
-          Retour au panier
+        <Link href="/boutique" className="block text-center text-sm text-muted">
+          Continuer mes achats
         </Link>
       </div>
     );
