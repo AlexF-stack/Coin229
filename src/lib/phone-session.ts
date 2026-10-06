@@ -2,6 +2,7 @@
  * Session téléphone signée (cookie httpOnly) — remplace localStorage pour l’IDOR.
  */
 
+import { normalizeBjPhone } from "@/lib/bj-phone";
 import { getSessionSecret, hasKind, signingInput } from "@/lib/session-secrets";
 
 const COOKIE = "coin229_phone";
@@ -75,13 +76,7 @@ export function phoneCookieOptions(maxAge = MAX_AGE_SEC) {
   };
 }
 
-export function normalizeBjPhone(raw: string): string | null {
-  const digits = raw.replace(/\D/g, "");
-  if (digits.startsWith("229") && digits.length === 11) return `+${digits}`;
-  if (digits.length === 8) return `+229${digits}`;
-  if (raw.startsWith("+") && digits.length >= 10) return `+${digits}`;
-  return null;
-}
+export { normalizeBjPhone };
 
 export async function createPhoneSessionToken(
   phone: string

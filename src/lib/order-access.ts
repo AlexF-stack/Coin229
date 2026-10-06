@@ -36,7 +36,7 @@ export async function canAccessOrder(orderId: string): Promise<boolean> {
   );
   if (
     sessionPhone &&
-    normalizeBjPhone(order.telephone) === sessionPhone
+    normalizeBjPhone(order.telephone) === normalizeBjPhone(sessionPhone)
   ) {
     return true;
   }

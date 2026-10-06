@@ -17,7 +17,7 @@
 | Phase | Statut |
 |---|---|
 | Audit | ✅ |
-| Corrections P0 | 🔄 (2/5) |
+| Corrections P0 | 🔄 (3/5) |
 | Corrections P1 | ⬜ |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
@@ -84,7 +84,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 |---|---|---|---|---|
 | P0-1 | ✅ | **Faille d'authentification admin** : une session non-admin pouvait être acceptée comme session admin | `src/lib/session-secrets.ts` (nouveau), `admin-auth.ts`, `vendor-auth.ts`, `vendor-auth-edge.ts`, `phone-session.ts`, `order-confirm.ts` | **Corrigé** : type de jeton dans le payload ET dans le message signé ; en production, secret dédié par type (≥ 16 car., distinct, pas d'exemple, pas `ADMIN_PASSWORD`). Testé : 29 tests unitaires + attaque rejouée en local → refusée (307 vers login). ⚠️ Voir « Checklist avant déploiement ». |
 | P0-2 | ✅ | **Données privées du vendeur envoyées au navigateur** (fiche produit publique, et aussi liste vendeurs admin + formulaire profil vendeur) | `src/lib/prisma.ts`, `src/lib/catalog.ts`, `src/lib/constants.ts` (`SafeVendor`), `admin-vendors.tsx`, `vendor-profile-form.tsx`, `api/vendor/login`, `api/vendor/forgot-password`, `actions.ts` | **Corrigé** : `passwordHash` / `resetTokenHash` / `resetTokenExpires` exclus par défaut de toutes les lectures Prisma (`omit` global), demandés explicitement seulement par login et mot de passe oublié ; fiche produit limitée aux champs vendeur publics ; action morte `getProductById` supprimée. Vérifié : 0 hash dans le HTML (fiche, vitrine, admin, profil), login vendeur OK / mauvais mot de passe refusé, mot de passe oublié OK. |
-| P0-3 | ⬜ | Numéros à 10 chiffres refusés (« Numéro invalide ») ✅ | `checkout-schema.ts`, `checkout-form.tsx`, `payment.ts`, `phone-session.ts` | Une seule fonction de normalisation (+229 + 8 ou 10 chiffres) partagée client / serveur / Fedapay |
+| P0-3 | ✅ | Numéros à 10 chiffres refusés (« Numéro invalide ») | `src/lib/bj-phone.ts` (nouveau), `checkout-schema.ts`, `checkout-form.tsx`, `phone-auth-form.tsx`, `payment.ts`, `phone-session.ts`, `order-access.ts`, `commande/paiement`, migration `20261006_bj_phone_10_digits` | **Corrigé** : fonction unique partagée client / serveur / Fedapay / KkiaPay. Accepte `01XXXXXXXX`, `+229…`, `00229…`, avec ou sans espaces ; ancien numéro 8 chiffres converti en `01` + ancien (règle officielle). Format stocké : `+22901XXXXXXXX`. Migration SQL qui convertit les clients et commandes existants (sans doublon). Placeholder et message d'erreur mis à jour. Vérifié : 18 tests unitaires + commande réelle avec `01 97 00 00 07` → confirmée. Fedapay reçoit désormais 10 chiffres (à valider en sandbox, voir P2-6). |
 | P0-4 | ⬜ | Notifications push « nouvelle commande / nouveau vendeur » envoyées à **tous** les abonnés, clients compris, avec le nom de l'acheteur 🔎 | `src/lib/order-notify.ts`, `src/app/api/vendor/register/route.ts` | Ajouter rôle + vendorId aux abonnements push et cibler les envois |
 | P0-5 | ⬜ | **Injection de script possible** via le contenu produit dans le JSON-LD 🔎 | `src/components/seo/json-ld.tsx` | Échapper le JSON sérialisé, valider les produits (zod), ajouter une CSP |
 
@@ -102,7 +102,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P1-8 | ⬜ | « Acheter maintenant » peut commander le panier d'un autre vendeur ; pas de choix de zone au checkout (Cotonou forcé) ✅ | `product-purchase-bar.tsx`, `cart-store.ts`, `checkout-form.tsx` | `addItem` renvoie un booléen ; jamais de repli sur tout le panier ; `ZoneSelector` au checkout |
 | P1-9 | ⬜ | Prix / stock du panier jamais revalidés → montant affiché ≠ facturé possible 🔎 | `src/lib/cart-store.ts` | Action `validateCart` au panier et au checkout |
 | P1-10 | ⬜ | Quantité > 20 et erreurs Zod affichées en anglais 🔎 | `checkout-schema.ts`, `cart-store.ts` | Plafond `min(stock, 20)` côté client ; messages FR |
-| P1-11 | ⬜ | Panier vidé avant le paiement Mobile Money, pas de bouton « Réessayer » (KkiaPay) 🔎 | `checkout-form.tsx`, `kkiapay-checkout.tsx` | Vider après confirmation ; bouton de relance du widget |
+| P1-11 | ⬜ | Panier vidé avant le paiement Mobile Money, pas de bouton « Réessayer » (KkiaPay) 🔎. Effet visible aussi en paiement à la livraison : « Aucun article à commander » s'affiche un instant avant la redirection vers la confirmation ✅ | `checkout-form.tsx`, `kkiapay-checkout.tsx` | Vider après confirmation / après la navigation ; bouton de relance du widget |
 | P1-12 | ⬜ | Cookie d'accès commande : 1 h, une seule commande ; secret partagé avec l'admin 🔎 | `src/lib/order-confirm.ts` | Secret dédié, plusieurs commandes, 24 h |
 | P1-13 | ⬜ | Annulation admin sans restitution du stock ni statut de remboursement 🔎 | `src/lib/actions.ts` (`updateOrderStatus`) | Même logique que l'annulation vendeur, en transaction |
 | P1-14 | ⬜ | Admin limité à la boutique maison ; KYC vendeur invisible ✅ | `actions.ts` (`getDefaultVendor`), `admin-vendors.tsx` | Vue marketplace globale + affichage KYC |
@@ -127,7 +127,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P2-12 | ⬜ | Finances vendeur calculées sur 50 commandes max, impayées incluses 🔎 | `vendor-actions.ts` (`getMyVendorFinances`) |
 | P2-13 | ⬜ | Inscription vendeur : slugs réservés non vérifiés (« espace », « login »…) 🔎 | `api/vendor/register` |
 | P2-14 | ⬜ | Bandeau cookies + bulle assistant masquent les CTA sur mobile ; « Hello — je t'aide » en anglais ✅ | `cookie-banner.tsx`, `shop-chatbot.tsx` |
-| P2-15 | ⬜ | Placeholder téléphone ancien format « 97 00 00 00 » ; « 21000 FCFA » non formaté ✅ | `checkout-form.tsx`, fiche produit |
+| P2-15 | 🔄 | ~~Placeholder téléphone ancien format~~ (corrigé en P0-3) ; « 21000 FCFA » non formaté ✅ | fiche produit |
 | P2-16 | ⬜ | Upload : repli `public/uploads` impossible sur Vercel ; type de fichier non vérifié par contenu 🔎 | `api/vendor/upload` |
 | P2-17 | ⏸️ | Contenu à valider : produits nommés Rolex / AP / Patek (authenticité impossible à confirmer → risque juridique), RCCM / IFU « en cours », contacts d'exemple | catalogue, variables d'env |
 
@@ -182,6 +182,8 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 
 - [ ] **Vercel → variables d'environnement** : définir `ADMIN_SESSION_SECRET`, `VENDOR_SESSION_SECRET` et `PHONE_SESSION_SECRET` avec **3 valeurs différentes** (≥ 16 car., générées avec `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`). Sans cela, après P0-1 : admin, espace vendeur, connexion SMS **et page de confirmation de commande** sont désactivés en production. (P0-1)
 - [ ] Prévenir admin / vendeurs / clients connectés : toutes les sessions existantes seront déconnectées une fois au déploiement (nouveau format de jeton). (P0-1)
+- [ ] Migration `20261006_bj_phone_10_digits` : appliquée automatiquement au build Vercel (`prisma migrate deploy`). Faire une **sauvegarde de la base** avant le déploiement (elle réécrit les numéros des clients et commandes). (P0-3)
+- [ ] Tester un paiement Fedapay sandbox avec un numéro 10 chiffres. (P0-3 / P2-6)
 
 ## Journal des corrections
 
@@ -189,4 +191,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 |---|---|---|---|
 | 05/10/2026 | — | `03f3b72` | Audit initial |
 | 06/10/2026 | P0-1 | `e8d97a8` | Jetons de session typés + secrets dédiés par type en production |
-| 06/10/2026 | P0-2 | voir `git log` | Champs secrets vendeur exclus par défaut (Prisma `omit`), fiche produit limitée aux champs publics |
+| 06/10/2026 | P0-2 | `d50b605` | Champs secrets vendeur exclus par défaut (Prisma `omit`), fiche produit limitée aux champs publics |
+| 06/10/2026 | P0-3 | voir `git log` | Numéros béninois 10 chiffres : fonction unique + migration des données existantes |

@@ -6,6 +6,12 @@ import { useCartStore } from "@/lib/cart-store";
 import { calculateShippingFee, ZONE_LABELS } from "@/lib/shipping";
 import { formatPrice, getEffectivePrice } from "@/lib/utils";
 import { createOrder } from "@/lib/actions";
+import {
+  BJ_PHONE_ERROR,
+  BJ_PHONE_PLACEHOLDER,
+  formatBjPhone,
+  normalizeBjPhone,
+} from "@/lib/bj-phone";
 import type { PaymentMode } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { Smartphone, Banknote, Loader2 } from "lucide-react";
@@ -51,7 +57,7 @@ export function CheckoutForm() {
         setAdresse(saved.adresse ?? "");
       }
       const phone = localStorage.getItem("coin229-phone");
-      if (phone && !telephone) setTelephone(phone.replace(/^\+229/, ""));
+      if (phone && !telephone) setTelephone(formatBjPhone(phone));
     } catch {
       // ignore
     }
@@ -91,15 +97,11 @@ export function CheckoutForm() {
       return;
     }
 
-    const phone = telephone.replace(/\s/g, "");
-    if (!/^\+?229\d{8}$|^\d{8,10}$/.test(phone)) {
-      setError("Numéro invalide (ex. 97 00 00 00)");
+    const normalized = normalizeBjPhone(telephone);
+    if (!normalized) {
+      setError(BJ_PHONE_ERROR);
       return;
     }
-
-    const normalized = phone.startsWith("+")
-      ? phone
-      : `+229${phone.replace(/^229/, "")}`;
 
     localStorage.setItem(
       CHECKOUT_KEY,
@@ -188,7 +190,7 @@ export function CheckoutForm() {
             onChange={(e) => setTelephone(e.target.value)}
             autoComplete="tel"
             className={fieldClass}
-            placeholder="97 00 00 00"
+            placeholder={BJ_PHONE_PLACEHOLDER}
           />
         </label>
         <label className="block space-y-1.5 text-sm">

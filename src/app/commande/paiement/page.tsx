@@ -1,4 +1,5 @@
 import { KkiaPayCheckout } from "@/components/checkout/kkiapay-checkout";
+import { bjLocalNumber } from "@/lib/bj-phone";
 import { canAccessOrder } from "@/lib/order-access";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -75,7 +76,8 @@ export default async function PaymentPage({ searchParams }: Props) {
   }
 
   if (order.paymentProvider === "kkiapay") {
-    const phoneDisplay = order.telephone.replace(/^\+229/, "");
+    const phoneDisplay =
+      bjLocalNumber(order.telephone) ?? order.telephone.replace(/^\+229/, "");
     return (
       <div className="mx-auto max-w-md space-y-4 px-4 py-10">
         <h1 className="font-display text-2xl font-bold">Paiement Mobile Money</h1>

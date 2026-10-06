@@ -1,3 +1,4 @@
+import { bjLocalNumber } from "@/lib/bj-phone";
 import { allowPaymentMock } from "@/lib/runtime-flags";
 
 export type PaymentMode = "mobile_money" | "livraison";
@@ -31,12 +32,8 @@ function fedapayBaseUrl() {
 }
 
 function parseBjPhone(phone: string): { number: string; country: string } {
-  const digits = phone.replace(/\D/g, "");
-  const local =
-    digits.startsWith("229") && digits.length === 11
-      ? digits.slice(3)
-      : digits.slice(-8);
-  return { number: local, country: "bj" };
+  // Numéro local à 10 chiffres (01XXXXXXXX)
+  return { number: bjLocalNumber(phone) ?? phone.replace(/\D/g, ""), country: "bj" };
 }
 
 async function createFedapayTransaction(

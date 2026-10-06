@@ -4,6 +4,11 @@ import { useState, useTransition, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  BJ_PHONE_ERROR,
+  BJ_PHONE_PLACEHOLDER,
+  normalizeBjPhone,
+} from "@/lib/bj-phone";
 
 type Props = {
   onAuthenticated: (phone: string) => void;
@@ -27,21 +32,13 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
     return () => window.clearTimeout(t);
   }, [resendIn]);
 
-  function normalizePhone(raw: string) {
-    const digits = raw.replace(/\D/g, "");
-    if (digits.startsWith("229") && digits.length === 11) return `+${digits}`;
-    if (digits.length === 8) return `+229${digits}`;
-    if (raw.startsWith("+") && digits.length >= 10) return `+${digits}`;
-    return null;
-  }
-
   function sendOtp(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
     setInfo(null);
-    const normalized = normalizePhone(phone);
+    const normalized = normalizeBjPhone(phone);
     if (!normalized) {
-      setError("Numéro invalide. Ex. 97 00 00 00");
+      setError(BJ_PHONE_ERROR);
       return;
     }
 
@@ -232,7 +229,7 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="min-w-0 flex-1 bg-transparent px-3 py-3.5 outline-none"
-            placeholder="97 00 00 00"
+            placeholder={BJ_PHONE_PLACEHOLDER}
             autoComplete="tel"
           />
         </div>
