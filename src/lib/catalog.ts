@@ -175,12 +175,22 @@ export function applyCatalogSort<
   return sortForCatalog(products);
 }
 
+/** Seuls champs vendeur publics — la fiche produit est rendue côté client */
+const PUBLIC_VENDOR_SELECT = {
+  id: true,
+  nomBoutique: true,
+  slug: true,
+  description: true,
+  logoUrl: true,
+  statut: true,
+} as const;
+
 export async function fetchProductById(id: string) {
   try {
     const product = await withTimeout(
       prisma.product.findUnique({
         where: { id },
-        include: { vendor: true },
+        include: { vendor: { select: PUBLIC_VENDOR_SELECT } },
       })
     );
     if (product && product.vendor.statut !== "actif") {
@@ -204,14 +214,10 @@ export async function fetchProductById(id: string) {
       vendor: {
         id: demo.vendorId,
         nomBoutique: "Coin229 Boutique",
-        contact: "+22990000000",
-        email: null,
-        passwordHash: null,
         slug: "coin229",
         description: null,
         logoUrl: null,
         statut: "actif" as const,
-        dateCreation: new Date(),
       },
     },
     source: "demo" as const,

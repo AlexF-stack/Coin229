@@ -47,13 +47,6 @@ export async function getProducts(filters?: {
   });
 }
 
-export async function getProductById(id: string) {
-  return prisma.product.findUnique({
-    where: { id },
-    include: { vendor: true },
-  });
-}
-
 export async function getSimilarProducts(
   productId: string,
   categorie: Categorie,

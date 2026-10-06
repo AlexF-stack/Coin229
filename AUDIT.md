@@ -17,7 +17,7 @@
 | Phase | Statut |
 |---|---|
 | Audit | ✅ |
-| Corrections P0 | 🔄 (1/5) |
+| Corrections P0 | 🔄 (2/5) |
 | Corrections P1 | ⬜ |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
@@ -83,7 +83,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | ID | Statut | Problème | Où | Correction recommandée |
 |---|---|---|---|---|
 | P0-1 | ✅ | **Faille d'authentification admin** : une session non-admin pouvait être acceptée comme session admin | `src/lib/session-secrets.ts` (nouveau), `admin-auth.ts`, `vendor-auth.ts`, `vendor-auth-edge.ts`, `phone-session.ts`, `order-confirm.ts` | **Corrigé** : type de jeton dans le payload ET dans le message signé ; en production, secret dédié par type (≥ 16 car., distinct, pas d'exemple, pas `ADMIN_PASSWORD`). Testé : 29 tests unitaires + attaque rejouée en local → refusée (307 vers login). ⚠️ Voir « Checklist avant déploiement ». |
-| P0-2 | ⬜ | **Données privées du vendeur envoyées au navigateur** sur la fiche produit ✅ | `src/lib/catalog.ts` (`fetchProductById`), `src/app/produit/[id]/page.tsx` | `select` explicite des champs vendeur publics ; objet réduit passé aux composants client |
+| P0-2 | ✅ | **Données privées du vendeur envoyées au navigateur** (fiche produit publique, et aussi liste vendeurs admin + formulaire profil vendeur) | `src/lib/prisma.ts`, `src/lib/catalog.ts`, `src/lib/constants.ts` (`SafeVendor`), `admin-vendors.tsx`, `vendor-profile-form.tsx`, `api/vendor/login`, `api/vendor/forgot-password`, `actions.ts` | **Corrigé** : `passwordHash` / `resetTokenHash` / `resetTokenExpires` exclus par défaut de toutes les lectures Prisma (`omit` global), demandés explicitement seulement par login et mot de passe oublié ; fiche produit limitée aux champs vendeur publics ; action morte `getProductById` supprimée. Vérifié : 0 hash dans le HTML (fiche, vitrine, admin, profil), login vendeur OK / mauvais mot de passe refusé, mot de passe oublié OK. |
 | P0-3 | ⬜ | Numéros à 10 chiffres refusés (« Numéro invalide ») ✅ | `checkout-schema.ts`, `checkout-form.tsx`, `payment.ts`, `phone-session.ts` | Une seule fonction de normalisation (+229 + 8 ou 10 chiffres) partagée client / serveur / Fedapay |
 | P0-4 | ⬜ | Notifications push « nouvelle commande / nouveau vendeur » envoyées à **tous** les abonnés, clients compris, avec le nom de l'acheteur 🔎 | `src/lib/order-notify.ts`, `src/app/api/vendor/register/route.ts` | Ajouter rôle + vendorId aux abonnements push et cibler les envois |
 | P0-5 | ⬜ | **Injection de script possible** via le contenu produit dans le JSON-LD 🔎 | `src/components/seo/json-ld.tsx` | Échapper le JSON sérialisé, valider les produits (zod), ajouter une CSP |
@@ -143,7 +143,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P3-6 | ⬜ | Galerie produit : flèches + zoom desktop |
 | P3-7 | ⬜ | Pagination du catalogue ; `React.cache` sur `fetchProductById` (requête doublée) |
 | P3-8 | ⬜ | Index Prisma (orders, conversations, products) ; `refundStatus` en enum |
-| P3-9 | ⬜ | Supprimer code mort (`getProducts`, `getProductById`, `getSimilarProducts`, `listPayoutQueue`, `benefit-chips.tsx`…) et doublons (niches, UTM, lien WhatsApp) |
+| P3-9 | 🔄 | Supprimer code mort (`getProducts`, ~~`getProductById`~~ supprimé en P0-2, `getSimilarProducts`, `listPayoutQueue`, `benefit-chips.tsx`…) et doublons (niches, UTM, lien WhatsApp) |
 | P3-10 | ⬜ | Migrer `next lint` → ESLint CLI ; corriger les 2 warnings |
 | P3-11 | ⬜ | Assistant boutique : salutation prioritaire sur la recherche, regex « ok », « autre suggestion », niches inexistantes |
 | P3-12 | ⬜ | Messagerie : doublons du message auto « Contacter », notification au vendeur |
@@ -188,4 +188,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | Date | ID | Commit | Note |
 |---|---|---|---|
 | 05/10/2026 | — | `03f3b72` | Audit initial |
-| 06/10/2026 | P0-1 | voir `git log` | Jetons de session typés + secrets dédiés par type en production |
+| 06/10/2026 | P0-1 | `e8d97a8` | Jetons de session typés + secrets dédiés par type en production |
+| 06/10/2026 | P0-2 | voir `git log` | Champs secrets vendeur exclus par défaut (Prisma `omit`), fiche produit limitée aux champs publics |

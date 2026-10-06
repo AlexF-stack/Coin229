@@ -44,7 +44,10 @@ export async function POST(request: Request) {
   }
 
   const email = parsed.data.email.toLowerCase();
-  const vendor = await prisma.vendor.findUnique({ where: { email } });
+  const vendor = await prisma.vendor.findUnique({
+    where: { email },
+    omit: { passwordHash: false },
+  });
 
   if (!vendor?.passwordHash) {
     return NextResponse.json({ ok: true });

@@ -2,12 +2,12 @@
 
 import { FormEvent, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import type { Vendor } from "@prisma/client";
+import type { SafeVendor } from "@/lib/constants";
 import { updateMyVendorProfile } from "@/lib/vendor-actions";
 import { ImagePlus, Loader2 } from "lucide-react";
 
 type Props = {
-  vendor: Vendor;
+  vendor: SafeVendor;
 };
 
 const field =

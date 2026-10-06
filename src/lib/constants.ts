@@ -1,4 +1,16 @@
-import type { Categorie, Genre, Product, ProductStatus } from "@prisma/client";
+import type {
+  Categorie,
+  Genre,
+  Product,
+  ProductStatus,
+  Vendor,
+} from "@prisma/client";
+
+/** Vendeur sans ses champs secrets (exclus par défaut, voir src/lib/prisma.ts) */
+export type SafeVendor = Omit<
+  Vendor,
+  "passwordHash" | "resetTokenHash" | "resetTokenExpires"
+>;
 
 export type ProductCardData = Pick<
   Product,

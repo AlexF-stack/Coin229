@@ -1,11 +1,12 @@
 "use client";
 
 import { useTransition } from "react";
-import type { Vendor, VendorStatus } from "@prisma/client";
+import type { VendorStatus } from "@prisma/client";
+import type { SafeVendor } from "@/lib/constants";
 import { setVendorStatus } from "@/lib/actions";
 import { Loader2 } from "lucide-react";
 
-type Row = Vendor & {
+type Row = SafeVendor & {
   _count: { products: number; orders: number };
 };
 
