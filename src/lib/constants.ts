@@ -12,6 +12,16 @@ export type SafeVendor = Omit<
   "passwordHash" | "resetTokenHash" | "resetTokenExpires"
 >;
 
+/** Quantité maximale par article et par commande (aussi vérifiée côté serveur) */
+export const MAX_QTY_PER_ITEM = 20;
+/** Nombre maximal d'articles différents par commande */
+export const MAX_ITEMS_PER_ORDER = 30;
+
+/** Quantité commandable : limitée par le stock ET par le plafond par commande */
+export function maxOrderQty(stockQuantite: number): number {
+  return Math.max(0, Math.min(stockQuantite, MAX_QTY_PER_ITEM));
+}
+
 export type ProductCardData = Pick<
   Product,
   | "id"

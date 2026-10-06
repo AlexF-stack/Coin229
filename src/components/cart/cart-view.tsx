@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Heart, Lock, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
-import type { ProductCardData } from "@/lib/constants";
+import { maxOrderQty, type ProductCardData } from "@/lib/constants";
 import {
   cn,
   formatPrice,
@@ -267,7 +267,7 @@ export function CartView({ suggestions }: Props) {
                     <div className="mt-auto flex flex-wrap items-end justify-between gap-x-2 gap-y-2 pt-3">
                       <QuantitySelector
                         value={item.quantite}
-                        max={item.stockQuantite}
+                        max={maxOrderQty(item.stockQuantite)}
                         onChange={(q) => updateQuantity(item.productId, q)}
                       />
                       <div className="ml-auto shrink-0 text-right">

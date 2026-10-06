@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ProductCardData } from "@/lib/constants";
+import { maxOrderQty, type ProductCardData } from "@/lib/constants";
 import { QuantitySelector } from "./quantity-selector";
 import { AddToCartButton } from "./add-to-cart-button";
 import { OTHER_VENDOR_MESSAGE, useCartStore } from "@/lib/cart-store";
@@ -16,7 +16,7 @@ type Props = {
 /** CTA qui convertissent : panier + achat immédiat */
 export function ProductPurchaseBar({ product }: Props) {
   const [qty, setQty] = useState(1);
-  const max = Math.max(1, product.stockQuantite);
+  const max = Math.max(1, maxOrderQty(product.stockQuantite));
   const buyNowInCart = useCartStore((s) => s.buyNow);
   const router = useRouter();
   const price = getEffectivePrice(product.prix, product.prixPromo);

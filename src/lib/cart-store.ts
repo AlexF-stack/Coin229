@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { DeliveryZone } from "@prisma/client";
+import { maxOrderQty } from "@/lib/constants";
 
 export type CartItem = {
   productId: string;
@@ -78,7 +79,7 @@ export const useCartStore = create<CartState>()(
                 i.productId === item.productId
                   ? {
                       ...i,
-                      quantite: Math.min(i.quantite + qty, i.stockQuantite),
+                      quantite: Math.min(i.quantite + qty, maxOrderQty(i.stockQuantite)),
                     }
                   : i
               ),
@@ -87,7 +88,7 @@ export const useCartStore = create<CartState>()(
           return {
             items: [
               ...state.items,
-              { ...item, quantite: Math.min(qty, item.stockQuantite) },
+              { ...item, quantite: Math.min(qty, maxOrderQty(item.stockQuantite)) },
             ],
           };
         });
@@ -99,7 +100,7 @@ export const useCartStore = create<CartState>()(
         if (state.items.some((i) => i.vendorId !== item.vendorId)) {
           return "other_vendor";
         }
-        const quantite = Math.max(1, Math.min(qty, item.stockQuantite));
+        const quantite = Math.max(1, Math.min(qty, maxOrderQty(item.stockQuantite)));
         const exists = state.items.some((i) => i.productId === item.productId);
         set({
           items: exists
@@ -123,7 +124,7 @@ export const useCartStore = create<CartState>()(
               ? state.items.filter((i) => i.productId !== productId)
               : state.items.map((i) =>
                   i.productId === productId
-                    ? { ...i, quantite: Math.min(quantite, i.stockQuantite) }
+                    ? { ...i, quantite: Math.min(quantite, maxOrderQty(i.stockQuantite)) }
                     : i
                 ),
         })),
@@ -143,7 +144,7 @@ export const useCartStore = create<CartState>()(
           if (before !== after) {
             changes.push({ type: "price", nom: fresh.nom, from: before, to: after });
           }
-          const quantite = Math.min(item.quantite, fresh.stockQuantite);
+          const quantite = Math.min(item.quantite, maxOrderQty(fresh.stockQuantite));
           if (quantite < item.quantite) {
             changes.push({ type: "quantity", nom: fresh.nom, to: quantite });
           }
