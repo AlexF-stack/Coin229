@@ -8,17 +8,13 @@ import {
   scryptSync,
   timingSafeEqual,
 } from "crypto";
+import { getSessionSecret as getKindSecret, hasKind, signingInput } from "@/lib/session-secrets";
 
 const COOKIE = "coin229_vendor";
 const MAX_AGE_SEC = 60 * 60 * 24 * 14; // 14 jours
 
 function getSessionSecret(): string | null {
-  const custom =
-    process.env.VENDOR_SESSION_SECRET?.trim() ||
-    process.env.ADMIN_SESSION_SECRET?.trim() ||
-    process.env.ADMIN_PASSWORD?.trim();
-  if (!custom) return null;
-  return custom.length >= 8 ? custom : null;
+  return getKindSecret("vendor");
 }
 
 function b64urlEncode(data: Buffer | Uint8Array): string {
@@ -90,10 +86,12 @@ export function createVendorSessionToken(vendorId: string): string | null {
   const now = Math.floor(Date.now() / 1000);
   const payload = b64urlEncode(
     Buffer.from(
-      JSON.stringify({ v: 1, vendorId, iat: now, exp: now + MAX_AGE_SEC })
+      JSON.stringify({ v: 2, typ: "vendor", vendorId, iat: now, exp: now + MAX_AGE_SEC })
     )
   );
-  const hmac = createHmac("sha256", secret).update(payload).digest();
+  const hmac = createHmac("sha256", secret)
+    .update(signingInput("vendor", payload))
+    .digest();
   return `${payload}.${b64urlEncode(hmac)}`;
 }
 
@@ -105,7 +103,9 @@ export function readVendorSessionToken(
   if (!secret) return null;
   const [payload, sig] = token.split(".");
   if (!payload || !sig) return null;
-  const expected = createHmac("sha256", secret).update(payload).digest();
+  const expected = createHmac("sha256", secret)
+    .update(signingInput("vendor", payload))
+    .digest();
   let given: Buffer;
   try {
     given = b64urlDecode(sig);
@@ -121,6 +121,7 @@ export function readVendorSessionToken(
       exp?: number;
     };
     if (
+      !hasKind(json, "vendor") ||
       !json.vendorId ||
       !json.exp ||
       json.exp < Math.floor(Date.now() / 1000)

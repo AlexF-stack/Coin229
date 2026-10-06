@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       {
         ok: false,
         error:
-          "ADMIN_PASSWORD non configuré (min. 8 car., pas de valeur d’exemple).",
+          "Admin non configuré : ADMIN_PASSWORD (min. 8 car.) et ADMIN_SESSION_SECRET (min. 16 car., distinct des autres secrets, pas de valeur d’exemple).",
       },
       { status: 503 }
     );

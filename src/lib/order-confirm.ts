@@ -7,16 +7,13 @@ import {
   createHmac,
   timingSafeEqual,
 } from "crypto";
+import { getSessionSecret, hasKind, signingInput } from "@/lib/session-secrets";
 
 const COOKIE = "coin229_order_confirm";
 const MAX_AGE_SEC = 60 * 60; // 1 heure
 
 function getSecret(): string | null {
-  const s =
-    process.env.PHONE_SESSION_SECRET?.trim() ||
-    process.env.ADMIN_SESSION_SECRET?.trim() ||
-    process.env.ADMIN_PASSWORD?.trim();
-  return s && s.length >= 8 ? s : null;
+  return getSessionSecret("order");
 }
 
 export function orderConfirmCookieName() {
@@ -38,10 +35,12 @@ export function createOrderConfirmToken(orderId: string): string | null {
   if (!secret || !orderId) return null;
   const exp = Math.floor(Date.now() / 1000) + MAX_AGE_SEC;
   const payload = Buffer.from(
-    JSON.stringify({ v: 1, orderId, exp }),
+    JSON.stringify({ v: 2, typ: "order", orderId, exp }),
     "utf8"
   ).toString("base64url");
-  const sig = createHmac("sha256", secret).update(payload).digest("base64url");
+  const sig = createHmac("sha256", secret)
+    .update(signingInput("order", payload))
+    .digest("base64url");
   return `${payload}.${sig}`;
 }
 
@@ -54,7 +53,7 @@ export function readOrderConfirmToken(
   const [payload, sig] = token.split(".");
   if (!payload || !sig) return null;
   const expected = createHmac("sha256", secret)
-    .update(payload)
+    .update(signingInput("order", payload))
     .digest("base64url");
   try {
     const a = Buffer.from(sig);
@@ -63,7 +62,12 @@ export function readOrderConfirmToken(
     const json = JSON.parse(
       Buffer.from(payload, "base64url").toString("utf8")
     ) as { orderId?: string; exp?: number };
-    if (!json.orderId || !json.exp || json.exp < Math.floor(Date.now() / 1000)) {
+    if (
+      !hasKind(json, "order") ||
+      !json.orderId ||
+      !json.exp ||
+      json.exp < Math.floor(Date.now() / 1000)
+    ) {
       return null;
     }
     return json.orderId;

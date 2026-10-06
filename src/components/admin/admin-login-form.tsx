@@ -32,7 +32,7 @@ export function AdminLoginForm() {
         return;
       }
       if (res.status === 503) {
-        setError("Admin non configuré (ADMIN_PASSWORD).");
+        setError("Admin non configuré (ADMIN_PASSWORD / ADMIN_SESSION_SECRET).");
         return;
       }
       if (!res.ok) {

@@ -2,15 +2,13 @@
  * Session téléphone signée (cookie httpOnly) — remplace localStorage pour l’IDOR.
  */
 
+import { getSessionSecret, hasKind, signingInput } from "@/lib/session-secrets";
+
 const COOKIE = "coin229_phone";
 const MAX_AGE_SEC = 60 * 60 * 24 * 30; // 30 jours
 
 function getSecret(): string | null {
-  const s =
-    process.env.PHONE_SESSION_SECRET?.trim() ||
-    process.env.ADMIN_SESSION_SECRET?.trim() ||
-    process.env.ADMIN_PASSWORD?.trim();
-  return s && s.length >= 8 ? s : null;
+  return getSessionSecret("phone");
 }
 
 function b64urlEncode(data: ArrayBuffer | Uint8Array): string {
@@ -95,14 +93,15 @@ export async function createPhoneSessionToken(
   const payload = b64urlEncode(
     new TextEncoder().encode(
       JSON.stringify({
-        v: 1,
+        v: 2,
+        typ: "phone",
         phone: normalized,
         iat: now,
         exp: now + MAX_AGE_SEC,
       })
     )
   );
-  const sig = await hmacSign(secret, payload);
+  const sig = await hmacSign(secret, signingInput("phone", payload));
   return `${payload}.${sig}`;
 }
 
@@ -114,12 +113,14 @@ export async function readPhoneFromToken(
   if (!secret) return null;
   const [payload, sig] = token.split(".");
   if (!payload || !sig) return null;
-  if (!(await hmacVerify(secret, payload, sig))) return null;
+  if (!(await hmacVerify(secret, signingInput("phone", payload), sig))) {
+    return null;
+  }
   try {
     const json = JSON.parse(
       new TextDecoder().decode(b64urlDecode(payload))
     ) as { phone?: string; exp?: number };
-    if (!json.phone || !json.exp || json.exp < Math.floor(Date.now() / 1000)) {
+    if (!hasKind(json, "phone") || !json.phone || !json.exp || json.exp < Math.floor(Date.now() / 1000)) {
       return null;
     }
     return json.phone;

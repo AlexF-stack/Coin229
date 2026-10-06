@@ -3,6 +3,8 @@
  * Compatible Edge (Web Crypto) et Node.
  */
 
+import { getSessionSecret as getKindSecret, hasKind, signingInput } from "@/lib/session-secrets";
+
 const COOKIE = "coin229_admin";
 const MAX_AGE_SEC = 60 * 60 * 24 * 7; // 7 jours
 
@@ -19,9 +21,7 @@ function getAdminPassword(): string | null {
 }
 
 function getSessionSecret(): string | null {
-  const custom = process.env.ADMIN_SESSION_SECRET?.trim();
-  if (custom && custom.length >= 16) return custom;
-  return getAdminPassword();
+  return getKindSecret("admin");
 }
 
 function b64urlEncode(data: ArrayBuffer | Uint8Array): string {
@@ -114,10 +114,10 @@ export async function createAdminSessionToken(): Promise<string | null> {
   const now = Math.floor(Date.now() / 1000);
   const payload = b64urlEncode(
     new TextEncoder().encode(
-      JSON.stringify({ v: 1, iat: now, exp: now + MAX_AGE_SEC })
+      JSON.stringify({ v: 2, typ: "admin", iat: now, exp: now + MAX_AGE_SEC })
     )
   );
-  const sig = await hmacSign(secret, payload);
+  const sig = await hmacSign(secret, signingInput("admin", payload));
   return `${payload}.${sig}`;
 }
 
@@ -129,12 +129,13 @@ export async function verifyAdminSessionToken(
   if (!secret) return false;
   const [payload, sig] = token.split(".");
   if (!payload || !sig) return false;
-  const valid = await hmacVerify(secret, payload, sig);
+  const valid = await hmacVerify(secret, signingInput("admin", payload), sig);
   if (!valid) return false;
   try {
     const json = JSON.parse(new TextDecoder().decode(b64urlDecode(payload))) as {
       exp?: number;
     };
+    if (!hasKind(json, "admin")) return false;
     if (!json.exp || json.exp < Math.floor(Date.now() / 1000)) return false;
     return true;
   } catch {

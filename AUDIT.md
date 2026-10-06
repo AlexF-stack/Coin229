@@ -17,7 +17,7 @@
 | Phase | Statut |
 |---|---|
 | Audit | ✅ |
-| Corrections P0 | ⬜ |
+| Corrections P0 | 🔄 (1/5) |
 | Corrections P1 | ⬜ |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
@@ -82,7 +82,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 
 | ID | Statut | Problème | Où | Correction recommandée |
 |---|---|---|---|---|
-| P0-1 | ⬜ | **Faille d'authentification admin** : une session non-admin peut être acceptée comme session admin ✅ | `src/lib/admin-auth.ts`, `vendor-auth.ts`, `phone-session.ts`, `order-confirm.ts` | Jetons typés et vérifiés par rôle ; secrets distincts obligatoires, sans repli ni valeur d'exemple. **Action immédiate : vérifier sur Vercel que `ADMIN_SESSION_SECRET`, `VENDOR_SESSION_SECRET` et `PHONE_SESSION_SECRET` sont distincts et non issus de `.env.example`.** |
+| P0-1 | ✅ | **Faille d'authentification admin** : une session non-admin pouvait être acceptée comme session admin | `src/lib/session-secrets.ts` (nouveau), `admin-auth.ts`, `vendor-auth.ts`, `vendor-auth-edge.ts`, `phone-session.ts`, `order-confirm.ts` | **Corrigé** : type de jeton dans le payload ET dans le message signé ; en production, secret dédié par type (≥ 16 car., distinct, pas d'exemple, pas `ADMIN_PASSWORD`). Testé : 29 tests unitaires + attaque rejouée en local → refusée (307 vers login). ⚠️ Voir « Checklist avant déploiement ». |
 | P0-2 | ⬜ | **Données privées du vendeur envoyées au navigateur** sur la fiche produit ✅ | `src/lib/catalog.ts` (`fetchProductById`), `src/app/produit/[id]/page.tsx` | `select` explicite des champs vendeur publics ; objet réduit passé aux composants client |
 | P0-3 | ⬜ | Numéros à 10 chiffres refusés (« Numéro invalide ») ✅ | `checkout-schema.ts`, `checkout-form.tsx`, `payment.ts`, `phone-session.ts` | Une seule fonction de normalisation (+229 + 8 ou 10 chiffres) partagée client / serveur / Fedapay |
 | P0-4 | ⬜ | Notifications push « nouvelle commande / nouveau vendeur » envoyées à **tous** les abonnés, clients compris, avec le nom de l'acheteur 🔎 | `src/lib/order-notify.ts`, `src/app/api/vendor/register/route.ts` | Ajouter rôle + vendorId aux abonnements push et cibler les envois |
@@ -178,8 +178,14 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 5. **P2** puis **P3**
 6. QA complète → build production → smoke test → validation → merge `main` → déploiement
 
+## Checklist avant déploiement (à compléter au fil des corrections)
+
+- [ ] **Vercel → variables d'environnement** : définir `ADMIN_SESSION_SECRET`, `VENDOR_SESSION_SECRET` et `PHONE_SESSION_SECRET` avec **3 valeurs différentes** (≥ 16 car., générées avec `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`). Sans cela, après P0-1 : admin, espace vendeur, connexion SMS **et page de confirmation de commande** sont désactivés en production. (P0-1)
+- [ ] Prévenir admin / vendeurs / clients connectés : toutes les sessions existantes seront déconnectées une fois au déploiement (nouveau format de jeton). (P0-1)
+
 ## Journal des corrections
 
 | Date | ID | Commit | Note |
 |---|---|---|---|
-| 05/10/2026 | — | — | Audit initial |
+| 05/10/2026 | — | `03f3b72` | Audit initial |
+| 06/10/2026 | P0-1 | voir `git log` | Jetons de session typés + secrets dédiés par type en production |
