@@ -17,7 +17,7 @@
 | Phase | Statut |
 |---|---|
 | Audit | ✅ |
-| Corrections P0 | 🔄 (3/5) |
+| Corrections P0 | 🔄 (4/5) |
 | Corrections P1 | ⬜ |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
@@ -86,7 +86,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P0-2 | ✅ | **Données privées du vendeur envoyées au navigateur** (fiche produit publique, et aussi liste vendeurs admin + formulaire profil vendeur) | `src/lib/prisma.ts`, `src/lib/catalog.ts`, `src/lib/constants.ts` (`SafeVendor`), `admin-vendors.tsx`, `vendor-profile-form.tsx`, `api/vendor/login`, `api/vendor/forgot-password`, `actions.ts` | **Corrigé** : `passwordHash` / `resetTokenHash` / `resetTokenExpires` exclus par défaut de toutes les lectures Prisma (`omit` global), demandés explicitement seulement par login et mot de passe oublié ; fiche produit limitée aux champs vendeur publics ; action morte `getProductById` supprimée. Vérifié : 0 hash dans le HTML (fiche, vitrine, admin, profil), login vendeur OK / mauvais mot de passe refusé, mot de passe oublié OK. |
 | P0-3 | ✅ | Numéros à 10 chiffres refusés (« Numéro invalide ») | `src/lib/bj-phone.ts` (nouveau), `checkout-schema.ts`, `checkout-form.tsx`, `phone-auth-form.tsx`, `payment.ts`, `phone-session.ts`, `order-access.ts`, `commande/paiement`, migration `20261006_bj_phone_10_digits` | **Corrigé** : fonction unique partagée client / serveur / Fedapay / KkiaPay. Accepte `01XXXXXXXX`, `+229…`, `00229…`, avec ou sans espaces ; ancien numéro 8 chiffres converti en `01` + ancien (règle officielle). Format stocké : `+22901XXXXXXXX`. Migration SQL qui convertit les clients et commandes existants (sans doublon). Placeholder et message d'erreur mis à jour. Vérifié : 18 tests unitaires + commande réelle avec `01 97 00 00 07` → confirmée. Fedapay reçoit désormais 10 chiffres (à valider en sandbox, voir P2-6). |
 | P0-4 | ⬜ | Notifications push « nouvelle commande / nouveau vendeur » envoyées à **tous** les abonnés, clients compris, avec le nom de l'acheteur 🔎 | `src/lib/order-notify.ts`, `src/app/api/vendor/register/route.ts` | Ajouter rôle + vendorId aux abonnements push et cibler les envois |
-| P0-5 | ⬜ | **Injection de script possible** via le contenu produit dans le JSON-LD 🔎 | `src/components/seo/json-ld.tsx` | Échapper le JSON sérialisé, valider les produits (zod), ajouter une CSP |
+| P0-5 | ✅ | **Injection de script possible** via le contenu produit dans le JSON-LD (reproduite en local : script exécuté) | `src/components/seo/json-ld.tsx` | **Corrigé** : nouveau `serializeJsonLd` qui échappe `<` `>` `&` U+2028 U+2029 (seul point d'injection HTML brut du code). Vérifié : 6 tests unitaires + produit piégé en local → script **non** exécuté, nom affiché en texte, JSON-LD valide ; fiche normale inchangée. Défense en profondeur restante : validation zod des produits (P2-5) et CSP (P2-3). |
 
 ## 8. P1 — Critiques
 
@@ -192,4 +192,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 05/10/2026 | — | `03f3b72` | Audit initial |
 | 06/10/2026 | P0-1 | `e8d97a8` | Jetons de session typés + secrets dédiés par type en production |
 | 06/10/2026 | P0-2 | `d50b605` | Champs secrets vendeur exclus par défaut (Prisma `omit`), fiche produit limitée aux champs publics |
-| 06/10/2026 | P0-3 | voir `git log` | Numéros béninois 10 chiffres : fonction unique + migration des données existantes |
+| 06/10/2026 | P0-3 | `e0857a1` | Numéros béninois 10 chiffres : fonction unique + migration des données existantes |
+| 06/10/2026 | P0-5 | voir `git log` | JSON-LD échappé : plus d'injection de script via les noms / descriptions produits |

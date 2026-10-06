@@ -106,11 +106,35 @@ export function breadcrumbJsonLd(
   };
 }
 
+/**
+ * JSON sûr à injecter dans une balise <script> : les noms / descriptions
+ * produits viennent des vendeurs, un « </script> » fermerait la balise.
+ * Échappés : < > & et les séparateurs de ligne U+2028 / U+2029.
+ * Le résultat reste du JSON valide (même donnée une fois parsée).
+ */
+const UNSAFE_JSON_CHARS = new Set([
+  "<",
+  ">",
+  "&",
+  String.fromCharCode(0x2028),
+  String.fromCharCode(0x2029),
+]);
+
+export function serializeJsonLd(data: unknown): string {
+  let out = "";
+  for (const c of JSON.stringify(data)) {
+    out += UNSAFE_JSON_CHARS.has(c)
+      ? "\\" + "u" + c.charCodeAt(0).toString(16).padStart(4, "0")
+      : c;
+  }
+  return out;
+}
+
 export function JsonLd({ data }: { data: Record<string, unknown> | Record<string, unknown>[] }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
     />
   );
 }
