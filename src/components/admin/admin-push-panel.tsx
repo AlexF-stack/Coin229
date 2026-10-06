@@ -73,7 +73,7 @@ export function AdminPushPanel() {
       <div className="rounded-xl border border-white/10 bg-[#161920] p-4">
         <div className="flex items-center gap-2 text-white/45">
           <Bell className="h-4 w-4" />
-          <span className="text-xs uppercase tracking-wide">Abonnés</span>
+          <span className="text-xs uppercase tracking-wide">Abonnés clients</span>
         </div>
         <p className="mt-2 text-3xl font-semibold text-white">
           {stats?.subscribers ?? "—"}
@@ -146,10 +146,10 @@ export function AdminPushPanel() {
           ) : (
             <Send className="h-4 w-4" />
           )}
-          Envoyer à tous les abonnés
+          Envoyer aux clients abonnés
         </button>
         <p className="text-xs text-white/35">
-          Envoie à tous les appareils opt-in. Teste d’abord avec 1 téléphone.
+          Envoie aux clients qui ont activé les alertes nouveautés & promos (pas aux admins ni aux vendeurs). Teste d’abord avec 1 téléphone.
         </p>
       </form>
     </div>

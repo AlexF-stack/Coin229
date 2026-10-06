@@ -14,7 +14,32 @@ function urlBase64ToUint8Array(base64String: string) {
 
 type Status = "loading" | "unsupported" | "denied" | "off" | "on" | "disabled";
 
-export function PushOptInCard() {
+export type PushOptInAudience = "client" | "admin" | "vendor";
+
+const COPY: Record<PushOptInAudience, { title: string; on: string; off: string }> = {
+  client: {
+    title: "Alertes nouveautés & promos",
+    on: "Activées sur cet appareil — tu peux les couper à tout moment.",
+    off: "Reçois une notif quand on sort une pièce ou une promo.",
+  },
+  admin: {
+    title: "Alertes admin",
+    on: "Activées sur cet appareil : nouvelles commandes et nouveaux vendeurs.",
+    off: "Reçois une notif à chaque nouvelle commande et inscription vendeur.",
+  },
+  vendor: {
+    title: "Alertes commandes",
+    on: "Activées sur cet appareil : tu es prévenu de chaque nouvelle commande.",
+    off: "Reçois une notif dès qu’un client commande dans ta boutique.",
+  },
+};
+
+export function PushOptInCard({
+  audience = "client",
+}: {
+  audience?: PushOptInAudience;
+} = {}) {
+  const copy = COPY[audience];
   const [status, setStatus] = useState<Status>("loading");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +76,15 @@ export function PushOptInCard() {
       try {
         const reg = await navigator.serviceWorker.ready;
         const sub = await reg.pushManager.getSubscription();
-        if (!cancelled) setStatus(sub ? "on" : "off");
+        if (!sub) {
+          if (!cancelled) setStatus("off");
+          return;
+        }
+        // L'appareil peut être abonné pour un autre public : on demande au serveur
+        const state = await fetch(
+          `/api/push/subscribe?audience=${audience}&endpoint=${encodeURIComponent(sub.endpoint)}`
+        ).then((r) => r.json());
+        if (!cancelled) setStatus(state?.subscribed ? "on" : "off");
       } catch {
         if (!cancelled) setStatus("off");
       }
@@ -59,7 +92,7 @@ export function PushOptInCard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [audience]);
 
   async function enable() {
     setBusy(true);
@@ -95,6 +128,7 @@ export function PushOptInCard() {
         body: JSON.stringify({
           endpoint: json.endpoint,
           keys: json.keys,
+          audience,
         }),
       });
       if (!res.ok) throw new Error("subscribe_failed");
@@ -113,12 +147,12 @@ export function PushOptInCard() {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
+        // Retire seulement ce public : l'appareil peut rester abonné aux autres
         await fetch("/api/push/subscribe", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ endpoint: sub.endpoint }),
+          body: JSON.stringify({ endpoint: sub.endpoint, audience }),
         });
-        await sub.unsubscribe();
       }
       setStatus("off");
     } catch {
@@ -128,9 +162,16 @@ export function PushOptInCard() {
     }
   }
 
+  // Espaces admin / vendeur : thème sombre
+  const dark = audience !== "client";
+  const boxClass = dark
+    ? "rounded-xl border border-white/10 bg-[#1a1c24] text-white"
+    : "rounded-2xl border border-border bg-card/80";
+  const mutedClass = dark ? "text-white/55" : "text-muted";
+
   if (status === "loading") {
     return (
-      <div className="flex items-center gap-2 rounded-2xl border border-border bg-card/80 px-4 py-3 text-sm text-muted">
+      <div className={`flex items-center gap-2 px-4 py-3 text-sm ${boxClass} ${mutedClass}`}>
         <Loader2 className="h-4 w-4 animate-spin" />
         Notifications…
       </div>
@@ -142,7 +183,7 @@ export function PushOptInCard() {
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-card/80 p-4">
+    <section className={`p-4 ${boxClass}`}>
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber/15 text-amber">
           {status === "on" ? (
@@ -152,13 +193,13 @@ export function PushOptInCard() {
           )}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold">Alertes nouveautés & promos</p>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="text-sm font-semibold">{copy.title}</p>
+          <p className={`mt-0.5 text-xs ${mutedClass}`}>
             {status === "on"
-              ? "Activées sur cet appareil — tu peux les couper à tout moment."
+              ? copy.on
               : status === "denied"
                 ? "Bloquées par le navigateur. Autorise Coin229 dans les réglages du site."
-                : "Reçois une notif quand on sort une pièce ou une promo."}
+                : copy.off}
           </p>
           {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
           {status !== "denied" && (
@@ -166,7 +207,11 @@ export function PushOptInCard() {
               type="button"
               disabled={busy}
               onClick={() => void (status === "on" ? disable() : enable())}
-              className="btn btn-secondary mt-3 h-9 px-4 text-sm"
+              className={
+                dark
+                  ? "mt-3 inline-flex h-9 items-center rounded-lg border border-white/15 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10"
+                  : "btn btn-secondary mt-3 h-9 px-4 text-sm"
+              }
             >
               {busy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

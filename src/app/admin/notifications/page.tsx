@@ -1,5 +1,6 @@
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPushPanel } from "@/components/admin/admin-push-panel";
+import { PushOptInCard } from "@/components/pwa/push-opt-in-card";
 import { getDefaultVendor } from "@/lib/actions";
 
 export const metadata = {
@@ -25,9 +26,10 @@ export default async function AdminNotificationsPage() {
             Notifications push
           </h1>
           <p className="mt-1 text-sm text-white/45">
-            Envoie une alerte aux visiteurs qui ont activé les notifications.
+            Envoie une annonce aux clients qui ont activé les notifications.
           </p>
         </div>
+        <PushOptInCard audience="admin" />
         <AdminPushPanel />
       </div>
     </AdminShell>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { VendorShell } from "@/components/vendeur/vendor-shell";
+import { PushOptInCard } from "@/components/pwa/push-opt-in-card";
 import { requireVendorPage } from "@/lib/require-vendor-page";
 import { getMyVendorStats } from "@/lib/vendor-actions";
 import { getVendorUnreadTotal } from "@/lib/messaging";
@@ -81,6 +82,8 @@ export default async function VendorDashboardPage() {
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
+
+        <PushOptInCard audience="vendor" />
 
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-[#1a1c24] p-4">

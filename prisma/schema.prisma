@@ -79,6 +79,7 @@ model Vendor {
   orders            Order[]
   conversations     Conversation[]
   payouts           VendorPayout[]
+  pushSubscriptions PushSubscription[]
 
   @@map("vendors")
 }
@@ -123,18 +124,31 @@ model Client {
 }
 
 /** Abonnements Web Push (opt-in navigateur). */
+/// Public d'un abonnement push : un même appareil peut être abonné à plusieurs
+enum PushRole {
+  client
+  admin
+  vendor
+}
+
 model PushSubscription {
   id        String   @id @default(cuid())
-  endpoint  String   @unique
+  endpoint  String
+  role      PushRole @default(client)
   p256dh    String
   auth      String
   userAgent String?  @map("user_agent")
   clientId  String?  @map("client_id")
+  vendorId  String?  @map("vendor_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  vendor    Vendor?  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
+  @@unique([endpoint, role])
   @@index([clientId])
+  @@index([role])
+  @@index([vendorId])
   @@map("push_subscriptions")
 }
 

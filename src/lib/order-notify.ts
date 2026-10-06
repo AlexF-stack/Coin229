@@ -1,13 +1,8 @@
 /**
  * Notifs commande marketplace — best-effort, ne bloque jamais le checkout.
- * Canaux : webhook ops + push abonnés (admin / clients).
+ * Canaux : webhook ops + push admin et vendeur concerné (jamais les clients).
  */
-import { prisma } from "@/lib/prisma";
-import {
-  isGonePushError,
-  isWebPushConfigured,
-  sendPushToSubscription,
-} from "@/lib/web-push";
+import { sendPushTo } from "@/lib/push-audience";
 import { SITE } from "@/lib/site";
 import { formatPrice } from "@/lib/utils";
 
@@ -28,7 +23,15 @@ export async function notifyNewOrder(input: NewOrderNotifyInput) {
 
   await Promise.allSettled([
     notifyWebhook(input, appUrl),
-    notifyPush(body, url, input.orderId),
+    sendPushTo(
+      { roles: ["admin", "vendor"], vendorId: input.vendorId },
+      {
+        title: "Nouvelle commande Coin229",
+        body,
+        url,
+        tag: `order-${input.orderId}`,
+      }
+    ),
   ]);
 }
 
@@ -56,29 +59,6 @@ async function notifyWebhook(input: NewOrderNotifyInput, appUrl: string) {
     }),
     signal: AbortSignal.timeout(8000),
   });
-}
-
-async function notifyPush(body: string, url: string, orderId: string) {
-  if (!isWebPushConfigured()) return;
-  const subs = await prisma.pushSubscription.findMany({ take: 200 });
-  const goneIds: string[] = [];
-  for (const sub of subs) {
-    try {
-      await sendPushToSubscription(sub, {
-        title: "Nouvelle commande Coin229",
-        body,
-        url,
-        tag: `order-${orderId}`,
-      });
-    } catch (err) {
-      if (isGonePushError(err)) goneIds.push(sub.id);
-    }
-  }
-  if (goneIds.length) {
-    await prisma.pushSubscription.deleteMany({
-      where: { id: { in: goneIds } },
-    });
-  }
 }
 
 function whatsappToContact(contact: string, text: string): string | null {

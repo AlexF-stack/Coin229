@@ -6,11 +6,8 @@ import {
   verifyAdminSessionToken,
 } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
-import {
-  isGonePushError,
-  isWebPushConfigured,
-  sendPushToSubscription,
-} from "@/lib/web-push";
+import { sendPushTo } from "@/lib/push-audience";
+import { isWebPushConfigured } from "@/lib/web-push";
 
 async function requireAdminApi() {
   const jar = await cookies();
@@ -48,7 +45,8 @@ export async function GET() {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  const count = await prisma.pushSubscription.count();
+  // Annonces marketing : abonnés clients uniquement
+  const count = await prisma.pushSubscription.count({ where: { role: "client" } });
   return NextResponse.json({
     ok: true,
     configured: isWebPushConfigured(),
@@ -80,37 +78,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid_body" }, { status: 400 });
   }
 
-  const subs = await prisma.pushSubscription.findMany();
-  let sent = 0;
-  let failed = 0;
-  const goneIds: string[] = [];
-
-  for (const sub of subs) {
-    try {
-      await sendPushToSubscription(sub, {
-        title: parsed.data.title,
-        body: parsed.data.body,
-        url: parsed.data.url,
-        tag: parsed.data.tag,
-      });
-      sent += 1;
-    } catch (err) {
-      failed += 1;
-      if (isGonePushError(err)) goneIds.push(sub.id);
+  // Annonces marketing : abonnés clients uniquement
+  const result = await sendPushTo(
+    { roles: ["client"] },
+    {
+      title: parsed.data.title,
+      body: parsed.data.body,
+      url: parsed.data.url,
+      tag: parsed.data.tag,
     }
-  }
+  );
 
-  if (goneIds.length) {
-    await prisma.pushSubscription.deleteMany({
-      where: { id: { in: goneIds } },
-    });
-  }
-
-  return NextResponse.json({
-    ok: true,
-    total: subs.length,
-    sent,
-    failed,
-    pruned: goneIds.length,
-  });
+  return NextResponse.json({ ok: true, ...result });
 }

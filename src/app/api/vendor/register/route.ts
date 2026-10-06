@@ -10,11 +10,7 @@ import {
   vendorCookieOptions,
 } from "@/lib/vendor-auth";
 import { SITE } from "@/lib/site";
-import {
-  isWebPushConfigured,
-  sendPushToSubscription,
-  isGonePushError,
-} from "@/lib/web-push";
+import { sendPushTo } from "@/lib/push-audience";
 
 const registerSchema = z.object({
   nomBoutique: z.string().trim().min(2).max(80),
@@ -45,25 +41,17 @@ async function notifyAdminNewVendor(input: {
       signal: AbortSignal.timeout(8000),
     }).catch(() => {});
   }
-  if (!isWebPushConfigured()) return;
   try {
-    const subs = await prisma.pushSubscription.findMany({ take: 100 });
-    const gone: string[] = [];
-    for (const sub of subs) {
-      try {
-        await sendPushToSubscription(sub, {
-          title: "Nouveau vendeur Coin229",
-          body: `${input.nomBoutique} — à valider`,
-          url: "/admin/vendeurs",
-          tag: "vendor-register",
-        });
-      } catch (e) {
-        if (isGonePushError(e)) gone.push(sub.id);
+    // Admin uniquement — jamais les clients ni les autres vendeurs
+    await sendPushTo(
+      { roles: ["admin"] },
+      {
+        title: "Nouveau vendeur Coin229",
+        body: `${input.nomBoutique} — à valider`,
+        url: "/admin/vendeurs",
+        tag: "vendor-register",
       }
-    }
-    if (gone.length) {
-      await prisma.pushSubscription.deleteMany({ where: { id: { in: gone } } });
-    }
+    );
   } catch {
     // ignore
   }

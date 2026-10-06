@@ -17,7 +17,7 @@
 | Phase | Statut |
 |---|---|
 | Audit | ✅ |
-| Corrections P0 | 🔄 (4/5) |
+| Corrections P0 | ✅ (5/5) |
 | Corrections P1 | ⬜ |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
@@ -85,7 +85,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P0-1 | ✅ | **Faille d'authentification admin** : une session non-admin pouvait être acceptée comme session admin | `src/lib/session-secrets.ts` (nouveau), `admin-auth.ts`, `vendor-auth.ts`, `vendor-auth-edge.ts`, `phone-session.ts`, `order-confirm.ts` | **Corrigé** : type de jeton dans le payload ET dans le message signé ; en production, secret dédié par type (≥ 16 car., distinct, pas d'exemple, pas `ADMIN_PASSWORD`). Testé : 29 tests unitaires + attaque rejouée en local → refusée (307 vers login). ⚠️ Voir « Checklist avant déploiement ». |
 | P0-2 | ✅ | **Données privées du vendeur envoyées au navigateur** (fiche produit publique, et aussi liste vendeurs admin + formulaire profil vendeur) | `src/lib/prisma.ts`, `src/lib/catalog.ts`, `src/lib/constants.ts` (`SafeVendor`), `admin-vendors.tsx`, `vendor-profile-form.tsx`, `api/vendor/login`, `api/vendor/forgot-password`, `actions.ts` | **Corrigé** : `passwordHash` / `resetTokenHash` / `resetTokenExpires` exclus par défaut de toutes les lectures Prisma (`omit` global), demandés explicitement seulement par login et mot de passe oublié ; fiche produit limitée aux champs vendeur publics ; action morte `getProductById` supprimée. Vérifié : 0 hash dans le HTML (fiche, vitrine, admin, profil), login vendeur OK / mauvais mot de passe refusé, mot de passe oublié OK. |
 | P0-3 | ✅ | Numéros à 10 chiffres refusés (« Numéro invalide ») | `src/lib/bj-phone.ts` (nouveau), `checkout-schema.ts`, `checkout-form.tsx`, `phone-auth-form.tsx`, `payment.ts`, `phone-session.ts`, `order-access.ts`, `commande/paiement`, migration `20261006_bj_phone_10_digits` | **Corrigé** : fonction unique partagée client / serveur / Fedapay / KkiaPay. Accepte `01XXXXXXXX`, `+229…`, `00229…`, avec ou sans espaces ; ancien numéro 8 chiffres converti en `01` + ancien (règle officielle). Format stocké : `+22901XXXXXXXX`. Migration SQL qui convertit les clients et commandes existants (sans doublon). Placeholder et message d'erreur mis à jour. Vérifié : 18 tests unitaires + commande réelle avec `01 97 00 00 07` → confirmée. Fedapay reçoit désormais 10 chiffres (à valider en sandbox, voir P2-6). |
-| P0-4 | ⬜ | Notifications push « nouvelle commande / nouveau vendeur » envoyées à **tous** les abonnés, clients compris, avec le nom de l'acheteur 🔎 | `src/lib/order-notify.ts`, `src/app/api/vendor/register/route.ts` | Ajouter rôle + vendorId aux abonnements push et cibler les envois |
+| P0-4 | ✅ | Notifications push « nouvelle commande / nouveau vendeur » envoyées à **tous** les abonnés, clients compris, avec le nom de l'acheteur | `prisma/schema.prisma` + migration `20261006_push_roles`, `src/lib/push-audience.ts` (nouveau), `order-notify.ts`, `api/push/subscribe`, `api/admin/push`, `api/vendor/register`, `push-opt-in-card.tsx`, `admin/notifications`, `vendeur/espace` | **Corrigé** : chaque abonnement a un rôle (`client` / `admin` / `vendor` + vendorId), un appareil peut en avoir plusieurs. Nouvelle commande → admin + vendeur concerné ; nouveau vendeur → admin ; annonce marketing → clients. Abonnement admin / vendeur vérifié par la session. Carte « Alertes » ajoutée dans l'espace admin et vendeur (thème sombre). Vérifié : 8 tests d'accès (401 sans session admin / vendeur) + 5 tests de ciblage. Réception réelle sur téléphone : impossible à confirmer en local (navigateur de test bloque les notifications). |
 | P0-5 | ✅ | **Injection de script possible** via le contenu produit dans le JSON-LD (reproduite en local : script exécuté) | `src/components/seo/json-ld.tsx` | **Corrigé** : nouveau `serializeJsonLd` qui échappe `<` `>` `&` U+2028 U+2029 (seul point d'injection HTML brut du code). Vérifié : 6 tests unitaires + produit piégé en local → script **non** exécuté, nom affiché en texte, JSON-LD valide ; fiche normale inchangée. Défense en profondeur restante : validation zod des produits (P2-5) et CSP (P2-3). |
 
 ## 8. P1 — Critiques
@@ -148,6 +148,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P3-11 | ⬜ | Assistant boutique : salutation prioritaire sur la recherche, regex « ok », « autre suggestion », niches inexistantes |
 | P3-12 | ⬜ | Messagerie : doublons du message auto « Contacter », notification au vendeur |
 | P3-13 | ⬜ | Énumération des comptes vendeurs (inscription 409, timing login) ; secret `ops/notify` en query string |
+| P3-14 | ⬜ | En dev (PWA désactivée), la carte notifications reste bloquée sur « Notifications… » (`serviceWorker.ready` ne se résout jamais) — sans impact en production |
 
 ---
 
@@ -184,6 +185,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 - [ ] Prévenir admin / vendeurs / clients connectés : toutes les sessions existantes seront déconnectées une fois au déploiement (nouveau format de jeton). (P0-1)
 - [ ] Migration `20261006_bj_phone_10_digits` : appliquée automatiquement au build Vercel (`prisma migrate deploy`). Faire une **sauvegarde de la base** avant le déploiement (elle réécrit les numéros des clients et commandes). (P0-3)
 - [ ] Tester un paiement Fedapay sandbox avec un numéro 10 chiffres. (P0-3 / P2-6)
+- [ ] Migration `20261006_push_roles` : les abonnements push existants deviennent « client ». **Après déploiement, l'admin et chaque vendeur doivent réactiver leurs alertes** (Admin → Notifications, Espace vendeur → Tableau de bord). Tester la réception sur un vrai téléphone. (P0-4)
 
 ## Journal des corrections
 
@@ -193,4 +195,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 06/10/2026 | P0-1 | `e8d97a8` | Jetons de session typés + secrets dédiés par type en production |
 | 06/10/2026 | P0-2 | `d50b605` | Champs secrets vendeur exclus par défaut (Prisma `omit`), fiche produit limitée aux champs publics |
 | 06/10/2026 | P0-3 | `e0857a1` | Numéros béninois 10 chiffres : fonction unique + migration des données existantes |
-| 06/10/2026 | P0-5 | voir `git log` | JSON-LD échappé : plus d'injection de script via les noms / descriptions produits |
+| 06/10/2026 | P0-5 | `1f44253` | JSON-LD échappé : plus d'injection de script via les noms / descriptions produits |
+| 06/10/2026 | P0-4 | voir `git log` | Notifications push ciblées par rôle (client / admin / vendeur) — **tous les P0 sont corrigés**, build production OK |
