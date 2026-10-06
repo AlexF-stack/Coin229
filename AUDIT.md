@@ -18,7 +18,7 @@
 |---|---|
 | Audit | ✅ |
 | Corrections P0 | ✅ (5/5) |
-| Corrections P1 | 🔄 (1/16) |
+| Corrections P1 | 🔄 (2/16) |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
 | Build production | ⬜ |
@@ -99,7 +99,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P1-5 | ⬜ | Aucun `error.tsx` / `global-error.tsx` / `loading.tsx` ; erreur checkout = écran brut ✅ | `src/app` | Ajouter les boundaries + try/catch dans `createOrder` et le formulaire |
 | P1-6 | ⬜ | Identifiants vendeurs présents dans l'historique Git d'un dépôt public 🔎 | historique Git | Changer les mots de passe concernés ; purger l'historique si nécessaire |
 | P1-7 | ⬜ | Rate limiting en mémoire → inefficace sur Vercel (login admin, OTP, login vendeur, chat) 🔎 | `src/lib/rate-limit.ts` | `rateLimitAsync` (base) partout, upsert atomique |
-| P1-8 | ⬜ | « Acheter maintenant » peut commander le panier d'un autre vendeur ; pas de choix de zone au checkout (Cotonou forcé) ✅ | `product-purchase-bar.tsx`, `cart-store.ts`, `checkout-form.tsx` | `addItem` renvoie un booléen ; jamais de repli sur tout le panier ; `ZoneSelector` au checkout |
+| P1-8 | ✅ | « Acheter maintenant » pouvait commander le panier d'un autre vendeur ; pas de choix de zone au checkout (Cotonou forcé) | `cart-store.ts`, `product-purchase-bar.tsx`, `add-to-cart-button.tsx`, `checkout-form.tsx` | **Corrigé** : `addItem` / nouveau `buyNow` renvoient un résultat (`added` / `other_vendor` / `out_of_stock`) ; « Acheter maintenant » ne navigue que si l'ajout a réussi (sinon message + lien panier), fixe la quantité exacte (plus de cumul) ; « Ajouté » seulement si ajouté, plus de ligne à quantité 0 ; checkout sans repli sur tout le panier (état vide avec liens) ; sélecteur de zone au checkout. Vérifié en navigateur : autre boutique → reste sur la page + message ; 2 clics → quantité 1 ; zone Porto-Novo → total 20 500 et commande enregistrée `porto_novo` / 1 500 FCFA. |
 | P1-9 | ⬜ | Prix / stock du panier jamais revalidés → montant affiché ≠ facturé possible 🔎 | `src/lib/cart-store.ts` | Action `validateCart` au panier et au checkout |
 | P1-10 | ⬜ | Quantité > 20 et erreurs Zod affichées en anglais 🔎 | `checkout-schema.ts`, `cart-store.ts` | Plafond `min(stock, 20)` côté client ; messages FR |
 | P1-11 | ⬜ | Panier vidé avant le paiement Mobile Money, pas de bouton « Réessayer » (KkiaPay) 🔎. Effet visible aussi en paiement à la livraison : « Aucun article à commander » s'affiche un instant avant la redirection vers la confirmation ✅ | `checkout-form.tsx`, `kkiapay-checkout.tsx` | Vider après confirmation / après la navigation ; bouton de relance du widget |
@@ -149,6 +149,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P3-12 | ⬜ | Messagerie : doublons du message auto « Contacter », notification au vendeur |
 | P3-13 | ⬜ | Énumération des comptes vendeurs (inscription 409, timing login) ; secret `ops/notify` en query string |
 | P3-14 | ⬜ | En dev (PWA désactivée), la carte notifications reste bloquée sur « Notifications… » (`serviceWorker.ready` ne se résout jamais) — sans impact en production |
+| P3-15 | ✅ | En dev, le navigateur gardait d'anciens fichiers JS (en-tête `immutable` d'un an appliqué aussi en dev, noms de fichiers inchangés) → modifications invisibles. Corrigé : en-tête limité à la production (`next.config.ts`). À revérifier au prochain build production. |
 
 ---
 
@@ -199,4 +200,6 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 06/10/2026 | P0-3 | `e0857a1` | Numéros béninois 10 chiffres : fonction unique + migration des données existantes |
 | 06/10/2026 | P0-5 | `1f44253` | JSON-LD échappé : plus d'injection de script via les noms / descriptions produits |
 | 06/10/2026 | P0-4 | `7536f9d` | Notifications push ciblées par rôle (client / admin / vendeur) — **tous les P0 sont corrigés**, build production OK |
-| 06/10/2026 | P1-1 | voir `git log` | Page de confirmation selon l'état réel de la commande et du paiement |
+| 06/10/2026 | P1-1 | `baf83ea` | Page de confirmation selon l'état réel de la commande et du paiement |
+| 06/10/2026 | P1-8 | voir `git log` | Achat immédiat fiable (autre boutique, quantité exacte) + choix de zone au checkout |
+| 06/10/2026 | P3-15 | voir `git log` | Cache `immutable` de `/_next/static` limité à la production (servait du vieux code en dev) |

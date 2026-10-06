@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import { calculateShippingFee, ZONE_LABELS } from "@/lib/shipping";
+import { ZoneSelector } from "@/components/cart/zone-selector";
+import Link from "next/link";
 import { formatPrice, getEffectivePrice } from "@/lib/utils";
 import { createOrder } from "@/lib/actions";
 import {
@@ -29,6 +31,7 @@ export function CheckoutForm() {
   const allItems = useCartStore((s) => s.items);
   const checkoutIds = useCartStore((s) => s.checkoutIds);
   const zone = useCartStore((s) => s.zone);
+  const setZone = useCartStore((s) => s.setZone);
   const clear = useCartStore((s) => s.clear);
   const removeItem = useCartStore((s) => s.removeItem);
   const [mounted, setMounted] = useState(false);
@@ -40,10 +43,11 @@ export function CheckoutForm() {
   const [adresse, setAdresse] = useState("");
   const [acceptCgv, setAcceptCgv] = useState(false);
 
+  // Uniquement les articles choisis : jamais de repli sur tout le panier
+  // (sinon on commanderait d'autres articles que ceux sélectionnés)
   const items = useMemo(() => {
     if (!checkoutIds?.length) return allItems;
-    const picked = allItems.filter((i) => checkoutIds.includes(i.productId));
-    return picked.length ? picked : allItems;
+    return allItems.filter((i) => checkoutIds.includes(i.productId));
   }, [allItems, checkoutIds]);
 
   useEffect(() => {
@@ -84,6 +88,14 @@ export function CheckoutForm() {
     return (
       <div className="px-4 py-12 text-center">
         <p className="text-muted">Aucun article à commander.</p>
+        <div className="mt-6 flex justify-center gap-3">
+          <Link href="/panier" className="btn btn-secondary">
+            Voir mon panier
+          </Link>
+          <Link href="/boutique" className="btn btn-primary">
+            Boutique
+          </Link>
+        </div>
       </div>
     );
   }
@@ -158,12 +170,13 @@ export function CheckoutForm() {
       onSubmit={onSubmit}
       className="mx-auto max-w-xl space-y-6 px-4 py-4 pb-28 md:px-0 md:py-6 md:pb-6"
     >
-      <header className="space-y-1">
-        <p className="text-sm text-muted">
-          Zone : {ZONE_LABELS[zone]} · {shipping.etaLabel}
+      <section className="space-y-2 rounded-[12px] bg-cream p-5">
+        <ZoneSelector value={zone} onChange={setZone} />
+        <p className="text-xs text-muted">
+          {ZONE_LABELS[zone]} · {shipping.etaLabel}
           {shipping.isFree ? " · livraison offerte" : ""}
         </p>
-      </header>
+      </section>
 
       <section className="space-y-4 rounded-[12px] bg-cream p-5">
         <h2 className="font-display text-base font-semibold text-navy">

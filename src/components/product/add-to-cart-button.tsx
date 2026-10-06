@@ -3,7 +3,7 @@
 import { Plus, Check } from "lucide-react";
 import { useState } from "react";
 import type { ProductCardData } from "@/lib/constants";
-import { useCartStore } from "@/lib/cart-store";
+import { OTHER_VENDOR_MESSAGE, useCartStore } from "@/lib/cart-store";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -27,7 +27,7 @@ export function AddToCartButton({
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    addItem(
+    const result = addItem(
       {
         productId: product.id,
         nom: product.nom,
@@ -39,6 +39,14 @@ export function AddToCartButton({
       },
       quantity
     );
+    if (result !== "added") {
+      window.alert(
+        result === "other_vendor"
+          ? OTHER_VENDOR_MESSAGE
+          : "Ce produit est en rupture de stock."
+      );
+      return;
+    }
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
   }
