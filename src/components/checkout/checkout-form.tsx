@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import { calculateShippingFee, ZONE_LABELS } from "@/lib/shipping";
 import { ZoneSelector } from "@/components/cart/zone-selector";
+import { CartChangesNotice } from "@/components/cart/cart-changes-notice";
+import { useCartSync } from "@/lib/use-cart-sync";
 import Link from "next/link";
 import { formatPrice, getEffectivePrice } from "@/lib/utils";
 import { createOrder } from "@/lib/actions";
@@ -42,11 +44,13 @@ export function CheckoutForm() {
   const [telephone, setTelephone] = useState("");
   const [adresse, setAdresse] = useState("");
   const [acceptCgv, setAcceptCgv] = useState(false);
+  const cartSync = useCartSync();
 
   // Uniquement les articles choisis : jamais de repli sur tout le panier
   // (sinon on commanderait d'autres articles que ceux sélectionnés)
   const items = useMemo(() => {
-    if (!checkoutIds?.length) return allItems;
+    // null = pas de sélection (tout le panier) ; [] = sélection vidée → rien
+    if (checkoutIds === null) return allItems;
     return allItems.filter((i) => checkoutIds.includes(i.productId));
   }, [allItems, checkoutIds]);
 
@@ -87,6 +91,12 @@ export function CheckoutForm() {
   if (!items.length) {
     return (
       <div className="px-4 py-12 text-center">
+        <div className="mx-auto mb-6 max-w-xl text-left">
+          <CartChangesNotice
+            changes={cartSync.changes}
+            onDismiss={cartSync.dismiss}
+          />
+        </div>
         <p className="text-muted">Aucun article à commander.</p>
         <div className="mt-6 flex justify-center gap-3">
           <Link href="/panier" className="btn btn-secondary">
@@ -135,10 +145,13 @@ export function CheckoutForm() {
           productId: i.productId,
           quantite: i.quantite,
         })),
+        expectedTotal: total,
       });
 
       if (!result.success) {
         setError(result.error);
+        // Prix / stock changés côté serveur : on met le panier à jour
+        if ("priceChanged" in result) void cartSync.resync();
         return;
       }
 
@@ -170,6 +183,8 @@ export function CheckoutForm() {
       onSubmit={onSubmit}
       className="mx-auto max-w-xl space-y-6 px-4 py-4 pb-28 md:px-0 md:py-6 md:pb-6"
     >
+      <CartChangesNotice changes={cartSync.changes} onDismiss={cartSync.dismiss} />
+
       <section className="space-y-2 rounded-[12px] bg-cream p-5">
         <ZoneSelector value={zone} onChange={setZone} />
         <p className="text-xs text-muted">
@@ -331,7 +346,7 @@ export function CheckoutForm() {
       <div className="safe-pb fixed inset-x-0 bottom-0 z-40 border-t border-border bg-white/95 px-4 pt-3 backdrop-blur-md md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <button
           type="submit"
-          disabled={pending || !acceptCgv}
+          disabled={pending || cartSync.syncing || !acceptCgv}
           className="btn btn-primary mx-auto w-full max-w-xl md:mx-0"
         >
           {pending ? (

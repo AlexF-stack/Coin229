@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { processPayment } from "@/lib/payment";
 import { calculateShippingFee } from "@/lib/shipping";
@@ -76,6 +77,7 @@ export async function createOrder(input: {
   zone: DeliveryZone;
   modePaiement: PaymentMode;
   items: CheckoutItem[];
+  expectedTotal?: number;
 }) {
   const parsed = checkoutSchema.safeParse(input);
   if (!parsed.success) {
@@ -188,6 +190,15 @@ export async function createOrder(input: {
   const subtotal = lineItems.reduce((s, l) => s + l.lineTotal, 0);
   const shipping = calculateShippingFee({ zone: data.zone, subtotal });
   const montantTotal = subtotal + shipping.fee;
+
+  // Le client ne paie jamais un autre montant que celui qu'il a vu
+  if (data.expectedTotal !== undefined && data.expectedTotal !== montantTotal) {
+    return {
+      success: false as const,
+      priceChanged: true as const,
+      error: `Les prix ou les frais ont changé depuis l’ajout au panier. Nouveau total : ${montantTotal.toLocaleString("fr-FR")} FCFA. Vérifie le récapitulatif puis confirme à nouveau.`,
+    };
+  }
 
   const { getMarketplaceCommissionPct, splitOrderAmounts } = await import(
     "@/lib/marketplace-finance"
@@ -512,6 +523,51 @@ export async function getClientOrders(telephone: string) {
     return null;
   }
   return getMyOrders();
+}
+
+export type CartSnapshotItem = {
+  productId: string;
+  nom: string;
+  prix: number;
+  prixPromo: number | null;
+  stockQuantite: number;
+  available: boolean;
+};
+
+const cartSnapshotSchema = z.array(z.string().min(1).max(64)).max(60);
+
+/** Prix / stock / disponibilité actuels des articles du panier (données publiques) */
+export async function getCartSnapshot(
+  productIds: string[]
+): Promise<CartSnapshotItem[] | null> {
+  const parsed = cartSnapshotSchema.safeParse(productIds);
+  if (!parsed.success || !parsed.data.length) return [];
+  try {
+    const products = await prisma.product.findMany({
+      where: { id: { in: [...new Set(parsed.data)] } },
+      select: {
+        id: true,
+        nom: true,
+        prix: true,
+        prixPromo: true,
+        stockQuantite: true,
+        statut: true,
+        vendor: { select: { statut: true } },
+      },
+    });
+    return products.map((p) => ({
+      productId: p.id,
+      nom: p.nom,
+      prix: p.prix,
+      prixPromo: p.prixPromo,
+      stockQuantite: p.stockQuantite,
+      available:
+        p.statut === "actif" && p.vendor.statut === "actif" && p.stockQuantite > 0,
+    }));
+  } catch {
+    // Base indisponible : on ne touche pas au panier
+    return null;
+  }
 }
 
 export async function getOrderForConfirmation(orderId: string) {

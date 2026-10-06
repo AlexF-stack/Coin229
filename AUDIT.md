@@ -18,7 +18,7 @@
 |---|---|
 | Audit | ✅ |
 | Corrections P0 | ✅ (5/5) |
-| Corrections P1 | 🔄 (2/16) |
+| Corrections P1 | 🔄 (3/16) |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
 | Build production | ⬜ |
@@ -100,7 +100,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P1-6 | ⬜ | Identifiants vendeurs présents dans l'historique Git d'un dépôt public 🔎 | historique Git | Changer les mots de passe concernés ; purger l'historique si nécessaire |
 | P1-7 | ⬜ | Rate limiting en mémoire → inefficace sur Vercel (login admin, OTP, login vendeur, chat) 🔎 | `src/lib/rate-limit.ts` | `rateLimitAsync` (base) partout, upsert atomique |
 | P1-8 | ✅ | « Acheter maintenant » pouvait commander le panier d'un autre vendeur ; pas de choix de zone au checkout (Cotonou forcé) | `cart-store.ts`, `product-purchase-bar.tsx`, `add-to-cart-button.tsx`, `checkout-form.tsx` | **Corrigé** : `addItem` / nouveau `buyNow` renvoient un résultat (`added` / `other_vendor` / `out_of_stock`) ; « Acheter maintenant » ne navigue que si l'ajout a réussi (sinon message + lien panier), fixe la quantité exacte (plus de cumul) ; « Ajouté » seulement si ajouté, plus de ligne à quantité 0 ; checkout sans repli sur tout le panier (état vide avec liens) ; sélecteur de zone au checkout. Vérifié en navigateur : autre boutique → reste sur la page + message ; 2 clics → quantité 1 ; zone Porto-Novo → total 20 500 et commande enregistrée `porto_novo` / 1 500 FCFA. |
-| P1-9 | ⬜ | Prix / stock du panier jamais revalidés → montant affiché ≠ facturé possible 🔎 | `src/lib/cart-store.ts` | Action `validateCart` au panier et au checkout |
+| P1-9 | ✅ | Prix / stock du panier jamais revalidés → montant affiché ≠ facturé possible | `actions.ts` (`getCartSnapshot`, `createOrder`), `checkout-schema.ts`, `cart-store.ts` (`applySnapshot`), `use-cart-sync.ts` (nouveau), `cart-changes-notice.tsx` (nouveau), `cart-view.tsx`, `checkout-form.tsx` | **Corrigé** : à l'ouverture du panier et du checkout, prix / stock / disponibilité revalidés auprès du serveur ; prix mis à jour, quantité plafonnée au stock, article indisponible retiré, avec un message par changement. Filet de sécurité : le checkout envoie le total affiché, la commande est refusée s'il diffère du total serveur (nouveau total affiché, panier resynchronisé). Vérifié en navigateur : baisse de prix / stock réduit / produit archivé détectés ; prix modifié pendant le checkout → commande refusée (aucune commande créée), bouton passe au nouveau total. |
 | P1-10 | ⬜ | Quantité > 20 et erreurs Zod affichées en anglais 🔎 | `checkout-schema.ts`, `cart-store.ts` | Plafond `min(stock, 20)` côté client ; messages FR |
 | P1-11 | ⬜ | Panier vidé avant le paiement Mobile Money, pas de bouton « Réessayer » (KkiaPay) 🔎. Effet visible aussi en paiement à la livraison : « Aucun article à commander » s'affiche un instant avant la redirection vers la confirmation ✅ | `checkout-form.tsx`, `kkiapay-checkout.tsx` | Vider après confirmation / après la navigation ; bouton de relance du widget |
 | P1-12 | ⬜ | Cookie d'accès commande : 1 h, une seule commande ; secret partagé avec l'admin 🔎 | `src/lib/order-confirm.ts` | Secret dédié, plusieurs commandes, 24 h |
@@ -201,5 +201,6 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 06/10/2026 | P0-5 | `1f44253` | JSON-LD échappé : plus d'injection de script via les noms / descriptions produits |
 | 06/10/2026 | P0-4 | `7536f9d` | Notifications push ciblées par rôle (client / admin / vendeur) — **tous les P0 sont corrigés**, build production OK |
 | 06/10/2026 | P1-1 | `baf83ea` | Page de confirmation selon l'état réel de la commande et du paiement |
-| 06/10/2026 | P1-8 | voir `git log` | Achat immédiat fiable (autre boutique, quantité exacte) + choix de zone au checkout |
-| 06/10/2026 | P3-15 | voir `git log` | Cache `immutable` de `/_next/static` limité à la production (servait du vieux code en dev) |
+| 06/10/2026 | P1-8 | `40deec0` | Achat immédiat fiable (autre boutique, quantité exacte) + choix de zone au checkout |
+| 06/10/2026 | P3-15 | `4b3d5dc` | Cache `immutable` de `/_next/static` limité à la production (servait du vieux code en dev) |
+| 07/10/2026 | P1-9 | voir `git log` | Panier revalidé (prix, stock, disponibilité) + total vérifié côté serveur avant commande |

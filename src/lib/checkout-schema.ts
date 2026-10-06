@@ -21,6 +21,8 @@ export const checkoutSchema = z.object({
     )
     .min(1)
     .max(30),
+  /** Total affiché au client : la commande est refusée s'il diffère du total serveur */
+  expectedTotal: z.number().int().min(0).optional(),
 });
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;

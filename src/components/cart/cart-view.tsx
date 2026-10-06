@@ -17,6 +17,8 @@ import {
 import { QuantitySelector } from "@/components/product/quantity-selector";
 import { FreeShippingProgress } from "@/components/cart/free-shipping-progress";
 import { ZoneSelector } from "@/components/cart/zone-selector";
+import { CartChangesNotice } from "@/components/cart/cart-changes-notice";
+import { useCartSync } from "@/lib/use-cart-sync";
 import { ProductCard } from "@/components/product/product-card";
 import { calculateShippingFee } from "@/lib/shipping";
 
@@ -35,6 +37,7 @@ export function CartView({ suggestions }: Props) {
   const toggleWish = useWishlistStore((s) => s.toggle);
   const [mounted, setMounted] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const cartSync = useCartSync();
 
   useEffect(() => setMounted(true), []);
 
@@ -111,6 +114,9 @@ export function CartView({ suggestions }: Props) {
 
     return (
       <div className="px-4 py-10 md:px-0 md:py-14">
+        <div className="mx-auto mb-6 max-w-md">
+          <CartChangesNotice changes={cartSync.changes} onDismiss={cartSync.dismiss} />
+        </div>
         <div className="mx-auto flex max-w-md flex-col items-center text-center">
           <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-navy">
             <ShoppingBag className="h-7 w-7 stroke-[1.25]" />
@@ -150,6 +156,7 @@ export function CartView({ suggestions }: Props) {
     <div className="pb-28 md:pb-8">
       <div className="space-y-5 px-4 py-4 md:grid md:grid-cols-[1.45fr_0.85fr] md:items-start md:gap-8 md:space-y-0 md:px-0 md:py-6">
         <div className="space-y-4">
+          <CartChangesNotice changes={cartSync.changes} onDismiss={cartSync.dismiss} />
           {multiVendor && (
             <p className="rounded-xl border border-coral/30 bg-coral/10 px-3 py-2.5 text-sm text-navy">
               Ton panier contient déjà des articles d’une autre marque — vide ou

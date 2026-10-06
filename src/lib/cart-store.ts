@@ -21,6 +21,25 @@ export type AddItemResult = "added" | "other_vendor" | "out_of_stock";
 export const OTHER_VENDOR_MESSAGE =
   "Ton panier contient déjà des articles d’une autre boutique. Commande-les d’abord ou vide ton panier.";
 
+/** Changement constaté en revalidant le panier auprès du serveur */
+export type CartChange =
+  | { type: "removed"; nom: string }
+  | { type: "price"; nom: string; from: number; to: number }
+  | { type: "quantity"; nom: string; to: number };
+
+export type CartSnapshotEntry = {
+  productId: string;
+  nom: string;
+  prix: number;
+  prixPromo: number | null;
+  stockQuantite: number;
+  available: boolean;
+};
+
+function unitPrice(prix: number, prixPromo: number | null) {
+  return prixPromo && prixPromo < prix ? prixPromo : prix;
+}
+
 type CartState = {
   items: CartItem[];
   zone: DeliveryZone;
@@ -31,6 +50,8 @@ type CartState = {
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantite: number) => void;
   setZone: (zone: DeliveryZone) => void;
+  /** Aligne prix / stock / disponibilité sur le serveur, renvoie ce qui a changé */
+  applySnapshot: (snapshot: CartSnapshotEntry[]) => CartChange[];
   prepareCheckout: (productIds: string[]) => void;
   clear: () => void;
   subtotal: () => number;
@@ -107,6 +128,44 @@ export const useCartStore = create<CartState>()(
                 ),
         })),
       setZone: (zone) => set({ zone }),
+      applySnapshot: (snapshot) => {
+        const byId = new Map(snapshot.map((s) => [s.productId, s]));
+        const changes: CartChange[] = [];
+        const next: CartItem[] = [];
+        for (const item of get().items) {
+          const fresh = byId.get(item.productId);
+          if (!fresh || !fresh.available) {
+            changes.push({ type: "removed", nom: item.nom });
+            continue;
+          }
+          const before = unitPrice(item.prix, item.prixPromo);
+          const after = unitPrice(fresh.prix, fresh.prixPromo);
+          if (before !== after) {
+            changes.push({ type: "price", nom: fresh.nom, from: before, to: after });
+          }
+          const quantite = Math.min(item.quantite, fresh.stockQuantite);
+          if (quantite < item.quantite) {
+            changes.push({ type: "quantity", nom: fresh.nom, to: quantite });
+          }
+          next.push({
+            ...item,
+            nom: fresh.nom,
+            prix: fresh.prix,
+            prixPromo: fresh.prixPromo,
+            stockQuantite: fresh.stockQuantite,
+            quantite,
+          });
+        }
+        if (changes.length) {
+          const kept = new Set(next.map((i) => i.productId));
+          set((state) => ({
+            items: next,
+            checkoutIds:
+              state.checkoutIds?.filter((id) => kept.has(id)) ?? null,
+          }));
+        }
+        return changes;
+      },
       prepareCheckout: (productIds) => set({ checkoutIds: productIds }),
       clear: () => set({ items: [], checkoutIds: null }),
       subtotal: () =>
