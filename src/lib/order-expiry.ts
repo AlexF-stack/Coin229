@@ -25,36 +25,49 @@ export async function releaseExpiredReservations(now = new Date()): Promise<numb
       modePaiement: "mobile_money",
       dateCreation: { lt: limit },
     },
-    select: { id: true, items: { select: { productId: true, quantite: true } } },
+    select: { id: true },
     take: 50,
     orderBy: { dateCreation: "asc" },
   });
 
   let released = 0;
   for (const order of expired) {
-    const done = await prisma.$transaction(async (tx) => {
-      // Garde : seulement si toujours en attente (un paiement a pu arriver)
-      const cancelled = await tx.order.updateMany({
-        where: { id: order.id, statut: "en_attente" },
-        data: { statut: "annulee", cancelReason: PAYMENT_TIMEOUT_REASON },
-      });
-      if (cancelled.count === 0) return false;
-      for (const item of order.items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stockQuantite: { increment: item.quantite } },
-        });
-        // Remis en vente seulement s'il était en rupture (jamais un produit archivé)
-        await tx.product.updateMany({
-          where: { id: item.productId, statut: "rupture", stockQuantite: { gt: 0 } },
-          data: { statut: "actif" },
-        });
-      }
-      return true;
-    });
-    if (done) released++;
+    if (await cancelPendingOrderAndRestock(order.id, PAYMENT_TIMEOUT_REASON)) released++;
   }
   return released;
+}
+
+/**
+ * Annule une commande ENCORE en attente et rend son stock, en une transaction.
+ * Renvoie false si elle n'était plus en attente (payée / déjà traitée entre-temps).
+ */
+export async function cancelPendingOrderAndRestock(
+  orderId: string,
+  reason: string
+): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
+    const cancelled = await tx.order.updateMany({
+      where: { id: orderId, statut: "en_attente" },
+      data: { statut: "annulee", cancelReason: reason },
+    });
+    if (cancelled.count === 0) return false;
+    const items = await tx.orderItem.findMany({
+      where: { orderId },
+      select: { productId: true, quantite: true },
+    });
+    for (const item of items) {
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { stockQuantite: { increment: item.quantite } },
+      });
+      // Remis en vente seulement s'il était en rupture (jamais un produit archivé)
+      await tx.product.updateMany({
+        where: { id: item.productId, statut: "rupture", stockQuantite: { gt: 0 } },
+        data: { statut: "actif" },
+      });
+    }
+    return true;
+  });
 }
 
 /** Version « au fil de l'eau » : au plus une fois par minute, ne bloque jamais */

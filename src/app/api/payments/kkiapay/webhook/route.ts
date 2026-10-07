@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {
   assertKkiaWebhookAuth,
   confirmOrderPaid,
+  handleFailedPayment,
 } from "@/lib/payment-confirm";
 
 /**
@@ -48,6 +49,13 @@ export async function POST(request: Request) {
     provider: "kkiapay",
     paymentRef: body.transactionId,
   });
+
+  // Échec signalé : vérifié auprès de KkiaPay puis commande annulée, stock rendu
+  if (result.reason === "not_success") {
+    const failed = await handleFailedPayment({ orderId, provider: "kkiapay", paymentRef: body.transactionId });
+    revalidatePath("/admin");
+    return NextResponse.json({ ok: true, cancelled: failed.cancelled });
+  }
 
   if (!result.ok && result.reason !== "already_processed") {
     return NextResponse.json(

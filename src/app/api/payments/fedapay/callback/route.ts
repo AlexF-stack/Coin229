@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import {
   assertFedapayWebhookAuth,
   confirmOrderPaid,
+  handleFailedPayment,
 } from "@/lib/payment-confirm";
 
 /**
@@ -23,11 +24,15 @@ export async function GET(request: Request) {
 
   try {
     if (txId) {
-      await confirmOrderPaid({
+      const result = await confirmOrderPaid({
         orderId,
         provider: "fedapay",
         paymentRef: String(txId),
       });
+      // Paiement refusé / annulé sur la page FedaPay : commande annulée, stock rendu
+      if (result.reason === "not_approved") {
+        await handleFailedPayment({ orderId, provider: "fedapay", paymentRef: String(txId) });
+      }
       revalidatePath("/compte");
       revalidatePath("/admin");
     } else {
@@ -89,6 +94,13 @@ export async function POST(request: Request) {
     provider: "fedapay",
     paymentRef: String(txId),
   });
+
+  // Échec signalé : vérifié auprès de FedaPay puis commande annulée, stock rendu
+  if (result.reason === "not_approved") {
+    const failed = await handleFailedPayment({ orderId, provider: "fedapay", paymentRef: String(txId) });
+    revalidatePath("/admin");
+    return NextResponse.json({ ok: true, cancelled: failed.cancelled });
+  }
 
   if (!result.ok && result.reason !== "already_processed") {
     return NextResponse.json(
