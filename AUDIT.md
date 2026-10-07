@@ -18,7 +18,7 @@
 |---|---|
 | Audit | ✅ |
 | Corrections P0 | ✅ (5/5) |
-| Corrections P1 | 🔄 (12/16) |
+| Corrections P1 | 🔄 (13/16) |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
 | Build production | ⬜ |
@@ -107,7 +107,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P1-13 | ✅ | Annulation admin sans restitution du stock ni statut de remboursement | `src/lib/actions.ts` (`updateOrderStatus`), `admin-orders.tsx` | **Corrigé avec P1-3** : l'admin passe par `changeOrderStatus` (transaction, stock rendu une fois, `refundStatus = pending` si payée) ; liste déroulante limitée aux passages autorisés, confirmation avant annulation, erreur affichée, mention « Remboursement à faire ». Reste à faire (P2) : bouton « remboursement effectué ». |
 | P1-14 | ⬜ | Admin limité à la boutique maison ; KYC vendeur invisible ✅ | `actions.ts` (`getDefaultVendor`), `admin-vendors.tsx` | Vue marketplace globale + affichage KYC |
 | P1-15 | ⬜ | « Mot de passe oublié » vendeur non fonctionnel en production 🔎 | `api/vendor/forgot-password`, `api/ops/notify` | Envoi du lien au vendeur (email / WhatsApp) |
-| P1-16 | ⬜ | Messagerie tronquée au-delà de 200 messages 🔎 | `src/lib/messaging.ts` | `orderBy desc` + `take`, puis inverser |
+| P1-16 | ✅ | Messagerie tronquée au-delà de 200 messages (les nouveaux n’apparaissaient plus) | `src/lib/messaging.ts` | **Corrigé** : chargement des 200 messages les plus récents puis remis dans l’ordre (client et vendeur). Vérifié : test Edge avec 250 messages → 051 à 250 affichés, ordre chronologique. |
 
 ## 9. P2 — Importants
 
@@ -214,4 +214,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 07/10/2026 | P1-7 | `21a40d1` | Anti-force brute partagé et atomique (base), limites par IP et par compte |
 | 07/10/2026 | P1-3 (+ P1-13, P3-3) | `2c98373` | Transitions de statut contrôlées (vendeur / admin), stock rendu une seule fois, écrans vendeur et admin limités aux actions permises |
 | 07/10/2026 | P1-4 (+ P2-12) | `406b7f1` | Reversements : règle unique, atomiques, sans doublon, montant vérifié ; finances vendeur exactes |
-| 07/10/2026 | P1-12 | voir `git log` | Accès aux 10 dernières commandes du navigateur pendant 7 jours |
+| 07/10/2026 | P1-12 | `ec4ab1d` | Accès aux 10 dernières commandes du navigateur pendant 7 jours |
+| 07/10/2026 | P1-16 | voir `git log` | Messagerie : les messages les plus récents toujours affichés |

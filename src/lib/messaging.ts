@@ -6,6 +6,8 @@ import { requireClient } from "@/lib/assert-client";
 import { requireVendor } from "@/lib/assert-vendor";
 
 const MAX_BODY = 2000;
+/** Messages affichés dans une discussion : les plus récents */
+const MESSAGES_SHOWN = 200;
 
 function cleanBody(raw: string) {
   return raw.replace(/\s+/g, " ").trim().slice(0, MAX_BODY);
@@ -50,7 +52,8 @@ export async function getClientConversation(conversationId: string) {
     where: { id: conversationId, clientId },
     include: {
       vendor: { select: { id: true, nomBoutique: true, slug: true } },
-      messages: { orderBy: { createdAt: "asc" }, take: 200 },
+      // Les PLUS RÉCENTS (sinon les nouveaux messages disparaissaient après 200)
+      messages: { orderBy: { createdAt: "desc" }, take: MESSAGES_SHOWN },
     },
   });
   if (!conv) return null;
@@ -60,7 +63,7 @@ export async function getClientConversation(conversationId: string) {
       data: { clientUnread: 0 },
     });
   }
-  return { ...conv, clientUnread: 0 };
+  return { ...conv, messages: conv.messages.reverse(), clientUnread: 0 };
 }
 
 export async function getVendorConversation(conversationId: string) {
@@ -69,7 +72,8 @@ export async function getVendorConversation(conversationId: string) {
     where: { id: conversationId, vendorId },
     include: {
       client: { select: { id: true, nom: true, telephone: true } },
-      messages: { orderBy: { createdAt: "asc" }, take: 200 },
+      // Les PLUS RÉCENTS (sinon les nouveaux messages disparaissaient après 200)
+      messages: { orderBy: { createdAt: "desc" }, take: MESSAGES_SHOWN },
     },
   });
   if (!conv) return null;
@@ -79,7 +83,7 @@ export async function getVendorConversation(conversationId: string) {
       data: { vendorUnread: 0 },
     });
   }
-  return { ...conv, vendorUnread: 0 };
+  return { ...conv, messages: conv.messages.reverse(), vendorUnread: 0 };
 }
 
 /** Client démarre / reprend une discussion avec une marque. */
