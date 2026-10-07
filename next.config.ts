@@ -129,7 +129,39 @@ const securityHeaders = [
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
+  // Production uniquement : le mode dev de Next a besoin d'eval et du websocket HMR
+  ...(process.env.NODE_ENV === "production"
+    ? [{ key: "Content-Security-Policy", value: contentSecurityPolicy() }]
+    : []),
 ];
+
+/**
+ * Sources autorisées par le navigateur. Limite les dégâts d'une éventuelle
+ * injection (chargement de script tiers, envoi de données ailleurs, iframe).
+ * 'unsafe-inline' pour les scripts : nécessaire aux scripts en ligne de Next.js
+ * sans système de nonce.
+ */
+function contentSecurityPolicy(): string {
+  const directives: Record<string, string[]> = {
+    "default-src": ["'self'"],
+    "script-src": ["'self'", "'unsafe-inline'", "https://*.kkiapay.me"],
+    "style-src": ["'self'", "'unsafe-inline'"],
+    "img-src": ["'self'", "data:", "blob:", "https://images.unsplash.com", "https://*.supabase.co"],
+    "font-src": ["'self'", "data:"],
+    "connect-src": ["'self'", "https://*.supabase.co", "wss://*.supabase.co", "https://*.kkiapay.me"],
+    "frame-src": ["'self'", "https://*.kkiapay.me"],
+    "worker-src": ["'self'", "blob:"],
+    "manifest-src": ["'self'"],
+    "object-src": ["'none'"],
+    "base-uri": ["'self'"],
+    "form-action": ["'self'"],
+    "frame-ancestors": ["'self'"],
+  };
+  return [
+    ...Object.entries(directives).map(([k, v]) => `${k} ${v.join(" ")}`),
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
 
 const nextConfig: NextConfig = {
   images: {
