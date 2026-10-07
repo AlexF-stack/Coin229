@@ -19,7 +19,7 @@ import {
   readPhoneFromToken,
 } from "@/lib/phone-session";
 import {
-  createOrderConfirmToken,
+  addOrderToConfirmToken,
   orderConfirmCookieName,
   orderConfirmCookieOptions,
 } from "@/lib/order-confirm";
@@ -379,7 +379,11 @@ async function createOrderUnsafe(input: {
   }
 
   const jar = await cookies();
-  const confirmToken = createOrderConfirmToken(order.id);
+  // Ajoute cette commande à celles déjà mémorisées sur ce navigateur
+  const confirmToken = addOrderToConfirmToken(
+    jar.get(orderConfirmCookieName())?.value,
+    order.id
+  );
   if (confirmToken) {
     jar.set(
       orderConfirmCookieName(),

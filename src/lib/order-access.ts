@@ -7,23 +7,24 @@ import {
 } from "@/lib/phone-session";
 import {
   orderConfirmCookieName,
-  readOrderConfirmToken,
+  readOrderConfirmIds,
 } from "@/lib/order-confirm";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 /**
- * Accès commande : cookie confirm court, session téléphone OTP, ou OAuth propriétaire.
+ * Accès commande : cookie des commandes de ce navigateur, session téléphone OTP, ou OAuth propriétaire.
  * Pas d’émission de session téléphone au checkout.
  */
 export async function canAccessOrder(orderId: string): Promise<boolean> {
   if (!orderId) return false;
 
   const jar = await cookies();
-  const confirmOrderId = readOrderConfirmToken(
+  // Commandes passées depuis ce navigateur (les 10 dernières, 7 jours)
+  const confirmedIds = readOrderConfirmIds(
     jar.get(orderConfirmCookieName())?.value
   );
-  if (confirmOrderId === orderId) return true;
+  if (confirmedIds.includes(orderId)) return true;
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
