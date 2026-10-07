@@ -6,15 +6,7 @@ import {
   isAdminPasswordConfigured,
   verifyAdminPassword,
 } from "@/lib/admin-auth";
-import { rateLimit } from "@/lib/rate-limit";
-
-function clientIp(request: Request): string {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown"
-  );
-}
+import { clientIp, rateLimitAll } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   if (!isAdminPasswordConfigured()) {
@@ -29,11 +21,12 @@ export async function POST(request: Request) {
   }
 
   const ip = clientIp(request);
-  const limited = rateLimit({
-    key: `admin-login:${ip}`,
-    limit: 8,
-    windowMs: 15 * 60 * 1000,
-  });
+  // Par IP + global : un seul compte admin, une attaque répartie sur
+  // plusieurs IP reste plafonnée
+  const limited = await rateLimitAll([
+    { key: `admin-login:${ip}`, limit: 8, windowMs: 15 * 60 * 1000 },
+    { key: "admin-login:global", limit: 30, windowMs: 60 * 60 * 1000 },
+  ]);
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: "Trop de tentatives. Réessaie plus tard." },

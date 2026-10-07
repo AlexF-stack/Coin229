@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { runShopAgent, type AgentPrefs } from "@/lib/shop-agent";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimitAsync } from "@/lib/rate-limit";
 
 const bodySchema = z.object({
   message: z.string().trim().min(1).max(500),
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     request.headers.get("x-real-ip") ||
     "anon";
 
-  const limited = rateLimit({
+  const limited = await rateLimitAsync({
     key: `chat:${ip}`,
     limit: 40,
     windowMs: 60_000,

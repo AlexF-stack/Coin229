@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { rateLimit } from "@/lib/rate-limit";
+import { clientIp, rateLimitAsync } from "@/lib/rate-limit";
 import {
   createVendorSessionToken,
   safeVendorNext,
@@ -17,10 +17,8 @@ const loginSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anon";
-  const limited = rateLimit({
-    key: `vendor-login:${ip}`,
+  const limited = await rateLimitAsync({
+    key: `vendor-login:${clientIp(request)}`,
     limit: 20,
     windowMs: 15 * 60 * 1000,
   });
@@ -38,6 +36,16 @@ export async function POST(request: Request) {
   const parsed = loginSchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: "invalid_body" }, { status: 400 });
+  }
+
+  // Par compte : protège un vendeur visé depuis plusieurs IP
+  const perAccount = await rateLimitAsync({
+    key: `vendor-login:email:${parsed.data.email.toLowerCase()}`,
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+  });
+  if (!perAccount.ok) {
+    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
   }
 
   const vendor = await prisma.vendor.findUnique({

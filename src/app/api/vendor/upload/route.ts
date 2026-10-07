@@ -12,7 +12,7 @@ import {
   vendorCookieName,
 } from "@/lib/vendor-auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimitAsync } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  const limited = rateLimit({
+  const limited = await rateLimitAsync({
     key: `vendor-upload:${vendorId}`,
     limit: 40,
     windowMs: 60 * 60 * 1000,

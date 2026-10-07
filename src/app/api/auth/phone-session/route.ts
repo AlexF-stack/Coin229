@@ -8,20 +8,12 @@ import {
   phoneCookieOptions,
   readPhoneFromToken,
 } from "@/lib/phone-session";
-import { rateLimit } from "@/lib/rate-limit";
+import { clientIp, rateLimitAsync } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
-
-function clientIp(request: Request): string {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown"
-  );
-}
 
 export async function POST(request: Request) {
   const ip = clientIp(request);
-  const limited = rateLimit({
+  const limited = await rateLimitAsync({
     key: `phone-session:${ip}`,
     limit: 20,
     windowMs: 15 * 60 * 1000,
@@ -44,6 +36,19 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { ok: false, error: "Données invalides" },
       { status: 400 }
+    );
+  }
+
+  // Par numéro : empêche de deviner un code depuis plusieurs IP
+  const perPhone = await rateLimitAsync({
+    key: `phone-session:tel:${phone}`,
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+  });
+  if (!perPhone.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Trop de tentatives pour ce numéro. Réessaie dans 15 minutes." },
+      { status: 429, headers: { "Retry-After": String(perPhone.retryAfterSec) } }
     );
   }
 
