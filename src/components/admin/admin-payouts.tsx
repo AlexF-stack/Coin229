@@ -10,6 +10,7 @@ type UnpaidVendor = {
   vendorId: string;
   nomBoutique: string;
   email: string | null;
+  mobileMoney: string | null;
   orderCount: number;
   vendorNet: number;
 };
@@ -72,6 +73,10 @@ export function AdminPayouts({ unpaidVendors, recentPayouts }: Props) {
                   <p className="text-xs text-white/45">
                     {v.email ?? "sans email"} · {v.orderCount} commande(s) ·{" "}
                     <span className="text-emerald-300">{formatPrice(v.vendorNet)}</span>
+                  </p>
+                  <p className="mt-1 text-xs text-white/60">
+                    Reverser sur le Mobile Money :{" "}
+                    <span className="select-all font-medium text-white">{v.mobileMoney ?? "non renseigné"}</span>
                   </p>
                 </div>
                 <button

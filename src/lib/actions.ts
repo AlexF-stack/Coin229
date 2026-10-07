@@ -7,7 +7,7 @@ import { rateLimitAsync } from "@/lib/rate-limit";
 import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import { prisma } from "@/lib/prisma";
 import { changeOrderStatus } from "@/lib/order-status";
-import { createPayoutForVendor, payableOrderWhere } from "@/lib/payouts";
+import { createPayoutForVendor, payableOrderWhere, SOLD_STATUSES } from "@/lib/payouts";
 import { randomBytes } from "crypto";
 import { SITE } from "@/lib/site";
 import { hashResetToken } from "@/lib/vendor-auth";
@@ -691,6 +691,101 @@ export async function getVendorOrders(vendorId: string) {
   });
 }
 
+/** Admin : commandes de TOUTE la marketplace (filtre vendeur optionnel) */
+export async function getAdminOrders(filter?: { vendorId?: string }) {
+  try {
+    await requireAdmin();
+  } catch {
+    return [];
+  }
+  return prisma.order.findMany({
+    where: filter?.vendorId ? { vendorId: filter.vendorId } : {},
+    include: {
+      items: { include: { product: true } },
+      client: true,
+      vendor: { select: { id: true, nomBoutique: true } },
+    },
+    orderBy: { dateCreation: "desc" },
+    take: 200,
+  });
+}
+
+/** Admin : chiffres globaux de la marketplace */
+export async function getAdminOverview() {
+  try {
+    await requireAdmin();
+  } catch {
+    return null;
+  }
+  const [products, orders, waiting, sold, payable, refunds, pendingVendors, resetRequests] =
+    await Promise.all([
+      prisma.product.count({ where: { statut: { in: ["actif", "rupture"] } } }),
+      prisma.order.count(),
+      prisma.order.count({ where: { statut: "en_attente" } }),
+      prisma.order.aggregate({
+        where: { statut: { in: SOLD_STATUSES } },
+        _sum: { montantTotal: true, fraisLivraison: true, commissionAmount: true },
+      }),
+      prisma.order.aggregate({ where: payableOrderWhere(), _sum: { vendorNet: true } }),
+      prisma.order.count({ where: { refundStatus: "pending" } }),
+      prisma.vendor.count({ where: { statut: "en_attente" } }),
+      prisma.vendor.count({ where: { resetRequestedAt: { not: null } } }),
+    ]);
+  return {
+    products,
+    orders,
+    waiting,
+    sales: (sold._sum.montantTotal ?? 0) - (sold._sum.fraisLivraison ?? 0),
+    commission: sold._sum.commissionAmount ?? 0,
+    toPayOut: payable._sum.vendorNet ?? 0,
+    refunds,
+    pendingVendors,
+    resetRequests,
+  };
+}
+
+/** Admin : produits des vendeurs marketplace (hors boutique maison) */
+export async function getMarketplaceProducts(houseVendorId?: string) {
+  try {
+    await requireAdmin();
+  } catch {
+    return [];
+  }
+  return prisma.product.findMany({
+    where: houseVendorId ? { vendorId: { not: houseVendorId } } : {},
+    include: { vendor: { select: { nomBoutique: true, slug: true } } },
+    orderBy: [{ statut: "asc" }, { dateCreation: "desc" }],
+    take: 300,
+  });
+}
+
+/** Admin : retirer de la vente (archive) ou remettre en vente un produit vendeur */
+export async function setProductStatusAdmin(
+  productId: string,
+  statut: "archive" | "actif"
+) {
+  try {
+    await requireAdmin();
+  } catch {
+    return { success: false as const, error: "Non autorisé" };
+  }
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { stockQuantite: true },
+  });
+  if (!product) return { success: false as const, error: "Produit introuvable" };
+  await prisma.product.update({
+    where: { id: productId },
+    data: {
+      statut: statut === "actif" && product.stockQuantite <= 0 ? "rupture" : statut,
+    },
+  });
+  revalidatePath("/admin/produits");
+  revalidatePath("/boutique");
+  revalidatePath(`/produit/${productId}`);
+  return { success: true as const };
+}
+
 export async function getVendorProducts(vendorId: string) {
   try {
     await requireAdmin();
@@ -703,23 +798,14 @@ export async function getVendorProducts(vendorId: string) {
   });
 }
 
-export async function updateOrderStatus(
-  orderId: string,
-  statut: OrderStatus,
-  vendorId: string
-) {
+export async function updateOrderStatus(orderId: string, statut: OrderStatus) {
   try {
     await requireAdmin();
   } catch {
     return { success: false, error: "Non autorisé" };
   }
-  const order = await prisma.order.findFirst({
-    where: { id: orderId, vendorId },
-    select: { id: true },
-  });
-  if (!order) return { success: false, error: "Commande introuvable" };
-
-  // Mêmes règles que le vendeur (droits admin) + stock rendu à l'annulation
+  // Toute commande de la marketplace ; mêmes règles que le vendeur (droits
+  // admin) + stock rendu à l'annulation
   const result = await changeOrderStatus({ orderId, to: statut, actor: "admin" });
   if (!result.success) return result;
   revalidatePath("/admin");
@@ -843,7 +929,7 @@ export async function listAdminPayoutData() {
   // Même règle que la création du reversement (src/lib/payouts.ts)
   const unpaidOrders = await prisma.order.findMany({
     where: payableOrderWhere(),
-    include: { vendor: { select: { id: true, nomBoutique: true, email: true } } },
+    include: { vendor: { select: { id: true, nomBoutique: true, email: true, mobileMoney: true, contact: true } } },
   });
 
   const byVendor = new Map<
@@ -852,6 +938,7 @@ export async function listAdminPayoutData() {
       vendorId: string;
       nomBoutique: string;
       email: string | null;
+      mobileMoney: string | null;
       orderCount: number;
       vendorNet: number;
     }
@@ -861,6 +948,8 @@ export async function listAdminPayoutData() {
       vendorId: o.vendorId,
       nomBoutique: o.vendor.nomBoutique,
       email: o.vendor.email,
+      // Numéro de reversement déclaré au KYC, sinon le contact
+      mobileMoney: o.vendor.mobileMoney || o.vendor.contact,
       orderCount: 0,
       vendorNet: 0,
     };

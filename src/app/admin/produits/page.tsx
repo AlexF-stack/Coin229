@@ -1,6 +1,7 @@
-import { getDefaultVendor, getVendorProducts } from "@/lib/actions";
+import { getDefaultVendor, getMarketplaceProducts, getVendorProducts } from "@/lib/actions";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminProducts } from "@/components/admin/admin-products";
+import { AdminMarketplaceProducts } from "@/components/admin/admin-marketplace-products";
 import { DEMO_VENDOR_ID, DEMO_PRODUCTS } from "@/lib/demo-data";
 
 export const metadata = {
@@ -24,6 +25,7 @@ export default async function AdminProductsPage() {
   } catch {
     // démo
   }
+  const marketplaceProducts = await getMarketplaceProducts(vendorId);
 
   return (
     <AdminShell boutique={boutique}>
@@ -35,6 +37,16 @@ export default async function AdminProductsPage() {
           </p>
         </div>
         <AdminProducts products={products} vendorId={vendorId} />
+
+        <section className="space-y-3 border-t border-white/10 pt-6">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Produits des vendeurs</h2>
+            <p className="mt-1 text-sm text-white/45">
+              Modération : retirer de la vente un produit non conforme, ou le remettre en vente.
+            </p>
+          </div>
+          <AdminMarketplaceProducts products={marketplaceProducts} />
+        </section>
       </div>
     </AdminShell>
   );

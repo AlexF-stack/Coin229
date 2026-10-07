@@ -17,6 +17,7 @@ import { formatPrice } from "@/lib/utils";
 type OrderWithRelations = Order & {
   items: (OrderItem & { product: Product })[];
   client: Client;
+  vendor?: { id: string; nomBoutique: string };
 };
 
 const statusTone: Record<OrderStatus, string> = {
@@ -29,10 +30,9 @@ const statusTone: Record<OrderStatus, string> = {
 
 type Props = {
   orders: OrderWithRelations[];
-  vendorId: string;
 };
 
-export function AdminOrders({ orders, vendorId }: Props) {
+export function AdminOrders({ orders }: Props) {
   const [pending, startTransition] = useTransition();
   const [local, setLocal] = useState(orders);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -50,7 +50,7 @@ export function AdminOrders({ orders, vendorId }: Props) {
       return;
     }
     startTransition(async () => {
-      const res = await updateOrderStatus(order.id, statut, vendorId);
+      const res = await updateOrderStatus(order.id, statut);
       if (!res.success) {
         setErrors((e) => ({ ...e, [order.id]: res.error ?? "Échec de la mise à jour" }));
         return;
@@ -94,6 +94,11 @@ export function AdminOrders({ orders, vendorId }: Props) {
         >
           <div className="flex items-start justify-between gap-2">
             <div>
+              {order.vendor && (
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300/80">
+                  {order.vendor.nomBoutique}
+                </p>
+              )}
               <p className="font-medium text-white">{order.nomClient}</p>
               <p className="text-xs text-white/40">{order.telephone}</p>
               <p className="mt-1 text-xs text-white/40">

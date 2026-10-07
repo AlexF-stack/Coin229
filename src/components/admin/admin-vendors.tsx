@@ -20,12 +20,48 @@ const LABELS: Record<VendorStatus, string> = {
   suspendu: "Suspendu",
 };
 
+/** Informations KYC attendues avant d'activer un vendeur */
+function missingKyc(v: Row): string[] {
+  const missing: string[] = [];
+  if (!v.ifu?.trim()) missing.push("IFU");
+  if (!v.rccm?.trim()) missing.push("RCCM");
+  if (!v.mobileMoney?.trim()) missing.push("numéro Mobile Money de reversement");
+  if (!v.termsAcceptedAt) missing.push("acceptation des conditions vendeur");
+  return missing;
+}
+
+function KycLine({ label, value }: { label: string; value: string | null }) {
+  return (
+    <span>
+      <span className="text-white/35">{label} </span>
+      <span className={value ? "text-white/75" : "text-red-300"}>{value || "manquant"}</span>
+    </span>
+  );
+}
+
 export function AdminVendors({ vendors }: Props) {
   const [pending, startTransition] = useTransition();
 
   const [resetLinks, setResetLinks] = useState<Record<string, string>>({});
 
   function setStatus(id: string, statut: VendorStatus) {
+    const v = vendors.find((x) => x.id === id);
+    const missing = v ? missingKyc(v) : [];
+    if (
+      statut === "actif" &&
+      missing.length > 0 &&
+      !window.confirm(
+        `KYC incomplet pour ${v?.nomBoutique} : ${missing.join(", ")} manquant(s).\n\nActiver quand même ?`
+      )
+    ) {
+      return;
+    }
+    if (
+      statut === "suspendu" &&
+      !window.confirm(`Suspendre ${v?.nomBoutique} ? Ses produits seront retirés de la vente.`)
+    ) {
+      return;
+    }
     startTransition(async () => {
       await setVendorStatus(id, statut);
       window.location.reload();
@@ -84,6 +120,15 @@ export function AdminVendors({ vendors }: Props) {
                 >
                   {LABELS[v.statut]}
                 </span>
+              </p>
+              <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                <KycLine label="IFU" value={v.ifu} />
+                <KycLine label="RCCM" value={v.rccm} />
+                <KycLine label="Mobile Money" value={v.mobileMoney} />
+                <KycLine
+                  label="Conditions acceptées"
+                  value={v.termsAcceptedAt ? new Date(v.termsAcceptedAt).toLocaleDateString("fr-FR") : null}
+                />
               </p>
               {v.resetRequestedAt && (
                 <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-300">
