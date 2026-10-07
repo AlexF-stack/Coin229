@@ -18,15 +18,15 @@ export type ShippingResult = {
   etaHoursMax: number;
 };
 
-function readNumber(
-  serverValue: string | undefined,
-  publicValue: string | undefined,
-  fallback: number
-): number {
-  const raw = serverValue ?? publicValue;
-  if (!raw) return fallback;
-  const parsed = Number(raw);
-  return Number.isFinite(parsed) ? parsed : fallback;
+/**
+ * Source UNIQUE : variables NEXT_PUBLIC_* (lues à l'identique par le serveur
+ * et le navigateur). Un écart entre frais affichés et frais facturés ferait
+ * refuser toutes les commandes (contrôle du total, P1-9).
+ */
+function readNumber(publicValue: string | undefined, fallback: number): number {
+  if (!publicValue) return fallback;
+  const parsed = Number(publicValue);
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed) : fallback;
 }
 
 /** ETA réalistes last-mile Bénin (moto / densités urbaines) */
@@ -42,26 +42,13 @@ const ZONE_ETA: Record<
 export function getShippingConfig() {
   return {
     freeShippingThreshold: readNumber(
-      process.env.FREE_SHIPPING_THRESHOLD,
       process.env.NEXT_PUBLIC_FREE_SHIPPING_THRESHOLD,
       25000
     ),
     fees: {
-      cotonou: readNumber(
-        process.env.SHIPPING_FEE_COTONOU,
-        process.env.NEXT_PUBLIC_SHIPPING_FEE_COTONOU,
-        1000
-      ),
-      porto_novo: readNumber(
-        process.env.SHIPPING_FEE_PORTO_NOVO,
-        process.env.NEXT_PUBLIC_SHIPPING_FEE_PORTO_NOVO,
-        1500
-      ),
-      godomey: readNumber(
-        process.env.SHIPPING_FEE_GODOMEY,
-        process.env.NEXT_PUBLIC_SHIPPING_FEE_GODOMEY,
-        1500
-      ),
+      cotonou: readNumber(process.env.NEXT_PUBLIC_SHIPPING_FEE_COTONOU, 1000),
+      porto_novo: readNumber(process.env.NEXT_PUBLIC_SHIPPING_FEE_PORTO_NOVO, 1500),
+      godomey: readNumber(process.env.NEXT_PUBLIC_SHIPPING_FEE_GODOMEY, 1500),
     } satisfies Record<DeliveryZone, number>,
   };
 }
