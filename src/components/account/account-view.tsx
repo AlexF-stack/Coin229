@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   ChevronRight,
@@ -46,7 +47,8 @@ const BENEFITS = [
   },
 ];
 
-export function AccountView() {
+export function AccountView({ next = "/compte" }: { next?: string } = {}) {
+  const router = useRouter();
   const [identity, setIdentity] = useState<{
     label: string;
     provider: string;
@@ -104,6 +106,11 @@ export function AccountView() {
   }
 
   function onPhoneAuth(phone: string) {
+    // Connexion demandée depuis une autre page (ex. messagerie) : on y retourne
+    if (next !== "/compte") {
+      router.push(next);
+      return;
+    }
     setIdentity({ label: phone, provider: "phone" });
   }
 
@@ -138,7 +145,7 @@ export function AccountView() {
 
         <div className="mx-auto max-w-md space-y-6 px-4 md:px-0">
           <div className="space-y-5 rounded-3xl border border-border bg-bg-elevated p-5 shadow-card md:p-6">
-            <SocialAuthButtons />
+            <SocialAuthButtons next={next} />
             <PhoneAuthForm onAuthenticated={onPhoneAuth} />
           </div>
 

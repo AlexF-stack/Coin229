@@ -6,7 +6,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 type Provider = "google" | "facebook";
 
-export function SocialAuthButtons() {
+export function SocialAuthButtons({ next = "/compte" }: { next?: string } = {}) {
   const [pending, setPending] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
   const configured = isSupabaseConfigured();
@@ -26,7 +26,7 @@ export function SocialAuthButtons() {
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${origin}/auth/callback?next=/compte`,
+          redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
           queryParams:
             provider === "google"
               ? { access_type: "offline", prompt: "consent" }

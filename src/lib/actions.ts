@@ -256,16 +256,19 @@ async function createOrderUnsafe(input: {
     commissionPct
   );
 
-  const existing = await prisma.client.findUnique({
-    where: { telephone },
-  });
+  // Client connecté avec Google / Facebook : la commande va sur SON compte
+  // (pas de fusion par numéro : le téléphone saisi ici n'est pas vérifié)
+  const oauthClientId = await currentOAuthClientId();
+  const existing = oauthClientId
+    ? null
+    : await prisma.client.findUnique({ where: { telephone } });
   let clientId: string;
-  if (existing) {
+  if (oauthClientId) {
+    clientId = oauthClientId;
+  } else if (existing) {
+    // Le nom du client existant n'est plus écrasé par n'importe quelle commande
+    // passée avec son numéro (le nom de livraison est enregistré sur la commande)
     clientId = existing.id;
-    await prisma.client.update({
-      where: { id: existing.id },
-      data: { nom: data.nom },
-    });
   } else {
     const created = await prisma.client.create({
       data: {
@@ -477,6 +480,25 @@ export async function getMyOrders() {
         adresses: true,
       },
     });
+  } catch {
+    return null;
+  }
+}
+
+/** Fiche Client du compte Google / Facebook connecté, sinon null */
+async function currentOAuthClientId(): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+    const client = await prisma.client.findFirst({
+      where: { authId: user.id },
+      select: { id: true },
+    });
+    return client?.id ?? null;
   } catch {
     return null;
   }
