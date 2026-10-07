@@ -27,7 +27,9 @@ export function buildPageMetadata({
   }));
 
   return {
-    title,
+    // Sans titre (accueil) : titre complet par défaut. Un `title: undefined`
+    // écrasait celui du layout → page d'accueil sans <title>.
+    title: title ?? { absolute: `${SITE.name} — ${SITE.tagline}` },
     description,
     alternates: { canonical: url },
     robots: noIndex

@@ -19,7 +19,7 @@
 | Audit | ✅ |
 | Corrections P0 | ✅ (5/5) |
 | Corrections P1 | ✅ code (15/16) — P1-6 ⏸️ actions à faire par toi |
-| Corrections P2 | ⬜ |
+| Corrections P2 | 🔄 |
 | QA complète | ⬜ |
 | Build production | ⬜ |
 | Smoke test | ⬜ |
@@ -114,7 +114,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | ID | Statut | Problème | Où |
 |---|---|---|---|
 | P2-1 | ⬜ | Vulnérabilités npm (1 critique, 9 élevées) — mettre à jour `next`, `@supabase/*`, `sharp`… | `package.json` |
-| P2-2 | ⬜ | Page d'accueil sans `<title>` (local et production) ✅ | `src/app/page.tsx` / `src/lib/seo.ts` |
+| P2-2 | ✅ | Page d’accueil sans `<title>` — **corrigé** : `buildPageMetadata` renvoyait `title: undefined`, qui écrasait le titre par défaut du layout ; repli explicite sur « Coin229 — Toute une tenue. Les bons détails. ». Vérifié dans le HTML servi. | `src/lib/seo.ts` |
 | P2-3 | ⬜ | Pas de Content-Security-Policy ✅ | `next.config.ts` |
 | P2-4 | ⬜ | Pages `/admin` et `/vendeur/espace` mises en cache hors ligne par le service worker 🔎 | `next.config.ts` (`runtimeCaching`) |
 | P2-5 | ⬜ | Actions produit sans validation serveur (prix négatif/décimal → 500, URL d'image libre qui casse `next/image`) 🔎 | `vendor-actions.ts`, `actions.ts` (`upsertProduct`) |
@@ -219,3 +219,4 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 07/10/2026 | P1-15 | `020ee8c` | Mot de passe oublié vendeur : demande → admin → lien unique 24 h sur le WhatsApp du vendeur |
 | 07/10/2026 | P1-14 | `2cdb5b0` | Admin : vue marketplace globale, KYC, modération des produits vendeurs |
 | 07/10/2026 | P1-6 | voir `git log` | Code vérifié propre ; rotation des 2 mots de passe + purge éventuelle de l’historique en attente de ta décision. Fin de phase P1 : build production OK, TypeScript 0 erreur, 10 suites de tests P0/P1 OK |
+| 08/10/2026 | P2-2 | voir `git log` | Titre de la page d’accueil |
