@@ -65,7 +65,7 @@ export function VendorProfileForm({ vendor }: Props) {
       if (res.success) {
         setMessage("Profil enregistré.");
       } else {
-        setMessage("Erreur lors de l’enregistrement.");
+        setMessage("error" in res ? res.error : "Erreur lors de l’enregistrement.");
       }
     });
   }

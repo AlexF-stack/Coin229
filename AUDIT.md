@@ -117,7 +117,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P2-2 | ✅ | Page d’accueil sans `<title>` — **corrigé** : `buildPageMetadata` renvoyait `title: undefined`, qui écrasait le titre par défaut du layout ; repli explicite sur « Coin229 — Toute une tenue. Les bons détails. ». Vérifié dans le HTML servi. | `src/lib/seo.ts` |
 | P2-3 | ⬜ | Pas de Content-Security-Policy ✅ | `next.config.ts` |
 | P2-4 | ⬜ | Pages `/admin` et `/vendeur/espace` mises en cache hors ligne par le service worker 🔎 | `next.config.ts` (`runtimeCaching`) |
-| P2-5 | ⬜ | Actions produit sans validation serveur (prix négatif/décimal → 500, URL d'image libre qui casse `next/image`) 🔎 | `vendor-actions.ts`, `actions.ts` (`upsertProduct`) |
+| P2-5 | ✅ | Actions produit sans validation serveur (prix négatif / décimal → erreur 500, URL d’image libre qui casse `next/image`) — **corrigé** : schéma partagé `product-schema.ts` (vendeur + admin) : nom 2–120, description ≤ 4 000, prix entier 100 – 50 000 000 FCFA, promo < prix, stock 0 – 100 000, 1 à 8 images **uniquement** de sources autorisées (fichiers du site, Supabase, Unsplash = `remotePatterns`) ; même contrôle pour le logo vendeur ; messages FR affichés dans les formulaires. Vérifié : 13 tests + les 33 produits existants restent valides. | `product-schema.ts` (nouveau), `vendor-actions.ts`, `actions.ts`, `vendor-profile-form.tsx` |
 | P2-6 | ⬜ | Webhooks paiement : format de signature Fedapay à valider, paiements échoués non traités, mode de paiement non contrôlé 🔎 | `src/lib/payment-confirm.ts`, `api/payments/*` |
 | P2-7 | ⬜ | Sessions non révocables ; reset mot de passe n'invalide pas les sessions 🔎 | `admin-auth.ts`, `vendor-auth.ts` |
 | P2-8 | ✅ | Frais de livraison dupliqués serveur / `NEXT_PUBLIC_*` → écart possible affiché / facturé — **corrigé** : source unique `NEXT_PUBLIC_*` lue à l’identique par le serveur et le navigateur ; `SHIPPING_FEE_*` / `FREE_SHIPPING_THRESHOLD` ne sont plus lues (`.env.example` mis à jour). Important depuis P1-9 : un écart aurait fait refuser toutes les commandes avec frais. Vérifié : test (ancienne variable à 9 999 ignorée). | `src/lib/shipping.ts`, `.env.example` |
@@ -227,4 +227,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P2-10 | `4b127ef` | Favoris filtrés comme le catalogue |
 | 08/10/2026 | P2-13 | `696e5d6` | Adresses de boutique réservées et sans conflit |
 | 08/10/2026 | P2-9 | `8a9e644` | Annulations atomiques ; réactivation vendeur sans republier les produits retirés volontairement |
-| 08/10/2026 | P2-8 | voir `git log` | Frais de livraison : source unique |
+| 08/10/2026 | P2-8 | `eb02f62` | Frais de livraison : source unique |
+| 08/10/2026 | P2-5 | voir `git log` | Validation serveur des produits et des images |

@@ -10,6 +10,7 @@ import type {
 import { requireVendor } from "@/lib/assert-vendor";
 import { prisma } from "@/lib/prisma";
 import { changeOrderStatus } from "@/lib/order-status";
+import { isAllowedImageUrl, parseProductInput } from "@/lib/product-schema";
 import { getVendorFinanceSummary, SOLD_STATUSES } from "@/lib/payouts";
 import { nicheToCategorie } from "@/lib/vendor-auth";
 import { getMarketplaceCommissionPct } from "@/lib/marketplace-finance";
@@ -121,6 +122,10 @@ export async function upsertVendorProduct(data: {
   if (vendorStatut === "suspendu") {
     return { success: false as const, error: "Compte suspendu" };
   }
+  // Validation serveur (prix entier positif, promo < prix, images autorisées…)
+  const checked = parseProductInput(data);
+  if (!checked.ok) return { success: false as const, error: checked.error };
+  data = { ...data, ...checked.data };
 
   const niche = data.niche.trim().slice(0, 80);
   const allowed = [
@@ -147,13 +152,7 @@ export async function upsertVendorProduct(data: {
     statut = "archive";
   }
 
-  if (data.images.length === 0) {
-    return {
-      success: false as const,
-      error: "Ajoute au moins une photo",
-    };
-  }
-  const images = data.images.slice(0, 8);
+  const images = data.images;
 
   if (data.id) {
     const existing = await prisma.product.findFirst({
@@ -237,6 +236,13 @@ export async function updateMyVendorProfile(data: {
   acceptTerms?: boolean;
 }) {
   const { vendorId } = await requireVendor();
+  // Logo affiché par next/image : seulement une source autorisée
+  if (data.logoUrl?.trim() && !isAllowedImageUrl(data.logoUrl)) {
+    return {
+      success: false as const,
+      error: "Logo non autorisé : envoie l’image depuis ton espace.",
+    };
+  }
   await prisma.vendor.update({
     where: { id: vendorId },
     data: {

@@ -8,6 +8,7 @@ import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
 import { changeOrderStatus } from "@/lib/order-status";
+import { parseProductInput } from "@/lib/product-schema";
 import { createPayoutForVendor, payableOrderWhere, SOLD_STATUSES } from "@/lib/payouts";
 import { randomBytes } from "crypto";
 import { SITE } from "@/lib/site";
@@ -841,6 +842,10 @@ export async function upsertProduct(
   } catch {
     return { success: false, error: "Non autorisé" };
   }
+  // Même validation que pour les vendeurs
+  const checked = parseProductInput(data);
+  if (!checked.ok) return { success: false, error: checked.error };
+  data = { ...data, ...checked.data, source: checked.data.source ?? data.source };
   if (data.id) {
     const existing = await prisma.product.findFirst({
       where: { id: data.id, vendorId },
