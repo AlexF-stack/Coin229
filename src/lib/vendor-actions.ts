@@ -9,6 +9,7 @@ import type {
 } from "@prisma/client";
 import { requireVendor } from "@/lib/assert-vendor";
 import { prisma } from "@/lib/prisma";
+import { changeOrderStatus } from "@/lib/order-status";
 import { nicheToCategorie } from "@/lib/vendor-auth";
 import { getMarketplaceCommissionPct } from "@/lib/marketplace-finance";
 
@@ -209,41 +210,14 @@ export async function updateMyOrderStatus(
   statut: OrderStatus
 ) {
   const { vendorId } = await requireVendor();
-  const order = await prisma.order.findFirst({
-    where: { id: orderId, vendorId },
-    include: { items: true },
+  // Transitions contrôlées (src/lib/order-status-rules.ts)
+  const result = await changeOrderStatus({
+    orderId,
+    to: statut,
+    actor: "vendor",
+    vendorId,
   });
-  if (!order) {
-    return { success: false as const, error: "Commande introuvable" };
-  }
-
-  if (statut === "annulee" && order.statut !== "annulee") {
-    await prisma.$transaction(async (tx) => {
-      for (const item of order.items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            stockQuantite: { increment: item.quantite },
-            statut: "actif",
-          },
-        });
-      }
-      await tx.order.update({
-        where: { id: orderId },
-        data: {
-          statut: "annulee",
-          refundStatus:
-            order.modePaiement === "livraison"
-              ? "n/a"
-              : order.paymentRef
-                ? "pending"
-                : "n/a",
-        },
-      });
-    });
-  } else {
-    await prisma.order.update({ where: { id: orderId }, data: { statut } });
-  }
+  if (!result.success) return result;
 
   revalidatePath("/vendeur/espace/commandes");
   revalidatePath("/vendeur/espace");

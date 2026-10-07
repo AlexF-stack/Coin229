@@ -1,8 +1,13 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import type { Order, OrderItem, Product, OrderStatus } from "@prisma/client";
 import { updateMyOrderStatus } from "@/lib/vendor-actions";
+import { ORDER_STATUS_LABELS } from "@/lib/constants";
+import {
+  allowedNextStatuses,
+  STATUS_ACTION_LABELS,
+} from "@/lib/order-status-rules";
 import { formatPrice } from "@/lib/utils";
 import { Download, Loader2 } from "lucide-react";
 
@@ -14,14 +19,6 @@ type OrderRow = Order & {
 type Props = {
   orders: OrderRow[];
 };
-
-const STATUTS: OrderStatus[] = [
-  "en_attente",
-  "confirmee",
-  "en_livraison",
-  "livree",
-  "annulee",
-];
 
 function exportCsv(orders: OrderRow[]) {
   const header = ["id", "date", "client", "total", "vendorNet", "statut"];
@@ -43,12 +40,38 @@ function exportCsv(orders: OrderRow[]) {
   URL.revokeObjectURL(url);
 }
 
+/** Explication affichée quand le vendeur ne peut plus rien faire lui-même */
+function waitingNote(o: OrderRow): string | null {
+  if (o.payoutId) return "Reversée — statut verrouillé.";
+  if (o.modePaiement === "mobile_money" && o.statut === "en_attente") {
+    return "En attente du paiement Mobile Money du client.";
+  }
+  if (o.modePaiement === "livraison" && o.statut === "en_livraison") {
+    return "Coin229 confirme la livraison et l’encaissement.";
+  }
+  return null;
+}
+
 export function VendorOrders({ orders }: Props) {
   const [pending, startTransition] = useTransition();
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   function setStatut(orderId: string, statut: OrderStatus) {
+    if (
+      statut === "annulee" &&
+      !window.confirm("Annuler cette commande ? Le stock sera remis en vente.")
+    ) {
+      return;
+    }
+    setBusyId(orderId);
     startTransition(async () => {
-      await updateMyOrderStatus(orderId, statut);
+      const result = await updateMyOrderStatus(orderId, statut);
+      if (!result.success) {
+        setErrors((e) => ({ ...e, [orderId]: result.error }));
+        setBusyId(null);
+        return;
+      }
       window.location.reload();
     });
   }
@@ -88,21 +111,36 @@ export function VendorOrders({ orders }: Props) {
                   {new Date(o.dateCreation).toLocaleDateString("fr-FR")}
                 </p>
               </div>
-              <select
-                value={o.statut}
-                disabled={pending}
-                onChange={(e) =>
-                  setStatut(o.id, e.target.value as OrderStatus)
-                }
-                className="rounded-lg border border-white/10 bg-[#0c0d12] px-2 py-1.5 text-xs text-white outline-none"
-              >
-                {STATUTS.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+              <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-white">
+                {ORDER_STATUS_LABELS[o.statut]}
+                {o.modePaiement === "mobile_money" ? " · Mobile Money" : " · à la livraison"}
+              </span>
             </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {allowedNextStatuses(o, "vendor").map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  disabled={pending}
+                  onClick={() => setStatut(o.id, s)}
+                  className={
+                    s === "annulee"
+                      ? "rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-300 hover:bg-red-400/10 disabled:opacity-50"
+                      : "rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-[#0c0d12] hover:bg-amber-400 disabled:opacity-50"
+                  }
+                >
+                  {STATUS_ACTION_LABELS[s]}
+                </button>
+              ))}
+              {waitingNote(o) && (
+                <span className="text-xs text-white/45">{waitingNote(o)}</span>
+              )}
+            </div>
+            {errors[o.id] && (
+              <p role="alert" className="mt-2 text-xs text-red-300">
+                {errors[o.id]}
+              </p>
+            )}
             <ul className="mt-3 space-y-1 text-sm text-white/70">
               {o.items.map((it) => (
                 <li key={it.id}>
@@ -111,7 +149,7 @@ export function VendorOrders({ orders }: Props) {
                 </li>
               ))}
             </ul>
-            {pending && (
+            {pending && busyId === o.id && (
               <p className="mt-2 flex items-center gap-1 text-xs text-amber-300">
                 <Loader2 className="h-3 w-3 animate-spin" /> Mise à jour…
               </p>

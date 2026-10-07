@@ -6,6 +6,7 @@ import { z } from "zod";
 import { rateLimitAsync } from "@/lib/rate-limit";
 import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import { prisma } from "@/lib/prisma";
+import { changeOrderStatus } from "@/lib/order-status";
 import { processPayment } from "@/lib/payment";
 import { calculateShippingFee } from "@/lib/shipping";
 import { checkoutSchema } from "@/lib/checkout-schema";
@@ -706,13 +707,13 @@ export async function updateOrderStatus(
   }
   const order = await prisma.order.findFirst({
     where: { id: orderId, vendorId },
+    select: { id: true },
   });
   if (!order) return { success: false, error: "Commande introuvable" };
 
-  await prisma.order.update({
-    where: { id: orderId },
-    data: { statut },
-  });
+  // Mêmes règles que le vendeur (droits admin) + stock rendu à l'annulation
+  const result = await changeOrderStatus({ orderId, to: statut, actor: "admin" });
+  if (!result.success) return result;
   revalidatePath("/admin");
   revalidatePath("/compte");
   return { success: true };

@@ -10,6 +10,7 @@ import type {
 } from "@prisma/client";
 import { updateOrderStatus } from "@/lib/actions";
 import { ORDER_STATUS_LABELS } from "@/lib/constants";
+import { allowedNextStatuses } from "@/lib/order-status-rules";
 import { ZONE_LABELS } from "@/lib/shipping";
 import { formatPrice } from "@/lib/utils";
 
@@ -17,14 +18,6 @@ type OrderWithRelations = Order & {
   items: (OrderItem & { product: Product })[];
   client: Client;
 };
-
-const statuses: OrderStatus[] = [
-  "en_attente",
-  "confirmee",
-  "en_livraison",
-  "livree",
-  "annulee",
-];
 
 const statusTone: Record<OrderStatus, string> = {
   en_attente: "bg-amber-500/15 text-amber-300 border-amber-500/30",
@@ -42,15 +35,45 @@ type Props = {
 export function AdminOrders({ orders, vendorId }: Props) {
   const [pending, startTransition] = useTransition();
   const [local, setLocal] = useState(orders);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  function changeStatus(orderId: string, statut: OrderStatus) {
+  function changeStatus(order: OrderWithRelations, statut: OrderStatus) {
+    if (statut === order.statut) return;
+    if (
+      statut === "annulee" &&
+      !window.confirm(
+        order.modePaiement === "mobile_money" && order.statut !== "en_attente"
+          ? "Annuler cette commande payée ? Le stock sera rendu et le client devra être remboursé."
+          : "Annuler cette commande ? Le stock sera remis en vente."
+      )
+    ) {
+      return;
+    }
     startTransition(async () => {
-      const res = await updateOrderStatus(orderId, statut, vendorId);
-      if (res.success) {
-        setLocal((prev) =>
-          prev.map((o) => (o.id === orderId ? { ...o, statut } : o))
-        );
+      const res = await updateOrderStatus(order.id, statut, vendorId);
+      if (!res.success) {
+        setErrors((e) => ({ ...e, [order.id]: res.error ?? "Échec de la mise à jour" }));
+        return;
       }
+      setErrors((e) => ({ ...e, [order.id]: "" }));
+      setLocal((prev) =>
+        prev.map((o) =>
+          o.id === order.id
+            ? {
+                ...o,
+                statut,
+                ...(statut === "annulee"
+                  ? {
+                      refundStatus:
+                        o.modePaiement === "mobile_money" && o.statut !== "en_attente"
+                          ? "pending"
+                          : "n/a",
+                    }
+                  : {}),
+              }
+            : o
+        )
+      );
     });
   }
 
@@ -101,20 +124,33 @@ export function AdminOrders({ orders, vendorId }: Props) {
                 : "Mobile Money"}
             </p>
           </div>
-          <select
-            disabled={pending}
-            value={order.statut}
-            onChange={(e) =>
-              changeStatus(order.id, e.target.value as OrderStatus)
-            }
-            className="w-full rounded-lg border border-white/10 bg-[#0a0b0f] px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-500/50"
-          >
-            {statuses.map((s) => (
-              <option key={s} value={s}>
-                {ORDER_STATUS_LABELS[s]}
-              </option>
-            ))}
-          </select>
+          {allowedNextStatuses(order, "admin").length > 0 ? (
+            <select
+              disabled={pending}
+              value={order.statut}
+              onChange={(e) => changeStatus(order, e.target.value as OrderStatus)}
+              className="w-full rounded-lg border border-white/10 bg-[#0a0b0f] px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-500/50"
+            >
+              {/* Statut actuel + seuls passages autorisés (src/lib/order-status-rules.ts) */}
+              {[order.statut, ...allowedNextStatuses(order, "admin")].map((s) => (
+                <option key={s} value={s}>
+                  {s === order.statut ? ORDER_STATUS_LABELS[s] : `→ ${ORDER_STATUS_LABELS[s]}`}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="text-xs text-white/40">
+              {order.payoutId ? "Reversée au vendeur — statut verrouillé." : "Statut définitif."}
+            </p>
+          )}
+          {order.refundStatus === "pending" && (
+            <p className="text-xs font-medium text-amber-300">Remboursement à faire</p>
+          )}
+          {errors[order.id] && (
+            <p role="alert" className="text-xs text-red-300">
+              {errors[order.id]}
+            </p>
+          )}
         </li>
       ))}
     </ul>
