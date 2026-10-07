@@ -33,10 +33,17 @@ const PAYOUT_LABEL = {
 export function AdminPayouts({ unpaidVendors, recentPayouts }: Props) {
   const [pending, startTransition] = useTransition();
 
-  function markPaid(vendorId: string) {
-    if (!confirm("Confirmer le reversement manuel pour ce vendeur ?")) return;
+  function markPaid(v: UnpaidVendor) {
+    if (
+      !confirm(
+        `Confirmer que ${formatPrice(v.vendorNet)} ont été reversés à ${v.nomBoutique} (${v.orderCount} commande(s) livrée(s)) ?`
+      )
+    ) {
+      return;
+    }
     startTransition(async () => {
-      const res = await createVendorPayout(vendorId);
+      // Le montant affiché est vérifié côté serveur
+      const res = await createVendorPayout(v.vendorId, v.vendorNet);
       if (!res.success) {
         alert(res.error ?? "Erreur");
         return;
@@ -70,7 +77,7 @@ export function AdminPayouts({ unpaidVendors, recentPayouts }: Props) {
                 <button
                   type="button"
                   disabled={pending}
-                  onClick={() => markPaid(v.vendorId)}
+                  onClick={() => markPaid(v)}
                   className="rounded-lg bg-emerald-500 px-4 py-2 text-xs font-semibold text-[#0a0b0f] disabled:opacity-60"
                 >
                   {pending ? (

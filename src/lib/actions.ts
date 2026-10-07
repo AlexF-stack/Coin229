@@ -7,6 +7,7 @@ import { rateLimitAsync } from "@/lib/rate-limit";
 import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import { prisma } from "@/lib/prisma";
 import { changeOrderStatus } from "@/lib/order-status";
+import { createPayoutForVendor, payableOrderWhere } from "@/lib/payouts";
 import { processPayment } from "@/lib/payment";
 import { calculateShippingFee } from "@/lib/shipping";
 import { checkoutSchema } from "@/lib/checkout-schema";
@@ -832,12 +833,9 @@ export async function listAdminPayoutData() {
     return { unpaidVendors: [], recentPayouts: [] };
   }
 
+  // Même règle que la création du reversement (src/lib/payouts.ts)
   const unpaidOrders = await prisma.order.findMany({
-    where: {
-      statut: { in: ["livree", "confirmee"] },
-      payoutId: null,
-      vendorNet: { gt: 0 },
-    },
+    where: payableOrderWhere(),
     include: { vendor: { select: { id: true, nomBoutique: true, email: true } } },
   });
 
@@ -919,46 +917,28 @@ export async function setVendorStatus(
 }
 
 /** Reverse manuel : regroupe les commandes unpaid livrées/confirmées. */
-export async function createVendorPayout(vendorId: string, note?: string) {
+export async function createVendorPayout(
+  vendorId: string,
+  expectedAmount: number,
+  note?: string
+) {
   try {
     await requireAdmin();
   } catch {
     return { success: false as const, error: "Non autorisé" };
   }
-
-  const orders = await prisma.order.findMany({
-    where: {
-      vendorId,
-      payoutId: null,
-      statut: { in: ["livree", "confirmee", "en_livraison"] },
-      vendorNet: { gt: 0 },
-    },
-  });
-  if (!orders.length) {
-    return { success: false as const, error: "Rien à reverser" };
+  if (!Number.isInteger(expectedAmount) || expectedAmount <= 0) {
+    return { success: false as const, error: "Montant invalide" };
   }
-  const amount = orders.reduce((s, o) => s + o.vendorNet, 0);
-  const payout = await prisma.$transaction(async (tx) => {
-    const p = await tx.vendorPayout.create({
-      data: {
-        vendorId,
-        amount,
-        statut: "paid",
-        note: note?.trim().slice(0, 200) || "Reverse manuel",
-        datePaid: new Date(),
-      },
-    });
-    await tx.order.updateMany({
-      where: { id: { in: orders.map((o) => o.id) } },
-      data: { payoutId: p.id },
-    });
-    return p;
-  });
+
+  // Atomique, sans double reversement, montant vérifié (src/lib/payouts.ts)
+  const result = await createPayoutForVendor({ vendorId, expectedAmount, note });
+  if (!result.success) return result;
 
   revalidatePath("/admin/payouts");
   revalidatePath("/admin/vendeurs");
   revalidatePath("/vendeur/espace/finances");
-  return { success: true as const, payoutId: payout.id, amount };
+  return result;
 }
 
 export async function listPayoutQueue() {

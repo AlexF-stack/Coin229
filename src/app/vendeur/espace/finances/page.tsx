@@ -34,6 +34,7 @@ export default async function VendorFinancesPage() {
           commission={finances.commission}
           net={finances.net}
           pendingPayout={finances.pendingPayout}
+          inProgress={finances.inProgress}
           recentOrders={finances.orders}
         />
       </div>

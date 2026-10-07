@@ -10,6 +10,7 @@ import type {
 import { requireVendor } from "@/lib/assert-vendor";
 import { prisma } from "@/lib/prisma";
 import { changeOrderStatus } from "@/lib/order-status";
+import { getVendorFinanceSummary, SOLD_STATUSES } from "@/lib/payouts";
 import { nicheToCategorie } from "@/lib/vendor-auth";
 import { getMarketplaceCommissionPct } from "@/lib/marketplace-finance";
 
@@ -59,9 +60,10 @@ export async function getMyVendorStats() {
   const stockBas = products.filter(
     (p) => p.stockQuantite > 0 && p.stockQuantite <= 5
   ).length;
+  // Ventes réelles hors frais de livraison (sans commandes impayées ni annulées)
   const ca = orders
-    .filter((o) => o.statut !== "annulee")
-    .reduce((s, o) => s + o.montantTotal, 0);
+    .filter((o) => SOLD_STATUSES.includes(o.statut))
+    .reduce((s, o) => s + o.montantTotal - o.fraisLivraison, 0);
   return {
     productCount: products.length,
     orderCount: orders.length,
@@ -74,24 +76,17 @@ export async function getMyVendorStats() {
 export async function getMyVendorFinances() {
   const { vendorId } = await requireVendor();
   const commissionPct = await getMarketplaceCommissionPct();
-  const orders = await prisma.order.findMany({
-    where: { vendorId, statut: { not: "annulee" } },
-    orderBy: { dateCreation: "desc" },
-    take: 50,
-  });
-  const brut = orders.reduce(
-    (s, o) => s + Math.max(0, o.montantTotal - o.fraisLivraison),
-    0
-  );
-  const commission = orders.reduce((s, o) => s + o.commissionAmount, 0);
-  const net = orders.reduce((s, o) => s + o.vendorNet, 0);
-  const pendingPayout = orders
-    .filter(
-      (o) =>
-        !o.payoutId &&
-        (o.statut === "livree" || o.statut === "confirmee" || o.statut === "en_livraison")
-    )
-    .reduce((s, o) => s + o.vendorNet, 0);
+  // Totaux sur TOUTES les commandes vendues (pas seulement les 50 dernières),
+  // avec la même règle de reversement que l'admin (src/lib/payouts.ts)
+  const [summary, orders] = await Promise.all([
+    getVendorFinanceSummary(vendorId),
+    prisma.order.findMany({
+      where: { vendorId, statut: { not: "annulee" } },
+      orderBy: { dateCreation: "desc" },
+      take: 50,
+    }),
+  ]);
+  const { brut, commission, net, pendingPayout, inProgress } = summary;
   const payouts = await prisma.vendorPayout.findMany({
     where: { vendorId },
     orderBy: { dateCreation: "desc" },
@@ -103,6 +98,7 @@ export async function getMyVendorFinances() {
     commission,
     net,
     pendingPayout,
+    inProgress,
     orders,
     payouts,
   };

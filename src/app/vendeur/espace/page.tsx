@@ -116,13 +116,14 @@ export default async function VendorDashboardPage() {
           </div>
           <div className="rounded-xl border border-white/10 bg-[#1a1c24] p-4">
             <p className="text-xs uppercase tracking-wide text-white/45">
-              Volume
+              Ventes
             </p>
             <p className="mt-2 text-3xl font-semibold text-white">
               {formatPrice(stats.ca)}
             </p>
             <p className="mt-1 text-[11px] text-white/35">
-              Encaissement plateforme — reverse hors app pour l’instant
+              Commandes confirmées, hors frais de livraison — détail et
+              reversements dans Finances
             </p>
           </div>
         </div>

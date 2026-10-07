@@ -9,6 +9,7 @@ type Props = {
   commission: number;
   net: number;
   pendingPayout: number;
+  inProgress: number;
   recentOrders: Order[];
 };
 
@@ -26,13 +27,14 @@ export function VendorFinances({
   commission,
   net,
   pendingPayout,
+  inProgress,
   recentOrders,
 }: Props) {
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Commission plateforme" value={`${commissionPct} %`} />
-        <StatCard label="CA brut" value={formatPrice(caBrut)} />
+        <StatCard label="Ventes (hors livraison)" value={formatPrice(caBrut)} />
         <StatCard label="Commission totale" value={formatPrice(commission)} />
         <StatCard label="Net vendeur" value={formatPrice(net)} highlight />
       </div>
@@ -45,8 +47,14 @@ export function VendorFinances({
           {formatPrice(pendingPayout)}
         </p>
         <p className="mt-1 text-xs text-white/45">
-          Commandes livrées non encore reversées par Coin229.
+          Net des commandes livrées, pas encore reversé par Coin229.
         </p>
+        {inProgress > 0 && (
+          <p className="mt-2 text-xs text-white/55">
+            + {formatPrice(inProgress)} de commandes confirmées ou en livraison,
+            reversables une fois livrées.
+          </p>
+        )}
       </div>
 
       <div>
