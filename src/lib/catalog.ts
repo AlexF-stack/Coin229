@@ -303,12 +303,17 @@ export async function fetchProductsByIds(ids: string[]) {
   try {
     return await withTimeout(
       prisma.product.findMany({
-        where: { id: { in: ids } },
+        // Mêmes règles que le catalogue : jamais un produit retiré ni d'un vendeur suspendu
+        where: {
+          id: { in: ids },
+          statut: { in: ["actif", "rupture"] },
+          vendor: { statut: "actif" },
+        },
       })
     );
   } catch {
     // fallthrough
   }
   if (!allowDemoCatalog()) return [];
-  return DEMO_PRODUCTS.filter((p) => ids.includes(p.id));
+  return DEMO_PRODUCTS.filter((p) => ids.includes(p.id) && p.statut !== "archive");
 }

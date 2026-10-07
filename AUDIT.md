@@ -122,7 +122,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P2-7 | ⬜ | Sessions non révocables ; reset mot de passe n'invalide pas les sessions 🔎 | `admin-auth.ts`, `vendor-auth.ts` |
 | P2-8 | ⬜ | Frais de livraison dupliqués serveur / `NEXT_PUBLIC_*` → écart possible affiché / facturé 🔎 | `src/lib/shipping.ts` |
 | P2-9 | 🔄 | Annulation non transactionnelle ; produit archivé réactivé à tort 🔎 — **corrigé pour vendeur / admin / expiration** (P1-3, P1-2) ; reste l'annulation après échec de paiement dans `createOrder` | `actions.ts` |
-| P2-10 | ⬜ | Favoris affichent produits archivés / vendeurs suspendus 🔎 | `catalog.ts` (`fetchProductsByIds`) |
+| P2-10 | ✅ | Favoris affichaient des produits retirés / de vendeurs suspendus — **corrigé** : `fetchProductsByIds` applique les mêmes règles que le catalogue (en vente ou rupture, vendeur actif). Vérifié : 3 tests. | `catalog.ts` (`fetchProductsByIds`) |
 | P2-11 | ⬜ | Client Google/Facebook ne voit pas ses commandes ; `?next=` ignoré après connexion 🔎 | `actions.ts`, `order-access.ts`, `compte` |
 | P2-12 | ✅ | Finances vendeur calculées sur 50 commandes max, impayées incluses — **corrigé avec P1-4** : totaux sur toutes les commandes vendues (hors impayées / annulées), « à reverser » = même règle que l'admin, montant « en cours » affiché ; tableau de bord « Ventes » hors livraison, texte « reversé hors app » obsolète retiré | `vendor-actions.ts`, `payouts.ts` |
 | P2-13 | ⬜ | Inscription vendeur : slugs réservés non vérifiés (« espace », « login »…) 🔎 | `api/vendor/register` |
@@ -221,4 +221,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 07/10/2026 | P1-6 | voir `git log` | Code vérifié propre ; rotation des 2 mots de passe + purge éventuelle de l’historique en attente de ta décision. Fin de phase P1 : build production OK, TypeScript 0 erreur, 10 suites de tests P0/P1 OK |
 | 08/10/2026 | P2-2 | `291c9d8` | Titre de la page d’accueil |
 | 08/10/2026 | P2-15 | `b562094` | Montants toujours lisibles (« 21 000 FCFA ») |
-| 08/10/2026 | P2-14 | voir `git log` | Mobile : plus rien ne masque les boutons d’achat ; assistant en français |
+| 08/10/2026 | P2-14 | `4cf393f` | Mobile : plus rien ne masque les boutons d’achat ; assistant en français |
+| 08/10/2026 | P2-10 | voir `git log` | Favoris filtrés comme le catalogue |
