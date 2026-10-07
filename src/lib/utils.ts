@@ -5,13 +5,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const priceFormatter = new Intl.NumberFormat("fr-BJ", {
+  style: "decimal",
+  maximumFractionDigits: 0,
+});
+
+/** Espace fine insécable (U+202F) d'Intl : invisible avec certaines polices / téléphones */
+const NARROW_NBSP = new RegExp(String.fromCharCode(0x202f), "g");
+const NBSP = String.fromCharCode(0x00a0);
+
+/** « 21 000 FCFA » — espaces insécables classiques, jamais coupé en fin de ligne */
 export function formatPrice(amount: number): string {
-  return (
-    new Intl.NumberFormat("fr-BJ", {
-      style: "decimal",
-      maximumFractionDigits: 0,
-    }).format(amount) + " FCFA"
-  );
+  return priceFormatter.format(amount).replace(NARROW_NBSP, NBSP) + NBSP + "FCFA";
 }
 
 export function getDiscountPercent(prix: number, prixPromo: number | null | undefined): number | null {

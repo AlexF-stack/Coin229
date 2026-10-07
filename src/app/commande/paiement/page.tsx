@@ -2,6 +2,7 @@ import { KkiaPayCheckout } from "@/components/checkout/kkiapay-checkout";
 import { bjLocalNumber } from "@/lib/bj-phone";
 import { canAccessOrder } from "@/lib/order-access";
 import { prisma } from "@/lib/prisma";
+import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -83,7 +84,7 @@ export default async function PaymentPage({ searchParams }: Props) {
         <h1 className="font-display text-2xl font-bold">Paiement Mobile Money</h1>
         <p className="text-sm text-muted">
           Commande {order.id.slice(0, 8)}… ·{" "}
-          {order.montantTotal.toLocaleString("fr-BJ")} FCFA
+          {formatPrice(order.montantTotal)}
         </p>
         <KkiaPayCheckout
           orderId={order.id}

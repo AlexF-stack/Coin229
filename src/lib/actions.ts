@@ -6,6 +6,7 @@ import { z } from "zod";
 import { rateLimitAsync } from "@/lib/rate-limit";
 import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import { prisma } from "@/lib/prisma";
+import { formatPrice } from "@/lib/utils";
 import { changeOrderStatus } from "@/lib/order-status";
 import { createPayoutForVendor, payableOrderWhere, SOLD_STATUSES } from "@/lib/payouts";
 import { randomBytes } from "crypto";
@@ -241,7 +242,7 @@ async function createOrderUnsafe(input: {
     return {
       success: false as const,
       priceChanged: true as const,
-      error: `Les prix ou les frais ont changé depuis l’ajout au panier. Nouveau total : ${montantTotal.toLocaleString("fr-FR")} FCFA. Vérifie le récapitulatif puis confirme à nouveau.`,
+      error: `Les prix ou les frais ont changé depuis l’ajout au panier. Nouveau total : ${formatPrice(montantTotal)}. Vérifie le récapitulatif puis confirme à nouveau.`,
     };
   }
 

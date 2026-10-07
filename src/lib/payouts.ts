@@ -8,6 +8,7 @@
  */
 import type { OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { formatPrice } from "@/lib/utils";
 
 export function payableOrderWhere(vendorId?: string): Prisma.OrderWhereInput {
   return {
@@ -48,7 +49,7 @@ export async function createPayoutForVendor(opts: {
       if (amount !== opts.expectedAmount) {
         return {
           success: false as const,
-          error: `Le montant a changé (${amount.toLocaleString("fr-FR")} FCFA au lieu de ${opts.expectedAmount.toLocaleString("fr-FR")}). Actualise la page avant de reverser.`,
+          error: `Le montant a changé (${formatPrice(amount)} au lieu de ${formatPrice(opts.expectedAmount)}). Actualise la page avant de reverser.`,
         };
       }
       const payout = await tx.vendorPayout.create({
