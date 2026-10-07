@@ -28,12 +28,16 @@ function uid(prefix: string) {
 const WELCOME: Msg = {
   id: "welcome",
   role: "bot",
-  text: "Hello — je t’aide à choisir.\nBudget, style, livraison ou paiement : dis-moi ce que tu cherches.",
+  text: "Bonjour ! Je t’aide à choisir.\nBudget, style, livraison ou paiement : dis-moi ce que tu cherches.",
   quickReplies: CHAT_STARTERS,
 };
 
+/** Pages d'achat : la bulle d'aide masquerait les boutons (ajout, commande, paiement) */
+const NO_NUDGE_PATHS = ["/produit/", "/panier", "/commande"];
+
 export function ShopChatbot() {
   const pathname = usePathname();
+  const onPurchasePage = NO_NUDGE_PATHS.some((p) => pathname.startsWith(p));
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Msg[]>([WELCOME]);
@@ -49,7 +53,7 @@ export function ShopChatbot() {
     }
   }, [messages, open, typing]);
 
-  // Bulle « Hello je t'aide » — après engagement court, soft-dismiss 1 session
+  // Bulle d'aide — après engagement court, soft-dismiss 1 session
   useEffect(() => {
     try {
       if (sessionStorage.getItem("coin229-chat-nudge-hide") === "1") return;
@@ -358,7 +362,7 @@ export function ShopChatbot() {
         </div>
       )}
 
-      {!open && nudge && (
+      {!open && nudge && !onPurchasePage && (
         <div
           className="fixed bottom-[5.75rem] right-4 z-[60] flex w-[min(100vw-5.25rem,18rem)] animate-[fab-in_0.45s_ease-out_both] flex-col items-end md:bottom-28 md:right-8"
           role="status"
@@ -381,7 +385,7 @@ export function ShopChatbot() {
                 Assistant Coin229
               </p>
               <p className="mt-1 text-[15px] font-semibold leading-snug text-[#0F2D26]">
-                Hello — je t&apos;aide
+                Besoin d&apos;aide pour choisir ?
               </p>
               <p className="mt-1 text-xs leading-relaxed text-muted">
                 Budget, style, livraison… Discuter →
@@ -397,11 +401,13 @@ export function ShopChatbot() {
         aria-label={open ? "Fermer le chat" : "Ouvrir l’assistant"}
         className={cn(
           "fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-[0_10px_30px_rgba(212,175,55,0.35)] transition hover:scale-105 active:scale-95 md:bottom-8 md:right-8",
+          // Au-dessus de la barre d'achat fixe des pages produit / panier / commande
+          onPurchasePage && "max-md:bottom-32",
           "animate-[fab-in_0.5s_ease-out_both]",
           open
             ? "border border-border bg-white text-navy shadow-md"
             : "bg-amber text-navy",
-          !open && nudge && "ring-2 ring-[#D4AF37]/45 ring-offset-2 ring-offset-bg"
+          !open && nudge && !onPurchasePage && "ring-2 ring-[#D4AF37]/45 ring-offset-2 ring-offset-bg"
         )}
       >
         {open ? (

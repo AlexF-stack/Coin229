@@ -126,7 +126,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P2-11 | ⬜ | Client Google/Facebook ne voit pas ses commandes ; `?next=` ignoré après connexion 🔎 | `actions.ts`, `order-access.ts`, `compte` |
 | P2-12 | ✅ | Finances vendeur calculées sur 50 commandes max, impayées incluses — **corrigé avec P1-4** : totaux sur toutes les commandes vendues (hors impayées / annulées), « à reverser » = même règle que l'admin, montant « en cours » affiché ; tableau de bord « Ventes » hors livraison, texte « reversé hors app » obsolète retiré | `vendor-actions.ts`, `payouts.ts` |
 | P2-13 | ⬜ | Inscription vendeur : slugs réservés non vérifiés (« espace », « login »…) 🔎 | `api/vendor/register` |
-| P2-14 | ⬜ | Bandeau cookies + bulle assistant masquent les CTA sur mobile ; « Hello — je t'aide » en anglais ✅ | `cookie-banner.tsx`, `shop-chatbot.tsx` |
+| P2-14 | ✅ | Bandeau cookies + bulle assistant masquaient les boutons d’achat sur mobile ; « Hello — je t’aide » en anglais — **corrigé** : bandeau cookies en fine barre en **haut** sur mobile (encart en bas à gauche sur ordinateur) ; bulle d’aide désactivée sur produit / panier / commande / paiement et bouton assistant remonté au-dessus de la barre d’achat ; textes en français (« Bonjour ! Je t’aide à choisir », « Besoin d’aide pour choisir ? »). Vérifié : test Edge mobile 375 px (6 contrôles + capture). Compromis : tant que « Compris » n’est pas touché, la barre recouvre l’en-tête sur mobile. | `cookie-banner.tsx`, `shop-chatbot.tsx` |
 | P2-15 | ✅ | Placeholder téléphone (corrigé en P0-3) ; « 21000 FCFA » — **corrigé** : `formatPrice` utilisait l’espace fine insécable d’Intl (U+202F), invisible avec certaines polices / téléphones ; remplacée par l’espace insécable classique, et les 3 montants formatés à la main (`toLocaleString`) passent par `formatPrice`. | `src/lib/utils.ts`, `commande/paiement`, `actions.ts`, `payouts.ts` |
 | P2-16 | ⬜ | Upload : repli `public/uploads` impossible sur Vercel ; type de fichier non vérifié par contenu 🔎 | `api/vendor/upload` |
 | P2-17 | ⏸️ | Contenu à valider : produits nommés Rolex / AP / Patek (authenticité impossible à confirmer → risque juridique), RCCM / IFU « en cours », contacts d'exemple | catalogue, variables d'env |
@@ -220,4 +220,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 07/10/2026 | P1-14 | `2cdb5b0` | Admin : vue marketplace globale, KYC, modération des produits vendeurs |
 | 07/10/2026 | P1-6 | voir `git log` | Code vérifié propre ; rotation des 2 mots de passe + purge éventuelle de l’historique en attente de ta décision. Fin de phase P1 : build production OK, TypeScript 0 erreur, 10 suites de tests P0/P1 OK |
 | 08/10/2026 | P2-2 | `291c9d8` | Titre de la page d’accueil |
-| 08/10/2026 | P2-15 | voir `git log` | Montants toujours lisibles (« 21 000 FCFA ») |
+| 08/10/2026 | P2-15 | `b562094` | Montants toujours lisibles (« 21 000 FCFA ») |
+| 08/10/2026 | P2-14 | voir `git log` | Mobile : plus rien ne masque les boutons d’achat ; assistant en français |

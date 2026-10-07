@@ -27,15 +27,20 @@ export function CookieBanner() {
 
   if (!visible) return null;
 
+  // Mobile : fine barre en HAUT (ne masque plus les boutons d'achat en bas) ;
+  // ordinateur : encart en bas à gauche.
   return (
     <div
       role="dialog"
       aria-label="Informations cookies"
-      className="safe-pb fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-white/95 p-4 shadow-[0_-8px_30px_rgba(2,11,38,0.1)] backdrop-blur-md md:bottom-4 md:left-4 md:right-auto md:max-w-md md:rounded-2xl md:border"
+      className="fixed inset-x-0 top-0 z-[60] flex items-center gap-3 border-b border-border bg-white/95 px-4 py-2.5 shadow-[0_8px_30px_rgba(2,11,38,0.08)] backdrop-blur-md md:inset-x-auto md:bottom-4 md:left-4 md:top-auto md:block md:max-w-md md:rounded-2xl md:border md:p-4"
     >
-      <p className="text-sm text-navy">
-        Nous utilisons des cookies techniques nécessaires au compte, au panier
-        et à la sécurité. Pas de publicité tierce.{" "}
+      <p className="min-w-0 flex-1 text-xs text-navy md:text-sm">
+        <span className="md:hidden">Cookies techniques uniquement, pas de pub.</span>
+        <span className="hidden md:inline">
+          Nous utilisons des cookies techniques nécessaires au compte, au panier
+          et à la sécurité. Pas de publicité tierce.
+        </span>{" "}
         <Link href="/cookies" className="font-medium text-amber underline">
           En savoir plus
         </Link>
@@ -43,7 +48,7 @@ export function CookieBanner() {
       <button
         type="button"
         onClick={accept}
-        className="mt-3 w-full rounded-full bg-navy px-4 py-2.5 text-sm font-semibold text-white md:w-auto"
+        className="shrink-0 rounded-full bg-navy px-4 py-2 text-xs font-semibold text-white md:mt-3 md:py-2.5 md:text-sm"
       >
         Compris
       </button>
