@@ -75,6 +75,8 @@ model Vendor {
   resetTokenExpires DateTime?        @map("reset_token_expires")
   /// Demande « mot de passe oublié » en attente de traitement par l'admin
   resetRequestedAt  DateTime?        @map("reset_requested_at")
+  /// Incrémenté à chaque changement de mot de passe : invalide toutes les sessions ouvertes
+  sessionVersion    Int              @default(0) @map("session_version")
   statut            VendorStatus     @default(en_attente)
   dateCreation      DateTime         @default(now()) @map("date_creation")
   products          Product[]

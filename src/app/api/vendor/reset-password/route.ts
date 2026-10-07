@@ -53,6 +53,8 @@ export async function POST(request: Request) {
       resetTokenHash: null,
       resetTokenExpires: null,
       resetRequestedAt: null,
+      // Déconnecte toutes les sessions ouvertes avec l'ancien mot de passe
+      sessionVersion: { increment: 1 },
     },
   });
 

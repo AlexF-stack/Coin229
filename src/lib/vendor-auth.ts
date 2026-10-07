@@ -103,13 +103,27 @@ export function slugifyBoutique(name: string): string {
   return base || "boutique";
 }
 
-export function createVendorSessionToken(vendorId: string): string | null {
+/**
+ * `sessionVersion` = Vendor.sessionVersion au moment de la connexion : s'il
+ * change (nouveau mot de passe), toutes les sessions ouvertes deviennent invalides.
+ */
+export function createVendorSessionToken(
+  vendorId: string,
+  sessionVersion = 0
+): string | null {
   const secret = getSessionSecret();
   if (!secret || !vendorId) return null;
   const now = Math.floor(Date.now() / 1000);
   const payload = b64urlEncode(
     Buffer.from(
-      JSON.stringify({ v: 2, typ: "vendor", vendorId, iat: now, exp: now + MAX_AGE_SEC })
+      JSON.stringify({
+        v: 2,
+        typ: "vendor",
+        vendorId,
+        sv: sessionVersion,
+        iat: now,
+        exp: now + MAX_AGE_SEC,
+      })
     )
   );
   const hmac = createHmac("sha256", secret)
@@ -121,6 +135,13 @@ export function createVendorSessionToken(vendorId: string): string | null {
 export function readVendorSessionToken(
   token: string | undefined | null
 ): string | null {
+  return readVendorSession(token)?.vendorId ?? null;
+}
+
+/** Session vendeur signée : identifiant + version (à comparer en base) */
+export function readVendorSession(
+  token: string | undefined | null
+): { vendorId: string; sessionVersion: number } | null {
   if (!token || !token.includes(".")) return null;
   const secret = getSessionSecret();
   if (!secret) return null;
@@ -141,6 +162,7 @@ export function readVendorSessionToken(
   try {
     const json = JSON.parse(b64urlDecode(payload).toString("utf8")) as {
       vendorId?: string;
+      sv?: number;
       exp?: number;
     };
     if (
@@ -151,7 +173,8 @@ export function readVendorSessionToken(
     ) {
       return null;
     }
-    return json.vendorId;
+    // Jetons émis avant la version de session : version 0
+    return { vendorId: json.vendorId, sessionVersion: Number(json.sv ?? 0) };
   } catch {
     return null;
   }

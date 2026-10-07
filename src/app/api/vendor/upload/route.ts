@@ -3,15 +3,10 @@
  * /public/uploads en développement uniquement.
  */
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
-import { prisma } from "@/lib/prisma";
-import {
-  readVendorSessionToken,
-  vendorCookieName,
-} from "@/lib/vendor-auth";
+import { assertVendor } from "@/lib/assert-vendor";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { rateLimitAsync } from "@/lib/rate-limit";
 
@@ -19,16 +14,10 @@ export const runtime = "nodejs";
 
 const MAX_BYTES = 4.5 * 1024 * 1024; // ~4.5 Mo (limite soft Vercel)
 
+/** Session vendeur valide (version de session vérifiée, compte non suspendu) */
 async function requireVendorId(): Promise<string | null> {
-  const jar = await cookies();
-  const vendorId = readVendorSessionToken(jar.get(vendorCookieName())?.value);
-  if (!vendorId) return null;
-  const vendor = await prisma.vendor.findUnique({
-    where: { id: vendorId },
-    select: { id: true, statut: true },
-  });
-  if (!vendor || vendor.statut === "suspendu") return null;
-  return vendor.id;
+  const session = await assertVendor();
+  return session.ok ? session.vendorId : null;
 }
 
 export async function POST(request: Request) {

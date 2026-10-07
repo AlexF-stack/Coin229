@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveSessionClientId } from "@/lib/push-session";
 import { getVapidPublicKey, isWebPushConfigured } from "@/lib/web-push";
 import { adminCookieName, verifyAdminSessionToken } from "@/lib/admin-auth";
-import { readVendorSessionToken, vendorCookieName } from "@/lib/vendor-auth";
+import { assertVendor } from "@/lib/assert-vendor";
 
 const audienceSchema = z.enum(["client", "admin", "vendor"]).default("client");
 
@@ -37,14 +37,9 @@ async function resolveAudience(
     return ok ? { role: "admin", vendorId: null } : null;
   }
   if (audience === "vendor") {
-    const vendorId = readVendorSessionToken(jar.get(vendorCookieName())?.value);
-    if (!vendorId) return null;
-    const vendor = await prisma.vendor.findUnique({
-      where: { id: vendorId },
-      select: { statut: true },
-    });
-    if (!vendor || vendor.statut === "suspendu") return null;
-    return { role: "vendor", vendorId };
+    // Session vérifiée (version de session, compte non suspendu)
+    const session = await assertVendor();
+    return session.ok ? { role: "vendor", vendorId: session.vendorId } : null;
   }
   return { role: "client", vendorId: null };
 }

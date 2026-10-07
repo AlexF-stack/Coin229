@@ -63,7 +63,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "suspended" }, { status: 403 });
   }
 
-  const token = createVendorSessionToken(vendor.id);
+  // Version de session actuelle : un changement de mot de passe la révoquera
+  const token = createVendorSessionToken(vendor.id, vendor.sessionVersion);
   if (!token) {
     return NextResponse.json({ ok: false, error: "server_misconfigured" }, { status: 500 });
   }

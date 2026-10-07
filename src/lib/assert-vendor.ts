@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import {
-  readVendorSessionToken,
+  readVendorSession,
   vendorCookieName,
 } from "@/lib/vendor-auth";
 import { prisma } from "@/lib/prisma";
@@ -14,20 +14,22 @@ export async function requireVendor(): Promise<{
   slug: string | null;
 }> {
   const jar = await cookies();
-  const vendorId = readVendorSessionToken(jar.get(vendorCookieName())?.value);
-  if (!vendorId) {
+  const session = readVendorSession(jar.get(vendorCookieName())?.value);
+  if (!session) {
     throw new Error("UNAUTHORIZED_VENDOR");
   }
   const vendor = await prisma.vendor.findUnique({
-    where: { id: vendorId },
+    where: { id: session.vendorId },
     select: {
       id: true,
       statut: true,
       nomBoutique: true,
       slug: true,
+      sessionVersion: true,
     },
   });
-  if (!vendor) {
+  // Mot de passe changé depuis la connexion → session révoquée
+  if (!vendor || vendor.sessionVersion !== session.sessionVersion) {
     throw new Error("UNAUTHORIZED_VENDOR");
   }
   if (vendor.statut === "suspendu") {

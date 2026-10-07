@@ -108,6 +108,21 @@ export function verifyAdminPassword(password: string): boolean {
   return ok === 0;
 }
 
+/**
+ * Empreinte du mot de passe admin, incluse dans la signature : changer
+ * ADMIN_PASSWORD déconnecte toutes les sessions admin ouvertes.
+ * (Pour tout déconnecter sans changer le mot de passe : changer ADMIN_SESSION_SECRET.)
+ */
+async function adminPasswordFingerprint(): Promise<string> {
+  const pwd = getAdminPassword() ?? "";
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pwd));
+  return b64urlEncode(digest).slice(0, 16);
+}
+
+async function adminSigningInput(payload: string): Promise<string> {
+  return `${signingInput("admin", payload)}.${await adminPasswordFingerprint()}`;
+}
+
 export async function createAdminSessionToken(): Promise<string | null> {
   const secret = getSessionSecret();
   if (!secret) return null;
@@ -117,7 +132,7 @@ export async function createAdminSessionToken(): Promise<string | null> {
       JSON.stringify({ v: 2, typ: "admin", iat: now, exp: now + MAX_AGE_SEC })
     )
   );
-  const sig = await hmacSign(secret, signingInput("admin", payload));
+  const sig = await hmacSign(secret, await adminSigningInput(payload));
   return `${payload}.${sig}`;
 }
 
@@ -129,7 +144,7 @@ export async function verifyAdminSessionToken(
   if (!secret) return false;
   const [payload, sig] = token.split(".");
   if (!payload || !sig) return false;
-  const valid = await hmacVerify(secret, signingInput("admin", payload), sig);
+  const valid = await hmacVerify(secret, await adminSigningInput(payload), sig);
   if (!valid) return false;
   try {
     const json = JSON.parse(new TextDecoder().decode(b64urlDecode(payload))) as {
