@@ -60,6 +60,9 @@ public/workbox-*.js
 public/workbox-*.js.map
 public/swe-worker-*.js
 public/swe-worker-*.js.map
+# Worker personnalisé compilé depuis worker/index.js (nom avec hash, régénéré à chaque build)
+public/worker-*.js
+public/worker-*.js.map
 public/fallback-*.js
 
 # audit — détails sécurité hors dépôt
