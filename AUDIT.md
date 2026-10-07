@@ -19,7 +19,7 @@
 | Audit | ✅ |
 | Corrections P0 | ✅ (5/5) |
 | Corrections P1 | ✅ code (15/16) — P1-6 ⏸️ actions à faire par toi |
-| Corrections P2 | 🔄 |
+| Corrections P2 | ✅ code (16/17) — P2-17 ⏸️ contenu à valider par toi |
 | QA complète | ⬜ |
 | Build production | ⬜ |
 | Smoke test | ⬜ |
@@ -237,4 +237,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P2-11 | `73c56bc` | Commandes visibles sur le compte Google/Facebook ; retour après connexion |
 | 08/10/2026 | P2-6 | `5f9a436` | Webhooks paiement : signature FedaPay officielle, échecs traités, mode de paiement contrôlé |
 | 08/10/2026 | P2-3 | `d57d678` | Content-Security-Policy en production |
-| 08/10/2026 | P2-1 | voir `git log` | Dépendances : Next 15.5.27, Supabase 2.117.3, postcss corrigé |
+| 08/10/2026 | P2-1 | `96ea409` | Dépendances : Next 15.5.27, Supabase 2.117.3, postcss corrigé |
+| 08/10/2026 | — | voir `git log` | Fin de la phase P2 : build production OK (Next 15.5.27), 15 suites de tests, tour Edge complet OK |
