@@ -5,6 +5,7 @@ import { rateLimitAsync } from "@/lib/rate-limit";
 import {
   createVendorSessionToken,
   hashVendorPassword,
+  RESERVED_VENDOR_SLUGS,
   slugifyBoutique,
   vendorCookieName,
   vendorCookieOptions,
@@ -87,23 +88,45 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "email_taken" }, { status: 409 });
   }
 
-  let slug = slugifyBoutique(parsed.data.nomBoutique);
-  const slugTaken = await prisma.vendor.findUnique({ where: { slug } });
-  if (slugTaken) {
-    slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
-  }
+  const base = slugifyBoutique(parsed.data.nomBoutique);
+  const withSuffix = () => `${base}-${Math.random().toString(36).slice(2, 6)}`;
+  // Nom réservé (page du site) ou déjà pris → suffixe
+  let slug =
+    RESERVED_VENDOR_SLUGS.has(base) ||
+    (await prisma.vendor.findUnique({ where: { slug: base }, select: { id: true } }))
+      ? withSuffix()
+      : base;
 
-  const vendor = await prisma.vendor.create({
-    data: {
-      nomBoutique: parsed.data.nomBoutique,
-      contact: parsed.data.contact,
-      email,
-      passwordHash: hashVendorPassword(parsed.data.password),
-      slug,
-      description: parsed.data.description || null,
-      statut: "en_attente",
-    },
-  });
+  const passwordHash = hashVendorPassword(parsed.data.password);
+  let vendor: Awaited<ReturnType<typeof prisma.vendor.create>> | null = null;
+  // Deux inscriptions simultanées au même nom : on réessaie avec un suffixe
+  for (let attempt = 0; attempt < 5 && !vendor; attempt++) {
+    try {
+      vendor = await prisma.vendor.create({
+        data: {
+          nomBoutique: parsed.data.nomBoutique,
+          contact: parsed.data.contact,
+          email,
+          passwordHash,
+          slug,
+          description: parsed.data.description || null,
+          statut: "en_attente",
+        },
+      });
+    } catch (err) {
+      const target = (err as { code?: string; meta?: { target?: unknown } }).code === "P2002"
+        ? String((err as { meta?: { target?: unknown } }).meta?.target ?? "")
+        : "";
+      if (target.includes("email")) {
+        return NextResponse.json({ ok: false, error: "email_taken" }, { status: 409 });
+      }
+      if (!target.includes("slug")) throw err;
+      slug = withSuffix();
+    }
+  }
+  if (!vendor) {
+    return NextResponse.json({ ok: false, error: "slug_unavailable" }, { status: 409 });
+  }
 
   void notifyAdminNewVendor({
     nomBoutique: vendor.nomBoutique,

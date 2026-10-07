@@ -75,6 +75,23 @@ export function hashResetToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
+/**
+ * Adresses déjà prises par des pages du site sous /vendeur/… : une boutique
+ * portant ce nom aurait une vitrine inaccessible.
+ */
+export const RESERVED_VENDOR_SLUGS = new Set([
+  "espace",
+  "inscription",
+  "login",
+  "connexion",
+  "mot-de-passe-oublie",
+  "reinitialiser",
+  "admin",
+  "api",
+  "coin229",
+  "boutique",
+]);
+
 export function slugifyBoutique(name: string): string {
   const base = name
     .normalize("NFD")
