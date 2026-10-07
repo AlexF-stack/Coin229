@@ -46,13 +46,15 @@ export function VendorForgotForm() {
         <h1 className="text-xl font-semibold text-white">Mot de passe oublié</h1>
         {sent ? (
           <p className="text-sm text-white/60">
-            Si un compte existe avec cet email, tu recevras un lien de
-            réinitialisation sous peu.
+            Demande enregistrée. Si un compte existe avec cet email, l’équipe
+            Coin229 vérifie ton identité puis t’envoie un lien sécurisé sur le
+            WhatsApp de ta boutique (valable 24 h).
           </p>
         ) : (
           <>
             <p className="text-sm text-white/50">
-              Entre l’email de ta marque. Nous t’enverrons un lien sécurisé.
+              Entre l’email de ta marque. Coin229 t’enverra un lien sécurisé sur
+              le WhatsApp de ta boutique.
             </p>
             <label className="block space-y-1.5 text-sm">
               <span className="text-white/45">Email</span>

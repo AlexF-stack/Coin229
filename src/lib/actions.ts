@@ -8,6 +8,9 @@ import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import { prisma } from "@/lib/prisma";
 import { changeOrderStatus } from "@/lib/order-status";
 import { createPayoutForVendor, payableOrderWhere } from "@/lib/payouts";
+import { randomBytes } from "crypto";
+import { SITE } from "@/lib/site";
+import { hashResetToken } from "@/lib/vendor-auth";
 import { processPayment } from "@/lib/payment";
 import { calculateShippingFee } from "@/lib/shipping";
 import { checkoutSchema } from "@/lib/checkout-schema";
@@ -878,6 +881,43 @@ export async function listAdminPayoutData() {
   return {
     unpaidVendors: [...byVendor.values()].sort((a, b) => b.vendorNet - a.vendorNet),
     recentPayouts,
+  };
+}
+
+/**
+ * Admin : lien de réinitialisation à usage unique (24 h) pour un vendeur,
+ * à envoyer sur SON WhatsApp après vérification d'identité. Le lien n'est
+ * stocké nulle part (seul son hash l'est).
+ */
+export async function createVendorResetLink(vendorId: string) {
+  try {
+    await requireAdmin();
+  } catch {
+    return { success: false as const, error: "Non autorisé" };
+  }
+  const vendor = await prisma.vendor.findUnique({
+    where: { id: vendorId },
+    select: { id: true, nomBoutique: true, contact: true, email: true },
+  });
+  if (!vendor?.email) {
+    return { success: false as const, error: "Ce vendeur n’a pas de compte (email) à réinitialiser." };
+  }
+  const token = randomBytes(32).toString("hex");
+  await prisma.vendor.update({
+    where: { id: vendor.id },
+    data: {
+      resetTokenHash: hashResetToken(token),
+      resetTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      resetRequestedAt: null,
+    },
+  });
+  const resetUrl = `${SITE.url}/vendeur/reinitialiser?token=${token}`;
+  const text = `Bonjour ${vendor.nomBoutique}, voici ton lien Coin229 pour choisir un nouveau mot de passe (valable 24 h, une seule fois) : ${resetUrl}`;
+  const phone = normalizeBjPhone(vendor.contact)?.replace("+", "") ?? vendor.contact.replace(/\D/g, "");
+  return {
+    success: true as const,
+    resetUrl,
+    whatsappUrl: phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : null,
   };
 }
 

@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
-import { createHash } from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { rateLimitAsync } from "@/lib/rate-limit";
-import { hashVendorPassword } from "@/lib/vendor-auth";
+import { hashResetToken as hashToken, hashVendorPassword } from "@/lib/vendor-auth";
 
 const schema = z.object({
   token: z.string().trim().min(20).max(200),
   password: z.string().min(8).max(72),
 });
-
-function hashToken(token: string) {
-  return createHash("sha256").update(token).digest("hex");
-}
 
 export async function POST(request: Request) {
   const ip =
@@ -57,6 +52,7 @@ export async function POST(request: Request) {
       passwordHash: hashVendorPassword(parsed.data.password),
       resetTokenHash: null,
       resetTokenExpires: null,
+      resetRequestedAt: null,
     },
   });
 

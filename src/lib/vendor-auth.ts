@@ -3,6 +3,7 @@
  */
 
 import {
+  createHash,
   createHmac,
   randomBytes,
   scryptSync,
@@ -67,6 +68,11 @@ export function verifyVendorPassword(
   } catch {
     return false;
   }
+}
+
+/** Jeton de réinitialisation : seul son hash SHA-256 est stocké */
+export function hashResetToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
 }
 
 export function slugifyBoutique(name: string): string {

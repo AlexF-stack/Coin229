@@ -73,6 +73,8 @@ model Vendor {
   termsAcceptedAt   DateTime?        @map("terms_accepted_at")
   resetTokenHash    String?          @map("reset_token_hash")
   resetTokenExpires DateTime?        @map("reset_token_expires")
+  /// Demande « mot de passe oublié » en attente de traitement par l'admin
+  resetRequestedAt  DateTime?        @map("reset_requested_at")
   statut            VendorStatus     @default(en_attente)
   dateCreation      DateTime         @default(now()) @map("date_creation")
   products          Product[]
