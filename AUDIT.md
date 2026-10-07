@@ -18,7 +18,7 @@
 |---|---|
 | Audit | ✅ |
 | Corrections P0 | ✅ (5/5) |
-| Corrections P1 | 🔄 (6/16) |
+| Corrections P1 | 🔄 (7/16) |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
 | Build production | ⬜ |
@@ -93,7 +93,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | ID | Statut | Problème | Où | Correction recommandée |
 |---|---|---|---|---|
 | P1-1 | ✅ | Confirmation « Commande confirmée ! » même si le paiement Mobile Money n'a pas eu lieu | `src/lib/order-confirmation-state.ts` (nouveau), `commande/confirmation/page.tsx`, `payment.ts`, `actions.ts` | **Corrigé** : la page affiche l'état réel — « Paiement en attente » (+ « Finaliser le paiement » si relance possible, « J'ai payé — actualiser »), « Paiement reçu », « Commande reçue » (livraison), « Commande annulée ». Logique indépendante du prestataire (prête pour FeexPay). Fedapay sans lien de paiement = échec (commande annulée, stock rendu). Commandes `demo_…` refusées en production. Vérifié : 11 tests + commande Mobile Money réelle en local (en attente → payée → annulée). |
-| P1-2 | ⬜ | Stock bloqué indéfiniment par les commandes non payées ; création de commandes sans limite de débit ✅ | `src/lib/actions.ts` (`createOrder`) | Rate limit IP + téléphone ; cron d'annulation des commandes non payées avec restitution du stock |
+| P1-2 | ✅ | Stock bloqué indéfiniment par les commandes non payées ; création de commandes sans limite de débit | `src/lib/order-expiry.ts` + `order-rules.ts` (nouveaux), `actions.ts`, `catalog.ts`, `payment-confirm.ts`, `order-confirmation-state.ts`, `api/cron/release-reservations` (nouveau), `vercel.json`, schéma + migration `20261007_order_reservation_expiry` | **Corrigé** : limite 10 commandes / 15 min par IP et 5 par numéro (message FR) ; commande Mobile Money non payée annulée après 30 min (`cancelReason = payment_timeout`) avec stock rendu (produit archivé jamais remis en vente) — déclenché à chaque commande, consultation du catalogue / panier (1×/min max) et par tâche planifiée Vercel quotidienne protégée par `CRON_SECRET` ; paiement tardif vérifié → stock re-réservé et commande confirmée, ou `refundStatus = pending` si plus de stock ; page de confirmation « Délai de paiement dépassé » + délai annoncé. Vérifié : 10 tests sur base réelle (expiration, idempotence, archivé, paiement tardif ×2), route cron 401/401/200, test Edge 6 commandes même numéro → 6e refusée. La limite par numéro utilise `rateLimitAsync` (base) ; son atomicité reste à renforcer (P1-7). |
 | P1-3 | ⬜ | Le vendeur peut fixer n'importe quel statut de commande (impayée → livrée → reversement) 🔎 | `src/lib/vendor-actions.ts` (`updateMyOrderStatus`) | Machine à états + statut de paiement séparé ; interdire de quitter `annulee` |
 | P1-4 | ⬜ | Reversements : montant affiché ≠ montant enregistré ; double reversement possible 🔎 | `src/lib/actions.ts` (`listAdminPayoutData`, `createVendorPayout`) | Filtre partagé (livrée / payée) ; `payoutId: null` vérifié dans la transaction |
 | P1-5 | ✅ | Aucun `error.tsx` / `global-error.tsx` / `loading.tsx` ; erreur checkout = écran brut ; base injoignable affichée comme « Page introuvable » / « Aucun accessoire » | `src/app/error.tsx`, `global-error.tsx`, `loading.tsx` (boutique, produit, vendeur, confirmation, paiement), `page-skeleton.tsx`, `actions.ts` (`createOrder`), `checkout-form.tsx`, `catalog.ts`, `boutique`, `produit/[id]`, `vendeur/[slug]` | **Corrigé** : page « Oups, un souci technique » (Réessayer, Boutique, WhatsApp, référence) marquée `noindex` ; page de dernier recours ; squelettes de chargement ; `createOrder` ne lève plus jamais d'exception (message lisible) et le formulaire gère la coupure réseau (formulaire conservé) ; base injoignable → page d'erreur au lieu d'un faux 404 / « aucun résultat ». Vérifié (build production + Edge) : réseau coupé à l'envoi → « Connexion impossible », formulaire rempli ; Postgres arrêté → 3 pages en « souci technique » + `noindex` ; retour automatique à la normale au redémarrage ; build OK sans base. Compromis noté : avec `loading.tsx` (streaming), le statut HTTP reste 200 sur erreur / 404 — compensé par `noindex`. |
@@ -188,6 +188,9 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 - [ ] Prévenir admin / vendeurs / clients connectés : toutes les sessions existantes seront déconnectées une fois au déploiement (nouveau format de jeton). (P0-1)
 - [ ] Migration `20261006_bj_phone_10_digits` : appliquée automatiquement au build Vercel (`prisma migrate deploy`). Faire une **sauvegarde de la base** avant le déploiement (elle réécrit les numéros des clients et commandes). (P0-3)
 - [ ] Tester un paiement Fedapay sandbox avec un numéro 10 chiffres. (P0-3 / P2-6)
+- [ ] **Vercel → `CRON_SECRET`** : définir un secret (≥ 16 car., même commande de génération). Sans lui la tâche planifiée répond 503 ; la libération du stock continue quand même au fil des commandes / consultations. La tâche Vercel (plan Hobby) ne tourne qu'une fois par jour : c'est un filet, pas le mécanisme principal. (P1-2)
+- [ ] Migration `20261007_order_reservation_expiry` : appliquée au build. Au premier passage, les anciennes commandes Mobile Money non payées de plus de 30 min seront annulées et leur stock rendu — vérifier la liste avant (Admin → Commandes). (P1-2)
+- [ ] Les commandes avec `refundStatus = pending` (paiement reçu après expiration, plus de stock) doivent être remboursées à la main en attendant l'écran admin (P1-13). (P1-2)
 - [ ] Migration `20261006_push_roles` : les abonnements push existants deviennent « client ». **Après déploiement, l'admin et chaque vendeur doivent réactiver leurs alertes** (Admin → Notifications, Espace vendeur → Tableau de bord). Tester la réception sur un vrai téléphone. (P0-4)
 
 ## Journal des corrections
@@ -206,4 +209,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 07/10/2026 | P1-9 | `70ba11e` | Panier revalidé (prix, stock, disponibilité) + total vérifié côté serveur avant commande |
 | 07/10/2026 | P1-10 | `beb5fb6` | Quantité plafonnée à 20 partout + messages de commande en français |
 | 07/10/2026 | P1-11 | `c21891e` | Plus de panier vide affiché après commande ; KkiaPay réessayable, sans impasse |
-| 07/10/2026 | P1-5 | voir `git log` | Pages d'erreur et de chargement ; checkout sans écran brut ; base injoignable ≠ faux 404 |
+| 07/10/2026 | P1-5 | `a01c202` | Pages d'erreur et de chargement ; checkout sans écran brut ; base injoignable ≠ faux 404 |
+| 07/10/2026 | P1-2 | voir `git log` | Limite de commandes + expiration des réservations Mobile Money (30 min) + paiement tardif géré |

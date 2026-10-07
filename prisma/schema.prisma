@@ -177,6 +177,8 @@ model Order {
   commissionAmount Int           @default(0) @map("commission_amount")
   vendorNet        Int           @default(0) @map("vendor_net")
   refundStatus     String?       @map("refund_status")
+  /// Raison d'annulation automatique, ex. "payment_timeout" (Mobile Money non payé à temps)
+  cancelReason     String?       @map("cancel_reason")
   payoutId         String?       @map("payout_id")
   telephone        String
   nomClient        String        @map("nom_client")
@@ -195,6 +197,7 @@ model Order {
   @@index([vendorId])
   @@index([statut])
   @@index([payoutId])
+  @@index([statut, modePaiement, dateCreation])
   @@map("orders")
 }
 

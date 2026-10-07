@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { z } from "zod";
+import { rateLimitAsync } from "@/lib/rate-limit";
+import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import { prisma } from "@/lib/prisma";
 import { processPayment } from "@/lib/payment";
 import { calculateShippingFee } from "@/lib/shipping";
@@ -109,6 +111,27 @@ async function createOrderUnsafe(input: {
   if (!telephone) {
     return { success: false as const, error: "Numéro invalide" };
   }
+
+  // Limite anti-abus : chaque commande réserve du stock
+  const ip =
+    (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "anon";
+  const [byIp, byPhone] = await Promise.all([
+    rateLimitAsync({ key: `order:ip:${ip}`, limit: 10, windowMs: 15 * 60_000 }),
+    rateLimitAsync({ key: `order:tel:${telephone}`, limit: 5, windowMs: 15 * 60_000 }),
+  ]);
+  if (!byIp.ok || !byPhone.ok) {
+    const minutes = Math.max(
+      1,
+      Math.ceil(Math.max(byIp.retryAfterSec, byPhone.retryAfterSec) / 60)
+    );
+    return {
+      success: false as const,
+      error: `Trop de commandes en peu de temps. Réessaie dans ${minutes} min, ou écris-nous sur WhatsApp.`,
+    };
+  }
+
+  // Libère le stock des commandes Mobile Money non payées à temps
+  await maybeReleaseExpiredReservations();
 
   let products;
   try {
@@ -559,6 +582,7 @@ export async function getCartSnapshot(
 ): Promise<CartSnapshotItem[] | null> {
   const parsed = cartSnapshotSchema.safeParse(productIds);
   if (!parsed.success || !parsed.data.length) return [];
+  await maybeReleaseExpiredReservations();
   try {
     const products = await prisma.product.findMany({
       where: { id: { in: [...new Set(parsed.data)] } },

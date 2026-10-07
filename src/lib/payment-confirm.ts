@@ -4,6 +4,10 @@ import {
   verifyKkiaTransaction,
 } from "@/lib/payment";
 import { createHmac, timingSafeEqual } from "crypto";
+import {
+  PAYMENT_TIMEOUT_REASON,
+  recoverExpiredPaidOrder,
+} from "@/lib/order-expiry";
 
 export function amountsMatch(expected: number, actual: unknown): boolean {
   const n =
@@ -99,7 +103,12 @@ export async function confirmOrderPaid(opts: {
 }): Promise<{ ok: boolean; reason?: string }> {
   const order = await prisma.order.findUnique({ where: { id: opts.orderId } });
   if (!order) return { ok: false, reason: "order_not_found" };
-  if (order.statut !== "en_attente") return { ok: true, reason: "already_processed" };
+  // Commande annulée faute de paiement à temps : un paiement tardif reste traité
+  const expired =
+    order.statut === "annulee" && order.cancelReason === PAYMENT_TIMEOUT_REASON;
+  if (order.statut !== "en_attente" && !expired) {
+    return { ok: true, reason: "already_processed" };
+  }
 
   if (
     opts.expectedAmount !== undefined &&
@@ -161,6 +170,16 @@ export async function confirmOrderPaid(opts: {
     if (order.paymentRef && order.paymentRef !== opts.paymentRef) {
       return { ok: false, reason: "ref_mismatch" };
     }
+  }
+
+  if (expired) {
+    // Paiement vérifié après expiration : re-réserver le stock ou rembourser
+    const outcome = await recoverExpiredPaidOrder({
+      orderId: opts.orderId,
+      provider: opts.provider,
+      paymentRef: opts.paymentRef,
+    });
+    return outcome === "confirmed" ? { ok: true } : { ok: true, reason: "refund_needed" };
   }
 
   try {

@@ -4,6 +4,10 @@
  * seuls le mode de paiement, le statut et la possibilité de relancer comptent.
  */
 import type { OrderStatus, PaymentMode } from "@prisma/client";
+import {
+  MOBILE_MONEY_RESERVATION_MINUTES,
+  PAYMENT_TIMEOUT_REASON,
+} from "@/lib/order-rules";
 
 export type ConfirmationKind =
   | "paid" // Mobile Money payé (statut confirmé ou plus loin)
@@ -25,7 +29,17 @@ export function getConfirmationState(order: {
   modePaiement: PaymentMode;
   paymentProvider: string | null;
   paymentUrl: string | null;
+  cancelReason?: string | null;
 }): ConfirmationState {
+  if (order.statut === "annulee" && order.cancelReason === PAYMENT_TIMEOUT_REASON) {
+    return {
+      kind: "cancelled",
+      title: "Délai de paiement dépassé",
+      message: `Le paiement Mobile Money n’a pas été reçu dans les ${MOBILE_MONEY_RESERVATION_MINUTES} minutes : la commande a été annulée et les articles remis en vente. Tu peux repasser commande. Si un montant a été débité, écris-nous sur WhatsApp avec ce numéro de commande.`,
+      canRetryPayment: false,
+    };
+  }
+
   if (order.statut === "annulee") {
     return {
       kind: "cancelled",
@@ -48,8 +62,7 @@ export function getConfirmationState(order: {
       return {
         kind: "payment_pending",
         title: "Paiement en attente",
-        message:
-          "Ta commande est enregistrée, mais nous n’avons pas encore reçu la confirmation du paiement Mobile Money. Si tu viens de valider sur ton téléphone, actualise dans quelques instants.",
+        message: `Ta commande est enregistrée, mais nous n’avons pas encore reçu la confirmation du paiement Mobile Money. Si tu viens de valider sur ton téléphone, actualise dans quelques instants. Sans paiement sous ${MOBILE_MONEY_RESERVATION_MINUTES} minutes, la commande est annulée.`,
         canRetryPayment,
       };
     }

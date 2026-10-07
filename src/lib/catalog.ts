@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { DEMO_PRODUCTS, filterDemoProducts } from "@/lib/demo-data";
 import { allowDemoCatalog } from "@/lib/runtime-flags";
+import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import {
   CATEGORIE_SORT_ORDER,
   NICHES_BY_CATEGORIE,
@@ -88,6 +89,8 @@ export async function fetchProducts(filters?: {
   enStock?: boolean;
   sort?: "pertinence" | "nouveautes" | "prix_asc" | "prix_desc";
 }) {
+  // Stock des réservations expirées remis en vente (au plus 1×/min)
+  await maybeReleaseExpiredReservations();
   const query = filters?.q?.trim();
   const niche = filters?.niche?.trim();
   const sort = filters?.sort ?? "pertinence";
@@ -187,6 +190,7 @@ const PUBLIC_VENDOR_SELECT = {
 } as const;
 
 export async function fetchProductById(id: string) {
+  await maybeReleaseExpiredReservations();
   try {
     const product = await withTimeout(
       prisma.product.findUnique({
