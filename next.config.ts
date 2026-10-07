@@ -21,15 +21,21 @@ const withPWA = withPWAInit({
     disableDevLogs: true,
     skipWaiting: true,
     clientsClaim: true,
-    navigateFallbackDenylist: [/^\/api\//, /^\/admin/, /^\/auth\//],
+    navigateFallbackDenylist: [/^\/api\//, /^\/admin/, /^\/auth\//, /^\/vendeur\/espace/, /^\/compte/],
     runtimeCaching: [
       {
-        // Pages HTML — timeout court pour ressenti rapide sur 3G
+        // Pages HTML PUBLIQUES — timeout court pour ressenti rapide sur 3G.
+        // Jamais les pages privées (admin, espace vendeur, compte, commande) :
+        // elles resteraient lisibles hors ligne après déconnexion.
+        // (Fonction sérialisée dans sw.js : aucune variable extérieure.)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        urlPattern: ({ request }: any) => request?.mode === "navigate",
+        urlPattern: ({ request, url }: any) =>
+          request?.mode === "navigate" &&
+          !/^\/(admin|vendeur\/espace|compte|commande|auth)(\/|$)/.test(url?.pathname ?? ""),
         handler: "NetworkFirst",
         options: {
-          cacheName: "pages-shell",
+          // v2 : l'ancien cache (qui pouvait contenir des pages privées) est supprimé par worker/index.js
+          cacheName: "pages-shell-v2",
           networkTimeoutSeconds: 3,
           expiration: {
             maxEntries: 48,

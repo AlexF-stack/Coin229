@@ -4,6 +4,15 @@
  */
 /* eslint-disable no-undef */
 
+// Ancien cache de pages : pouvait contenir des pages privées (admin, espace
+// vendeur, compte). Supprimé à l'activation de la nouvelle version.
+const OBSOLETE_CACHES = ["pages-shell"];
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    Promise.all(OBSOLETE_CACHES.map((name) => caches.delete(name)))
+  );
+});
+
 self.addEventListener("push", (event) => {
   /** @type {{ title?: string; body?: string; url?: string; tag?: string }} */
   let data = {

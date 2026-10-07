@@ -116,7 +116,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P2-1 | ⬜ | Vulnérabilités npm (1 critique, 9 élevées) — mettre à jour `next`, `@supabase/*`, `sharp`… | `package.json` |
 | P2-2 | ✅ | Page d’accueil sans `<title>` — **corrigé** : `buildPageMetadata` renvoyait `title: undefined`, qui écrasait le titre par défaut du layout ; repli explicite sur « Coin229 — Toute une tenue. Les bons détails. ». Vérifié dans le HTML servi. | `src/lib/seo.ts` |
 | P2-3 | ⬜ | Pas de Content-Security-Policy ✅ | `next.config.ts` |
-| P2-4 | ⬜ | Pages `/admin` et `/vendeur/espace` mises en cache hors ligne par le service worker 🔎 | `next.config.ts` (`runtimeCaching`) |
+| P2-4 | ✅ | Pages `/admin` et `/vendeur/espace` mises en cache hors ligne par le service worker — **corrigé** : le cache des pages ne concerne plus que les pages publiques (jamais admin, espace vendeur, compte, commande, auth) ; nouveau nom `pages-shell-v2` et suppression de l’ancien cache (qui pouvait contenir des pages privées) à l’activation de la nouvelle version, y compris sur les téléphones déjà installés. Vérifié : build production + Edge (service worker réel) : public en cache, aucune page privée, ancien cache supprimé. | `next.config.ts`, `worker/index.js` |
 | P2-5 | ✅ | Actions produit sans validation serveur (prix négatif / décimal → erreur 500, URL d’image libre qui casse `next/image`) — **corrigé** : schéma partagé `product-schema.ts` (vendeur + admin) : nom 2–120, description ≤ 4 000, prix entier 100 – 50 000 000 FCFA, promo < prix, stock 0 – 100 000, 1 à 8 images **uniquement** de sources autorisées (fichiers du site, Supabase, Unsplash = `remotePatterns`) ; même contrôle pour le logo vendeur ; messages FR affichés dans les formulaires. Vérifié : 13 tests + les 33 produits existants restent valides. | `product-schema.ts` (nouveau), `vendor-actions.ts`, `actions.ts`, `vendor-profile-form.tsx` |
 | P2-6 | ⬜ | Webhooks paiement : format de signature Fedapay à valider, paiements échoués non traités, mode de paiement non contrôlé 🔎 | `src/lib/payment-confirm.ts`, `api/payments/*` |
 | P2-7 | ⬜ | Sessions non révocables ; reset mot de passe n'invalide pas les sessions 🔎 | `admin-auth.ts`, `vendor-auth.ts` |
@@ -228,4 +228,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P2-13 | `696e5d6` | Adresses de boutique réservées et sans conflit |
 | 08/10/2026 | P2-9 | `8a9e644` | Annulations atomiques ; réactivation vendeur sans republier les produits retirés volontairement |
 | 08/10/2026 | P2-8 | `eb02f62` | Frais de livraison : source unique |
-| 08/10/2026 | P2-5 | voir `git log` | Validation serveur des produits et des images |
+| 08/10/2026 | P2-5 | `be7176c` | Validation serveur des produits et des images |
+| 08/10/2026 | P2-4 | voir `git log` | Mode hors ligne : plus aucune page privée en cache |
