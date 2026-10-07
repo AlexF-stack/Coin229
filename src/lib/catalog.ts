@@ -141,7 +141,8 @@ export async function fetchProducts(filters?: {
     };
   }
 
-  return { products: [], source: "db" as const };
+  // Base injoignable en production : ne pas faire passer ça pour « aucun résultat »
+  return { products: [], source: "unavailable" as const };
 }
 
 export function applyCatalogSort<
@@ -203,7 +204,7 @@ export async function fetchProductById(id: string) {
   }
 
   if (!allowDemoCatalog()) {
-    return { product: null, source: "db" as const };
+    return { product: null, source: "unavailable" as const };
   }
 
   const demo = DEMO_PRODUCTS.find((p) => p.id === id);

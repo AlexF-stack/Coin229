@@ -18,7 +18,7 @@
 |---|---|
 | Audit | ✅ |
 | Corrections P0 | ✅ (5/5) |
-| Corrections P1 | 🔄 (5/16) |
+| Corrections P1 | 🔄 (6/16) |
 | Corrections P2 | ⬜ |
 | QA complète | ⬜ |
 | Build production | ⬜ |
@@ -96,7 +96,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P1-2 | ⬜ | Stock bloqué indéfiniment par les commandes non payées ; création de commandes sans limite de débit ✅ | `src/lib/actions.ts` (`createOrder`) | Rate limit IP + téléphone ; cron d'annulation des commandes non payées avec restitution du stock |
 | P1-3 | ⬜ | Le vendeur peut fixer n'importe quel statut de commande (impayée → livrée → reversement) 🔎 | `src/lib/vendor-actions.ts` (`updateMyOrderStatus`) | Machine à états + statut de paiement séparé ; interdire de quitter `annulee` |
 | P1-4 | ⬜ | Reversements : montant affiché ≠ montant enregistré ; double reversement possible 🔎 | `src/lib/actions.ts` (`listAdminPayoutData`, `createVendorPayout`) | Filtre partagé (livrée / payée) ; `payoutId: null` vérifié dans la transaction |
-| P1-5 | ⬜ | Aucun `error.tsx` / `global-error.tsx` / `loading.tsx` ; erreur checkout = écran brut ✅ | `src/app` | Ajouter les boundaries + try/catch dans `createOrder` et le formulaire |
+| P1-5 | ✅ | Aucun `error.tsx` / `global-error.tsx` / `loading.tsx` ; erreur checkout = écran brut ; base injoignable affichée comme « Page introuvable » / « Aucun accessoire » | `src/app/error.tsx`, `global-error.tsx`, `loading.tsx` (boutique, produit, vendeur, confirmation, paiement), `page-skeleton.tsx`, `actions.ts` (`createOrder`), `checkout-form.tsx`, `catalog.ts`, `boutique`, `produit/[id]`, `vendeur/[slug]` | **Corrigé** : page « Oups, un souci technique » (Réessayer, Boutique, WhatsApp, référence) marquée `noindex` ; page de dernier recours ; squelettes de chargement ; `createOrder` ne lève plus jamais d'exception (message lisible) et le formulaire gère la coupure réseau (formulaire conservé) ; base injoignable → page d'erreur au lieu d'un faux 404 / « aucun résultat ». Vérifié (build production + Edge) : réseau coupé à l'envoi → « Connexion impossible », formulaire rempli ; Postgres arrêté → 3 pages en « souci technique » + `noindex` ; retour automatique à la normale au redémarrage ; build OK sans base. Compromis noté : avec `loading.tsx` (streaming), le statut HTTP reste 200 sur erreur / 404 — compensé par `noindex`. |
 | P1-6 | ⬜ | Identifiants vendeurs présents dans l'historique Git d'un dépôt public 🔎 | historique Git | Changer les mots de passe concernés ; purger l'historique si nécessaire |
 | P1-7 | ⬜ | Rate limiting en mémoire → inefficace sur Vercel (login admin, OTP, login vendeur, chat) 🔎 | `src/lib/rate-limit.ts` | `rateLimitAsync` (base) partout, upsert atomique |
 | P1-8 | ✅ | « Acheter maintenant » pouvait commander le panier d'un autre vendeur ; pas de choix de zone au checkout (Cotonou forcé) | `cart-store.ts`, `product-purchase-bar.tsx`, `add-to-cart-button.tsx`, `checkout-form.tsx` | **Corrigé** : `addItem` / nouveau `buyNow` renvoient un résultat (`added` / `other_vendor` / `out_of_stock`) ; « Acheter maintenant » ne navigue que si l'ajout a réussi (sinon message + lien panier), fixe la quantité exacte (plus de cumul) ; « Ajouté » seulement si ajouté, plus de ligne à quantité 0 ; checkout sans repli sur tout le panier (état vide avec liens) ; sélecteur de zone au checkout. Vérifié en navigateur : autre boutique → reste sur la page + message ; 2 clics → quantité 1 ; zone Porto-Novo → total 20 500 et commande enregistrée `porto_novo` / 1 500 FCFA. |
@@ -149,7 +149,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P3-12 | ⬜ | Messagerie : doublons du message auto « Contacter », notification au vendeur |
 | P3-13 | ⬜ | Énumération des comptes vendeurs (inscription 409, timing login) ; secret `ops/notify` en query string |
 | P3-14 | ⬜ | En dev (PWA désactivée), la carte notifications reste bloquée sur « Notifications… » (`serviceWorker.ready` ne se résout jamais) — sans impact en production |
-| P3-15 | ✅ | En dev, le navigateur gardait d'anciens fichiers JS (en-tête `immutable` d'un an appliqué aussi en dev, noms de fichiers inchangés) → modifications invisibles. Corrigé : en-tête limité à la production (`next.config.ts`). À revérifier au prochain build production. |
+| P3-15 | ✅ | En dev, le navigateur gardait d'anciens fichiers JS (en-tête `immutable` d'un an appliqué aussi en dev, noms de fichiers inchangés) → modifications invisibles. Corrigé : en-tête limité à la production (`next.config.ts`). Revérifié au build production du 07/10 : `immutable` toujours actif en production, `no-store` en dev. |
 
 ---
 
@@ -205,4 +205,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 06/10/2026 | P3-15 | `4b3d5dc` | Cache `immutable` de `/_next/static` limité à la production (servait du vieux code en dev) |
 | 07/10/2026 | P1-9 | `70ba11e` | Panier revalidé (prix, stock, disponibilité) + total vérifié côté serveur avant commande |
 | 07/10/2026 | P1-10 | `beb5fb6` | Quantité plafonnée à 20 partout + messages de commande en français |
-| 07/10/2026 | P1-11 | voir `git log` | Plus de panier vide affiché après commande ; KkiaPay réessayable, sans impasse |
+| 07/10/2026 | P1-11 | `c21891e` | Plus de panier vide affiché après commande ; KkiaPay réessayable, sans impasse |
+| 07/10/2026 | P1-5 | voir `git log` | Pages d'erreur et de chargement ; checkout sans écran brut ; base injoignable ≠ faux 404 |

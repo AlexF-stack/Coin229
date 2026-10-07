@@ -95,7 +95,9 @@ function AccordionItem({
 
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
-  const { product } = await fetchProductById(id);
+  const { product, source } = await fetchProductById(id);
+  // Base injoignable : erreur temporaire (500), pas un faux « introuvable » (404)
+  if (source === "unavailable") throw new Error("CATALOG_UNAVAILABLE");
   if (!product) notFound();
 
   const discount = getDiscountPercent(product.prix, product.prixPromo);

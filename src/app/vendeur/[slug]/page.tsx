@@ -48,12 +48,8 @@ export const dynamic = "force-dynamic";
 
 export default async function VendorStorefrontPage({ params }: Props) {
   const { slug } = await params;
-  let vendor: Awaited<ReturnType<typeof getStore>> = null;
-  try {
-    vendor = await getStore(slug);
-  } catch {
-    notFound();
-  }
+  // Erreur base → page d'erreur temporaire (500) ; boutique absente → 404
+  const vendor = await getStore(slug);
   if (!vendor) notFound();
 
   const products = sortForCatalog(vendor.products);

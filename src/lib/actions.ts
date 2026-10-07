@@ -70,7 +70,24 @@ type CheckoutItem = {
   quantite: number;
 };
 
-export async function createOrder(input: {
+/**
+ * Point d'entrée du checkout : ne lève jamais d'exception vers le client
+ * (sinon écran d'erreur brut) — toute erreur inattendue devient un message lisible.
+ */
+export async function createOrder(input: Parameters<typeof createOrderUnsafe>[0]) {
+  try {
+    return await createOrderUnsafe(input);
+  } catch (err) {
+    console.error("[createOrder]", err);
+    return {
+      success: false as const,
+      error:
+        "Une erreur technique a empêché la validation de ta commande. Réessaie dans un instant ; si le problème continue, écris-nous sur WhatsApp.",
+    };
+  }
+}
+
+async function createOrderUnsafe(input: {
   nom: string;
   telephone: string;
   adresse: string;

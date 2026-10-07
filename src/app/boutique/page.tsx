@@ -73,7 +73,7 @@ export default async function BoutiquePage({
   ) as "pertinence" | "nouveautes" | "prix_asc" | "prix_desc";
   const enStock = params.enStock === "1";
 
-  const [{ products }, niches] = await Promise.all([
+  const [{ products, source }, niches] = await Promise.all([
     fetchProducts({
       q: q || undefined,
       categorie,
@@ -84,6 +84,8 @@ export default async function BoutiquePage({
     }),
     fetchActiveNiches(24, categorie),
   ]);
+  // Base injoignable : page d'erreur temporaire, pas un faux « aucun résultat »
+  if (source === "unavailable") throw new Error("CATALOG_UNAVAILABLE");
 
   const heading = niche
     ? nicheLabel(niche) || niche

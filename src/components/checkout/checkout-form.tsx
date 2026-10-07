@@ -149,18 +149,27 @@ export function CheckoutForm() {
     );
 
     startTransition(async () => {
-      const result = await createOrder({
-        nom: nom.trim(),
-        telephone: normalized,
-        adresse: adresse.trim(),
-        zone,
-        modePaiement: mode,
-        items: items.map((i) => ({
-          productId: i.productId,
-          quantite: i.quantite,
-        })),
-        expectedTotal: total,
-      });
+      let result: Awaited<ReturnType<typeof createOrder>>;
+      try {
+        result = await createOrder({
+          nom: nom.trim(),
+          telephone: normalized,
+          adresse: adresse.trim(),
+          zone,
+          modePaiement: mode,
+          items: items.map((i) => ({
+            productId: i.productId,
+            quantite: i.quantite,
+          })),
+          expectedTotal: total,
+        });
+      } catch {
+        // Réseau coupé / serveur injoignable : le formulaire reste rempli
+        setError(
+          "Connexion impossible. Vérifie ta connexion internet puis réessaie : ta commande n’a pas encore été envoyée."
+        );
+        return;
+      }
 
       if (!result.success) {
         setError(result.error);
