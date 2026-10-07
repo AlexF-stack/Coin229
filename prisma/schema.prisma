@@ -100,6 +100,9 @@ model Product {
   source         ProductSource @default(local)
   images         String[]
   statut         ProductStatus @default(actif)
+  /// Archivé à cause du statut du vendeur (en attente / suspendu), à remettre en vente à l'activation.
+  /// Faux pour un produit retiré volontairement par le vendeur.
+  heldByModeration Boolean     @default(false) @map("held_by_moderation")
   dateCreation   DateTime      @default(now()) @map("date_creation")
   vendor         Vendor        @relation(fields: [vendorId], references: [id])
   orderItems     OrderItem[]

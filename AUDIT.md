@@ -121,7 +121,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P2-6 | ⬜ | Webhooks paiement : format de signature Fedapay à valider, paiements échoués non traités, mode de paiement non contrôlé 🔎 | `src/lib/payment-confirm.ts`, `api/payments/*` |
 | P2-7 | ⬜ | Sessions non révocables ; reset mot de passe n'invalide pas les sessions 🔎 | `admin-auth.ts`, `vendor-auth.ts` |
 | P2-8 | ⬜ | Frais de livraison dupliqués serveur / `NEXT_PUBLIC_*` → écart possible affiché / facturé 🔎 | `src/lib/shipping.ts` |
-| P2-9 | 🔄 | Annulation non transactionnelle ; produit archivé réactivé à tort 🔎 — **corrigé pour vendeur / admin / expiration** (P1-3, P1-2) ; reste l'annulation après échec de paiement dans `createOrder` | `actions.ts` |
+| P2-9 | ✅ | Annulations non transactionnelles ; produits archivés remis en vente à tort — **corrigé** : vendeur / admin / expiration déjà traités (P1-3, P1-2) ; l’annulation après échec de paiement dans `createOrder` est maintenant une transaction (+ `cancelReason = payment_failed`) qui ne réactive que les produits en rupture ; nouveau marqueur `heldByModeration` : à la réactivation d’un vendeur, seuls les produits retenus par la modération (inscription en attente / suspension) reviennent en vente — un produit retiré par le vendeur lui-même reste retiré (migration `20261008_product_held_by_moderation`, avec reprise de l’existant). Vérifié : test Edge suspension → réactivation (4 contrôles). | `actions.ts`, `vendor-actions.ts`, schéma |
 | P2-10 | ✅ | Favoris affichaient des produits retirés / de vendeurs suspendus — **corrigé** : `fetchProductsByIds` applique les mêmes règles que le catalogue (en vente ou rupture, vendeur actif). Vérifié : 3 tests. | `catalog.ts` (`fetchProductsByIds`) |
 | P2-11 | ⬜ | Client Google/Facebook ne voit pas ses commandes ; `?next=` ignoré après connexion 🔎 | `actions.ts`, `order-access.ts`, `compte` |
 | P2-12 | ✅ | Finances vendeur calculées sur 50 commandes max, impayées incluses — **corrigé avec P1-4** : totaux sur toutes les commandes vendues (hors impayées / annulées), « à reverser » = même règle que l'admin, montant « en cours » affiché ; tableau de bord « Ventes » hors livraison, texte « reversé hors app » obsolète retiré | `vendor-actions.ts`, `payouts.ts` |
@@ -189,6 +189,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 - [ ] Migration `20261006_bj_phone_10_digits` : appliquée automatiquement au build Vercel (`prisma migrate deploy`). Faire une **sauvegarde de la base** avant le déploiement (elle réécrit les numéros des clients et commandes). (P0-3)
 - [ ] Tester un paiement Fedapay sandbox avec un numéro 10 chiffres. (P0-3 / P2-6)
 - [ ] **Vercel → `CRON_SECRET`** : définir un secret (≥ 16 car., même commande de génération). Sans lui la tâche planifiée répond 503 ; la libération du stock continue quand même au fil des commandes / consultations. La tâche Vercel (plan Hobby) ne tourne qu'une fois par jour : c'est un filet, pas le mécanisme principal. (P1-2)
+- [ ] Migration `20261008_product_held_by_moderation` : appliquée au build ; les produits archivés des vendeurs en attente / suspendus sont marqués « retenus par la modération ». (P2-9)
 - [ ] Migration `20261007_order_reservation_expiry` : appliquée au build. Au premier passage, les anciennes commandes Mobile Money non payées de plus de 30 min seront annulées et leur stock rendu — vérifier la liste avant (Admin → Commandes). (P1-2)
 - [ ] Les commandes avec `refundStatus = pending` (paiement reçu après expiration, plus de stock) doivent être remboursées à la main en attendant l'écran admin (P1-13). (P1-2)
 - [ ] Migration `20261006_push_roles` : les abonnements push existants deviennent « client ». **Après déploiement, l'admin et chaque vendeur doivent réactiver leurs alertes** (Admin → Notifications, Espace vendeur → Tableau de bord). Tester la réception sur un vrai téléphone. (P0-4)
@@ -223,4 +224,5 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P2-15 | `b562094` | Montants toujours lisibles (« 21 000 FCFA ») |
 | 08/10/2026 | P2-14 | `4cf393f` | Mobile : plus rien ne masque les boutons d’achat ; assistant en français |
 | 08/10/2026 | P2-10 | `4b127ef` | Favoris filtrés comme le catalogue |
-| 08/10/2026 | P2-13 | voir `git log` | Adresses de boutique réservées et sans conflit |
+| 08/10/2026 | P2-13 | `696e5d6` | Adresses de boutique réservées et sans conflit |
+| 08/10/2026 | P2-9 | voir `git log` | Annulations atomiques ; réactivation vendeur sans republier les produits retirés volontairement |

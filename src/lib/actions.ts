@@ -354,19 +354,25 @@ async function createOrderUnsafe(input: {
   });
 
   if (!payment.success) {
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { statut: "annulee" },
-    });
-    for (const item of data.items) {
-      await prisma.product.update({
-        where: { id: item.productId },
-        data: {
-          stockQuantite: { increment: item.quantite },
-          statut: "actif",
-        },
+    // Annulation + stock rendu en une seule transaction ; produit remis en
+    // vente seulement s'il était en rupture (jamais un produit archivé)
+    await prisma.$transaction(async (tx) => {
+      const cancelled = await tx.order.updateMany({
+        where: { id: order.id, statut: "en_attente" },
+        data: { statut: "annulee", cancelReason: "payment_failed" },
       });
-    }
+      if (cancelled.count === 0) return;
+      for (const item of data.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stockQuantite: { increment: item.quantite } },
+        });
+        await tx.product.updateMany({
+          where: { id: item.productId, statut: "rupture", stockQuantite: { gt: 0 } },
+          data: { statut: "actif" },
+        });
+      }
+    });
     return { success: false as const, error: payment.message };
   }
 
@@ -1027,19 +1033,23 @@ export async function setVendorStatus(
 
   // Activation : publier les produits préparés (archive → actif si stock)
   if (statut === "actif") {
-    await prisma.product.updateMany({
-      where: {
-        vendorId,
-        statut: "archive",
-        stockQuantite: { gt: 0 },
-      },
-      data: { statut: "actif" },
-    });
+    // Uniquement les produits retenus par la modération : un produit que le
+    // vendeur avait retiré lui-même reste retiré
+    await prisma.$transaction([
+      prisma.product.updateMany({
+        where: { vendorId, heldByModeration: true, stockQuantite: { gt: 0 } },
+        data: { statut: "actif", heldByModeration: false },
+      }),
+      prisma.product.updateMany({
+        where: { vendorId, heldByModeration: true },
+        data: { statut: "rupture", heldByModeration: false },
+      }),
+    ]);
   }
   if (statut === "suspendu") {
     await prisma.product.updateMany({
       where: { vendorId, statut: "actif" },
-      data: { statut: "archive" },
+      data: { statut: "archive", heldByModeration: true },
     });
   }
 

@@ -140,7 +140,10 @@ export async function upsertVendorProduct(data: {
   // Compte non actif : produits en archive (modération à l’activation)
   let statut: ProductStatus =
     data.stockQuantite <= 0 ? "rupture" : data.statut;
-  if (vendorStatut === "en_attente" && statut === "actif") {
+  // Marqué « retenu par la modération » : remis en vente à l'activation du
+  // vendeur (contrairement à un produit qu'il archive lui-même)
+  const heldByModeration = vendorStatut === "en_attente" && statut === "actif";
+  if (heldByModeration) {
     statut = "archive";
   }
 
@@ -173,6 +176,7 @@ export async function upsertVendorProduct(data: {
         source: data.source ?? "local",
         images,
         statut,
+        heldByModeration,
       },
     });
   } else {
@@ -190,6 +194,7 @@ export async function upsertVendorProduct(data: {
         source: data.source ?? "local",
         images,
         statut,
+        heldByModeration,
       },
     });
   }
