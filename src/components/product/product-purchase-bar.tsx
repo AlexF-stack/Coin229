@@ -65,7 +65,7 @@ export function ProductPurchaseBar({ product }: Props) {
           <QuantitySelector value={qty} max={max} onChange={setQty} />
         </div>
         <div className="hidden md:block">
-          <AddToCartButton product={product} quantity={qty} variant="secondary" />
+          <AddToCartButton product={product} quantity={qty} variant="secondary" onBlocked={setBlocked} />
         </div>
         <button
           type="button"
@@ -84,6 +84,7 @@ export function ProductPurchaseBar({ product }: Props) {
             quantity={qty}
             variant="secondary"
             className="flex-1"
+            onBlocked={setBlocked}
           />
           <button
             type="button"
