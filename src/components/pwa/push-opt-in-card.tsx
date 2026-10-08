@@ -12,6 +12,22 @@ function urlBase64ToUint8Array(base64String: string) {
   return out;
 }
 
+/**
+ * Service worker de l'appli, ou null s'il n'y en a pas (dev sans PWA,
+ * navigation privée…). navigator.serviceWorker.ready seul attend sans fin.
+ */
+async function getWorker(timeoutMs: number): Promise<ServiceWorkerRegistration | null> {
+  const reg = await navigator.serviceWorker.getRegistration();
+  if (reg?.active) return reg;
+  // Première visite : il s'installe, on lui laisse un peu de temps
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+  ]);
+}
+
+const NO_WORKER = "Notifications indisponibles sur cette page — recharge-la, ou ouvre l’app installée.";
+
 type Status = "loading" | "unsupported" | "denied" | "off" | "on" | "disabled";
 
 export type PushOptInAudience = "client" | "admin" | "vendor";
@@ -74,7 +90,15 @@ export function PushOptInCard({
       }
 
       try {
-        const reg = await navigator.serviceWorker.ready;
+        let reg = await navigator.serviceWorker.getRegistration();
+        if (!reg?.active) {
+          // Pas encore de service worker actif (1re visite) ou aucun (dev sans
+          // PWA) : carte masquée plutôt qu'un chargement sans fin, affichée
+          // dès qu'il est prêt
+          if (!cancelled) setStatus("unsupported");
+          reg = await navigator.serviceWorker.ready;
+          if (cancelled) return;
+        }
         const sub = await reg.pushManager.getSubscription();
         if (!sub) {
           if (!cancelled) setStatus("off");
@@ -112,7 +136,11 @@ export function PushOptInCard({
         return;
       }
 
-      const reg = await navigator.serviceWorker.ready;
+      const reg = await getWorker(10000);
+      if (!reg) {
+        setError(NO_WORKER);
+        return;
+      }
       let sub = await reg.pushManager.getSubscription();
       if (!sub) {
         sub = await reg.pushManager.subscribe({
@@ -144,7 +172,11 @@ export function PushOptInCard({
     setBusy(true);
     setError(null);
     try {
-      const reg = await navigator.serviceWorker.ready;
+      const reg = await getWorker(10000);
+      if (!reg) {
+        setError(NO_WORKER);
+        return;
+      }
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
         // Retire seulement ce public : l'appareil peut rester abonné aux autres
