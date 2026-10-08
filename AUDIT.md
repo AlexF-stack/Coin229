@@ -195,6 +195,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 - [ ] Migration `20261007_order_reservation_expiry` : appliquée au build. Au premier passage, les anciennes commandes Mobile Money non payées de plus de 30 min seront annulées et leur stock rendu — vérifier la liste avant (Admin → Commandes). (P1-2)
 - [ ] Les commandes avec `refundStatus = pending` (paiement reçu après expiration, plus de stock) se remboursent à la main, puis bouton « Marquer remboursé » dans Admin → Commandes. (P1-2, P3-9)
 - [ ] Migration `20261006_push_roles` : les abonnements push existants deviennent « client ». **Après déploiement, l'admin et chaque vendeur doivent réactiver leurs alertes** (Admin → Notifications, Espace vendeur → Tableau de bord). Tester la réception sur un vrai téléphone. (P0-4)
+- [ ] **Connexion email + mot de passe** : migration `20261008_client_email_password` appliquée au build. Optionnel : définir `ADMIN_EMAIL` sur Vercel pour que l’admin puisse se connecter depuis `/compte` (avec `ADMIN_PASSWORD`) ; sinon il garde `/admin/login`.
 - [ ] **Webhook ops** (seulement si `ORDER_NOTIFY_WEBHOOK` est utilisé) : retirer tout `?key=` / `?secret=` de l’URL ; si le webhook est `…/api/ops/notify` du site, définir `NOTIFY_HOOK_SECRET` (le site l’envoie lui-même en en-tête). Un service tiers (Make, n8n) doit l’envoyer dans l’en-tête `x-notify-secret`. (P3-13)
 
 ## Journal des corrections
@@ -253,3 +254,4 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P3-12 | voir `git log` | Messagerie : plus de message auto en double, notifications vendeur / client, anti-spam |
 | 08/10/2026 | P3-13 | voir `git log` | Connexion vendeur à durée constante, secret du webhook ops hors URL |
 | 08/10/2026 | P3-14 | voir `git log` | Carte notifications : plus de chargement sans fin |
+| 08/10/2026 | — | voir `git log` | Connexion email + mot de passe sur /compte (rôle reconnu : client, vendeur, admin), création de compte client par email, « Devenir vendeur » visible (en-tête, accueil, page de connexion) |

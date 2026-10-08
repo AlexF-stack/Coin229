@@ -7,6 +7,7 @@ import { ProductRail } from "@/components/home/product-rail";
 import { EditorialBlock } from "@/components/home/editorial-block";
 import { WhyCoin229 } from "@/components/home/why-coin229";
 import { HomeClosingCta } from "@/components/home/home-closing-cta";
+import { SellOnCoin229 } from "@/components/home/sell-on-coin229";
 import { StickyShopCta } from "@/components/home/sticky-shop-cta";
 import { Reveal } from "@/components/motion/reveal";
 import { fetchProducts } from "@/lib/catalog";
@@ -135,6 +136,10 @@ export default async function HomePage() {
 
       <Reveal>
         <WhyCoin229 />
+      </Reveal>
+
+      <Reveal>
+        <SellOnCoin229 />
       </Reveal>
 
       <Reveal>

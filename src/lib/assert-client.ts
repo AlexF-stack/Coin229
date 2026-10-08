@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { currentEmailClientId } from "@/lib/client-session";
 import {
   phoneCookieName,
   readPhoneFromToken,
@@ -14,6 +15,13 @@ export async function requireClient(): Promise<{
   clientId: string;
   nom: string;
 }> {
+  // Compte email + mot de passe
+  const emailClientId = await currentEmailClientId();
+  if (emailClientId) {
+    const client = await prisma.client.findUnique({ where: { id: emailClientId }, select: { id: true, nom: true } });
+    if (client) return { clientId: client.id, nom: client.nom };
+  }
+
   const jar = await cookies();
   const phone = await readPhoneFromToken(jar.get(phoneCookieName())?.value);
   if (phone) {

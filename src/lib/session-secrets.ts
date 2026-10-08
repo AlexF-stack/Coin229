@@ -11,7 +11,7 @@
  * Hors production : repli sur les autres secrets pour simplifier le dev local.
  */
 
-export type SessionKind = "admin" | "vendor" | "phone" | "order";
+export type SessionKind = "admin" | "vendor" | "phone" | "order" | "client";
 
 const MIN_LENGTH = 16;
 
@@ -30,6 +30,8 @@ const ENV_BY_KIND: Record<SessionKind, string> = {
   vendor: "VENDOR_SESSION_SECRET",
   phone: "PHONE_SESSION_SECRET",
   order: "PHONE_SESSION_SECRET",
+  // Session client email + mot de passe (type distinct dans la signature)
+  client: "PHONE_SESSION_SECRET",
 };
 
 function readEnv(name: string): string | null {

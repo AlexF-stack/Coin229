@@ -8,11 +8,13 @@ import {
   Menu,
   Search,
   ShoppingBag,
+  Store,
   User,
   X,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { cn } from "@/lib/utils";
+import { buttonClasses } from "@/components/ui/button";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 
@@ -176,6 +178,11 @@ function HeaderInner() {
           >
             <User className="h-5 w-5 stroke-[1.5]" />
           </Link>
+          {/* Toujours visible sur ordinateur : accès direct à la création de compte vendeur */}
+          <Link href="/vendeur/inscription" className={buttonClasses({ size: "sm", variant: "outline", className: "ml-2 hidden md:inline-flex" })}>
+            <Store className="h-4 w-4" />
+            Devenir vendeur
+          </Link>
         </div>
       </div>
 
@@ -243,7 +250,7 @@ function HeaderInner() {
                 href="/vendeur/inscription"
                 className="block rounded-control px-3 py-2.5 text-sm font-medium text-primary hover:bg-background"
               >
-                Vendre sur Coin229
+                Devenir vendeur
               </Link>
             </li>
             <li>

@@ -47,7 +47,7 @@ export function SiteFooter() {
             </li>
             <li>
               <Link href="/vendeur/inscription" className="hover:text-white">
-                Vendre sur Coin229
+                Devenir vendeur
               </Link>
             </li>
             <li>

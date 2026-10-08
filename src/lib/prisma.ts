@@ -10,6 +10,9 @@ function createPrismaClient() {
   return new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
     omit: {
+      client: {
+        passwordHash: true,
+      },
       vendor: {
         passwordHash: true,
         resetTokenHash: true,

@@ -16,6 +16,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { PhoneAuthForm } from "./phone-auth-form";
+import { EmailAuthForm } from "./email-auth-form";
 import { SocialAuthButtons } from "./social-auth-buttons";
 import { getAccountSession, getMyOrders } from "@/lib/actions";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -94,7 +95,10 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
   }, [identity]);
 
   async function logout() {
-    await fetch("/api/auth/phone-session", { method: "DELETE" });
+    await Promise.all([
+      fetch("/api/auth/phone-session", { method: "DELETE" }),
+      fetch("/api/auth/login", { method: "DELETE" }),
+    ]);
     if (isSupabaseConfigured()) {
       try {
         const supabase = createClient();
@@ -136,16 +140,36 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
               Connexion
             </h1>
             <p className="mt-2 text-sm text-muted">
-              Google, Facebook ou numéro SMS — à toi de choisir.
+              Email, Google, Facebook ou SMS — clients et marques, même formulaire.
             </p>
           </div>
         </div>
 
         <div className="mx-auto max-w-md space-y-6 px-4 md:px-0">
           <div className="space-y-5 rounded-card border border-border bg-surface p-5 shadow-card md:p-6">
+            <EmailAuthForm next={next} />
             <SocialAuthButtons next={next} />
-            <PhoneAuthForm onAuthenticated={onPhoneAuth} />
+            <details className="group rounded-control border border-border">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-sm font-medium text-fg-secondary hover:text-fg">
+                Recevoir un code par SMS
+                <span className="text-xs text-muted group-open:hidden">Afficher</span>
+              </summary>
+              <div className="border-t border-border p-3">
+                <PhoneAuthForm onAuthenticated={onPhoneAuth} />
+              </div>
+            </details>
           </div>
+
+          <Link
+            href="/vendeur/inscription"
+            className="flex items-center justify-between gap-3 rounded-card bg-surface-inverse px-5 py-4 text-inverse shadow-card transition hover:bg-primary-hover"
+          >
+            <span>
+              <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-accent">Tu es une marque ?</span>
+              <span className="mt-0.5 block font-display text-base font-semibold">Devenir vendeur sur Coin229</span>
+            </span>
+            <ChevronRight className="h-5 w-5 shrink-0 text-accent" />
+          </Link>
 
           <ul className="grid gap-3">
             {BENEFITS.map(({ icon: Icon, title, text }) => (
@@ -217,7 +241,9 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
         ? "Facebook"
         : identity.provider === "phone"
           ? "SMS"
-          : "Compte";
+          : identity.provider === "email"
+            ? "email"
+            : "Compte";
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pb-10 pt-5 md:px-0 md:pt-8">

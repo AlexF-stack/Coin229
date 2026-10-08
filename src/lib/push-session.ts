@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { currentEmailClientId } from "@/lib/client-session";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import {
@@ -11,6 +12,9 @@ import {
 /** Résout le Client connecté (téléphone ou OAuth) pour lier un abonnement push. */
 export async function resolveSessionClientId(): Promise<string | null> {
   try {
+    const emailClientId = await currentEmailClientId();
+    if (emailClientId) return emailClientId;
+
     const jar = await cookies();
     const phone = await readPhoneFromToken(jar.get(phoneCookieName())?.value);
     if (phone) {

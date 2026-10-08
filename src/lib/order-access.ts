@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { currentEmailClientId } from "@/lib/client-session";
 import {
   normalizeBjPhone,
   phoneCookieName,
@@ -31,6 +32,9 @@ export async function canAccessOrder(orderId: string): Promise<boolean> {
     select: { id: true, telephone: true, clientId: true },
   });
   if (!order) return false;
+
+  const emailClientId = await currentEmailClientId();
+  if (emailClientId && order.clientId === emailClientId) return true;
 
   const sessionPhone = await readPhoneFromToken(
     jar.get(phoneCookieName())?.value

@@ -124,6 +124,10 @@ model Client {
   telephone          String?            @unique
   email              String?            @unique
   authId             String?            @unique @map("auth_id")
+  /// Connexion email + mot de passe (scrypt) — null si le client passe par SMS / Google / Facebook
+  passwordHash       String?            @map("password_hash")
+  /// Incrémenté à chaque changement de mot de passe : invalide les sessions email ouvertes
+  sessionVersion     Int                @default(0) @map("session_version")
   adresses           Address[]
   orders             Order[]
   pushSubscriptions  PushSubscription[]

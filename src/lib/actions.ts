@@ -6,6 +6,7 @@ import { z } from "zod";
 import { rateLimitAsync } from "@/lib/rate-limit";
 import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import { prisma } from "@/lib/prisma";
+import { currentEmailClientId } from "@/lib/client-session";
 import { formatPrice } from "@/lib/utils";
 import { changeOrderStatus } from "@/lib/order-status";
 import { parseProductInput } from "@/lib/product-schema";
@@ -406,6 +407,20 @@ async function createOrderUnsafe(input: {
 /** Compte connecté : session téléphone OU session Supabase (Google/Facebook). */
 export async function getMyOrders() {
   try {
+    const emailClientId = await currentEmailClientId();
+    if (emailClientId) {
+      return await prisma.client.findUnique({
+        where: { id: emailClientId },
+        include: {
+          orders: {
+            include: { items: { include: { product: true } } },
+            orderBy: { dateCreation: "desc" },
+          },
+          adresses: true,
+        },
+      });
+    }
+
     const jar = await cookies();
     const phone = await readPhoneFromToken(
       jar.get(phoneCookieName())?.value
@@ -456,6 +471,9 @@ export async function getMyOrders() {
 
 /** Fiche Client du compte Google / Facebook connecté, sinon null */
 async function currentOAuthClientId(): Promise<string | null> {
+  // Compte email + mot de passe en priorité
+  const emailClientId = await currentEmailClientId();
+  if (emailClientId) return emailClientId;
   if (!isSupabaseConfigured()) return null;
   try {
     const supabase = await createClient();
@@ -529,9 +547,15 @@ export async function ensureOAuthClient() {
 /** Session affichée côté client (téléphone ou OAuth). */
 export async function getAccountSession(): Promise<{
   label: string;
-  provider: "phone" | "google" | "facebook" | "oauth";
+  provider: "phone" | "google" | "facebook" | "oauth" | "email";
 } | null> {
   try {
+    const emailClientId = await currentEmailClientId();
+    if (emailClientId) {
+      const c = await prisma.client.findUnique({ where: { id: emailClientId }, select: { email: true, nom: true } });
+      if (c) return { label: c.email ?? c.nom, provider: "email" };
+    }
+
     const jar = await cookies();
     const phone = await readPhoneFromToken(
       jar.get(phoneCookieName())?.value
