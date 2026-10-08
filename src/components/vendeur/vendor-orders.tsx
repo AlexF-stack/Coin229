@@ -3,14 +3,17 @@
 import { useState, useTransition } from "react";
 import type { Order, OrderItem, Product, OrderStatus } from "@prisma/client";
 import { updateMyOrderStatus } from "@/lib/vendor-actions";
-import { ORDER_STATUS_LABELS } from "@/lib/constants";
 import {
   allowedNextStatuses,
   STATUS_ACTION_LABELS,
 } from "@/lib/order-status-rules";
 import { formatPrice } from "@/lib/utils";
 import { useConfirm } from "@/components/common/confirm-dialog";
-import { Download, Loader2 } from "lucide-react";
+import { Download, ShoppingCart } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge, StatusBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState, Spinner } from "@/components/ui/feedback";
 
 type OrderRow = Order & {
   items: (OrderItem & { product: Product })[];
@@ -86,9 +89,11 @@ export function VendorOrders({ orders }: Props) {
 
   if (orders.length === 0) {
     return (
-      <p className="rounded-xl border border-white/10 bg-[#1a1c24] px-4 py-10 text-center text-sm text-white/45">
-        Aucune commande pour ta marque.
-      </p>
+      <EmptyState
+        icon={<ShoppingCart />}
+        title="Aucune commande pour ta marque"
+        description="Les commandes de tes produits apparaîtront ici dès qu’un client achète."
+      />
     );
   }
 
@@ -97,74 +102,66 @@ export function VendorOrders({ orders }: Props) {
       {dialog}
       <div className="space-y-4">
         <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => exportCsv(orders)}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-white hover:bg-white/10"
-          >
-            <Download className="h-3.5 w-3.5" />
+          <Button size="sm" variant="outline" onClick={() => exportCsv(orders)}>
+            <Download className="h-4 w-4" />
             Exporter CSV
-          </button>
+          </Button>
         </div>
-        <ul className="space-y-3">
+        <ul className="grid gap-4 lg:grid-cols-2">
           {orders.map((o) => (
-            <li
-              key={o.id}
-              className="rounded-xl border border-white/10 bg-[#1a1c24] p-4"
-            >
+            <Card as="li" key={o.id} className="flex flex-col gap-3">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <p className="font-medium text-white">{o.nomClient}</p>
-                  <p className="text-xs text-white/45">
-                    {o.telephone} · {formatPrice(o.montantTotal)} · net{" "}
-                    {formatPrice(o.vendorNet)} ·{" "}
-                    {new Date(o.dateCreation).toLocaleDateString("fr-FR")}
+                <div className="min-w-0">
+                  <p className="font-medium text-fg">{o.nomClient}</p>
+                  <p className="text-xs text-muted">
+                    {o.telephone} · {new Date(o.dateCreation).toLocaleDateString("fr-FR")}
                   </p>
                 </div>
-                <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-white">
-                  {ORDER_STATUS_LABELS[o.statut]}
-                  {o.modePaiement === "mobile_money" ? " · Mobile Money" : " · à la livraison"}
-                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  <StatusBadge kind="order" status={o.statut} />
+                  <Badge tone="neutral">{o.modePaiement === "mobile_money" ? "Mobile Money" : "À la livraison"}</Badge>
+                </div>
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                {allowedNextStatuses(o, "vendor").map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    disabled={pending}
-                    onClick={() => setStatut(o.id, s)}
-                    className={
-                      s === "annulee"
-                        ? "rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-300 hover:bg-red-400/10 disabled:opacity-50"
-                        : "rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-[#0c0d12] hover:bg-amber-400 disabled:opacity-50"
-                    }
-                  >
-                    {STATUS_ACTION_LABELS[s]}
-                  </button>
-                ))}
-                {waitingNote(o) && (
-                  <span className="text-xs text-white/45">{waitingNote(o)}</span>
-                )}
-              </div>
-              {errors[o.id] && (
-                <p role="alert" className="mt-2 text-xs text-red-300">
-                  {errors[o.id]}
-                </p>
-              )}
-              <ul className="mt-3 space-y-1 text-sm text-white/70">
+
+              <ul className="space-y-1 rounded-control bg-surface-muted px-3 py-2 text-sm text-fg-secondary">
                 {o.items.map((it) => (
                   <li key={it.id}>
-                    {it.quantite}× {it.product.nom} —{" "}
-                    {formatPrice(it.prixUnitaireAuMomentCommande)}
+                    {it.quantite}× {it.product.nom} — {formatPrice(it.prixUnitaireAuMomentCommande)}
                   </li>
                 ))}
               </ul>
-              {pending && busyId === o.id && (
-                <p className="mt-2 flex items-center gap-1 text-xs text-amber-300">
-                  <Loader2 className="h-3 w-3 animate-spin" /> Mise à jour…
+
+              <p className="flex items-baseline justify-between text-sm">
+                <span className="font-display text-lg font-semibold text-fg">{formatPrice(o.montantTotal)}</span>
+                <span className="text-muted">
+                  Net pour toi : <span className="font-semibold text-fg">{formatPrice(o.vendorNet)}</span>
+                </span>
+              </p>
+
+              {(allowedNextStatuses(o, "vendor").length > 0 || waitingNote(o)) && (
+                <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+                  {allowedNextStatuses(o, "vendor").map((st) => (
+                    <Button
+                      key={st}
+                      size="sm"
+                      variant={st === "annulee" ? "outline" : "primary"}
+                      className={st === "annulee" ? "border-error/30 text-error hover:border-error hover:bg-error-soft" : undefined}
+                      disabled={pending}
+                      onClick={() => setStatut(o.id, st)}
+                    >
+                      {STATUS_ACTION_LABELS[st]}
+                    </Button>
+                  ))}
+                  {waitingNote(o) && <span className="text-xs text-muted">{waitingNote(o)}</span>}
+                </div>
+              )}
+              {errors[o.id] && (
+                <p role="alert" className="text-xs font-medium text-error">
+                  {errors[o.id]}
                 </p>
               )}
-            </li>
+              {pending && busyId === o.id && <Spinner label="Mise à jour…" className="text-xs" />}
+            </Card>
           ))}
         </ul>
       </div>

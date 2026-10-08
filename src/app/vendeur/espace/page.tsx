@@ -5,7 +5,10 @@ import { requireVendorPage } from "@/lib/require-vendor-page";
 import { getMyVendorStats } from "@/lib/vendor-actions";
 import { getVendorUnreadTotal } from "@/lib/messaging";
 import { formatPrice } from "@/lib/utils";
-import { Package, ShoppingCart, Megaphone, ArrowRight } from "lucide-react";
+import { Package, ShoppingCart, Megaphone, ArrowRight, TrendingUp } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatCard } from "@/components/ui/card";
+import { buttonClasses } from "@/components/ui/button";
 
 export const metadata = { title: "Espace vendeur" };
 export const dynamic = "force-dynamic";
@@ -54,97 +57,59 @@ export default async function VendorDashboardPage() {
       statut={session.statut}
       unreadMessages={unreadMessages}
     >
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">
-            Tableau de bord
-          </h1>
-          <p className="mt-1 text-sm text-white/45">
-            {session.nomBoutique}
-            {session.statut === "en_attente" &&
-              " — en attente de validation Coin229"}
-          </p>
-        </div>
+      <PageHeader
+        title="Tableau de bord"
+        description={`${session.nomBoutique}${session.statut === "en_attente" ? " — en attente de validation Coin229" : ""}`}
+      />
 
-        <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-300/90">
-            Prochaine étape
-          </p>
-          <p className="mt-1 text-lg font-semibold text-white">
-            {nextStep.title}
-          </p>
-          <p className="mt-1 text-sm text-white/55">{nextStep.body}</p>
-          <Link
-            href={nextStep.href}
-            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-[#0c0d12] hover:bg-amber-400"
-          >
+      <div className="space-y-6">
+        {/* Action principale du moment : seule zone en Deep Green + Gold */}
+        <section className="rounded-card bg-surface-inverse p-5 text-inverse shadow-card md:p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">Prochaine étape</p>
+          <p className="mt-1 font-display text-lg font-semibold text-inverse">{nextStep.title}</p>
+          <p className="mt-1 text-sm text-inverse/75">{nextStep.body}</p>
+          <Link href={nextStep.href} className={buttonClasses({ variant: "accent", className: "mt-4" })}>
             {nextStep.cta}
             <ArrowRight className="h-4 w-4" />
           </Link>
-        </div>
+        </section>
 
         <PushOptInCard audience="vendor" />
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-white/10 bg-[#1a1c24] p-4">
-            <div className="flex items-center gap-2 text-white/45">
-              <Package className="h-4 w-4" />
-              <span className="text-xs uppercase tracking-wide">Produits</span>
-            </div>
-            <p className="mt-2 text-3xl font-semibold text-white">
-              {stats.productCount}
-            </p>
-            {stats.stockBas > 0 && (
-              <p className="mt-1 text-xs text-amber-400">
-                {stats.stockBas} stock bas
-              </p>
-            )}
-          </div>
-          <div className="rounded-xl border border-white/10 bg-[#1a1c24] p-4">
-            <div className="flex items-center gap-2 text-white/45">
-              <ShoppingCart className="h-4 w-4" />
-              <span className="text-xs uppercase tracking-wide">Commandes</span>
-            </div>
-            <p className="mt-2 text-3xl font-semibold text-white">
-              {stats.orderCount}
-            </p>
-            {stats.enAttente > 0 && (
-              <p className="mt-1 text-xs text-amber-400">
-                {stats.enAttente} en attente
-              </p>
-            )}
-          </div>
-          <div className="rounded-xl border border-white/10 bg-[#1a1c24] p-4">
-            <p className="text-xs uppercase tracking-wide text-white/45">
-              Ventes
-            </p>
-            <p className="mt-2 text-3xl font-semibold text-white">
-              {formatPrice(stats.ca)}
-            </p>
-            <p className="mt-1 text-[11px] text-white/35">
-              Commandes confirmées, hors frais de livraison — détail et
-              reversements dans Finances
-            </p>
-          </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StatCard
+            icon={<Package />}
+            label="Produits"
+            value={stats.productCount}
+            hint={stats.stockBas > 0 ? `${stats.stockBas} stock bas` : undefined}
+            tone={stats.stockBas > 0 ? "warning" : undefined}
+            href="/vendeur/espace/produits"
+          />
+          <StatCard
+            icon={<ShoppingCart />}
+            label="Commandes"
+            value={stats.orderCount}
+            hint={stats.enAttente > 0 ? `${stats.enAttente} en attente` : undefined}
+            tone={stats.enAttente > 0 ? "warning" : undefined}
+            href="/vendeur/espace/commandes"
+          />
+          <StatCard
+            icon={<TrendingUp />}
+            label="Ventes"
+            value={formatPrice(stats.ca)}
+            hint="Commandes confirmées, hors livraison — détail dans Finances"
+            href="/vendeur/espace/finances"
+          />
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Link
-            href="/vendeur/espace/produits"
-            className="rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-[#0c0d12] hover:bg-amber-400"
-          >
+          <Link href="/vendeur/espace/produits" className={buttonClasses()}>
             Gérer les produits
           </Link>
-          <Link
-            href="/vendeur/espace/commandes"
-            className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/10"
-          >
+          <Link href="/vendeur/espace/commandes" className={buttonClasses({ variant: "outline" })}>
             Commandes
           </Link>
-          <Link
-            href="/vendeur/espace/pub"
-            className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/10"
-          >
+          <Link href="/vendeur/espace/pub" className={buttonClasses({ variant: "outline" })}>
             <Megaphone className="h-4 w-4" />
             Liens pub
           </Link>

@@ -1,4 +1,5 @@
 import { VendorShell } from "@/components/vendeur/vendor-shell";
+import { PageHeader } from "@/components/ui/page-header";
 import { VendorFinances } from "@/components/vendeur/vendor-finances";
 import { requireVendorPage } from "@/lib/require-vendor-page";
 import { getMyVendorFinances } from "@/lib/vendor-actions";
@@ -22,12 +23,7 @@ export default async function VendorFinancesPage() {
       unreadMessages={unreadMessages}
     >
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Finances</h1>
-          <p className="mt-1 text-sm text-white/45">
-            Commissions, net vendeur et reversements Coin229.
-          </p>
-        </div>
+        <PageHeader title="Finances" description="Commissions, net vendeur et reversements Coin229." />
         <VendorFinances
           commissionPct={finances.commissionPct}
           caBrut={finances.brut}

@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { VendorShell } from "@/components/vendeur/vendor-shell";
+import { PageHeader } from "@/components/ui/page-header";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/feedback";
 import { requireVendorPage } from "@/lib/require-vendor-page";
 import { listVendorConversations } from "@/lib/messaging";
 import { MessageCircle } from "lucide-react";
@@ -20,56 +24,46 @@ export default async function VendorMessagesPage() {
       unreadMessages={unreadMessages}
     >
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Messages</h1>
-          <p className="mt-1 text-sm text-white/45">
-            Discussions avec tes clients Coin229.
-          </p>
-        </div>
+        <PageHeader title="Messages" description="Discussions avec tes clients Coin229." />
 
         {conversations.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-[#1a1c24] px-4 py-12 text-center">
-            <MessageCircle className="mx-auto h-8 w-8 text-white/30" />
-            <p className="mt-3 text-sm text-white/50">
-              Aucun message pour l’instant.
-            </p>
-          </div>
+          <EmptyState
+            icon={<MessageCircle />}
+            title="Aucun message pour l’instant"
+            description="Les questions de tes clients sur tes produits arriveront ici."
+          />
         ) : (
-          <ul className="divide-y divide-white/10 rounded-xl border border-white/10 bg-[#1a1c24]">
-            {conversations.map((c) => {
-              const last = c.messages[0];
-              return (
-                <li key={c.id}>
-                  <Link
-                    href={`/vendeur/espace/messages/${c.id}`}
-                    className="flex items-start justify-between gap-3 px-4 py-3.5 hover:bg-white/5"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-medium text-white">
-                        {c.client.nom}
-                        {c.vendorUnread > 0 && (
-                          <span className="ml-2 rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-semibold text-[#0c0d12]">
-                            {c.vendorUnread}
-                          </span>
-                        )}
-                      </p>
-                      {c.client.telephone && (
-                        <p className="text-xs text-white/40">
-                          {c.client.telephone}
+          <Card as="section" padding="none" className="overflow-hidden">
+            <ul className="divide-y divide-border">
+              {conversations.map((c) => {
+                const last = c.messages[0];
+                return (
+                  <li key={c.id}>
+                    <Link
+                      href={`/vendeur/espace/messages/${c.id}`}
+                      className="flex items-start justify-between gap-3 px-4 py-3.5 hover:bg-surface-muted"
+                    >
+                      <div className="min-w-0">
+                        <p className="flex items-center gap-2 font-medium text-fg">
+                          {c.client.nom}
+                          {c.vendorUnread > 0 && (
+                            <Badge tone="accent" variant="solid" aria-label={`${c.vendorUnread} non lu(s)`}>
+                              {c.vendorUnread}
+                            </Badge>
+                          )}
                         </p>
-                      )}
-                      <p className="mt-1 truncate text-sm text-white/60">
-                        {last?.body ?? "Nouvelle conversation"}
-                      </p>
-                    </div>
-                    <time className="shrink-0 text-[11px] text-white/35">
-                      {new Date(c.lastMessageAt).toLocaleDateString("fr-FR")}
-                    </time>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+                        {c.client.telephone && <p className="text-xs text-muted">{c.client.telephone}</p>}
+                        <p className="mt-1 truncate text-sm text-fg-secondary">{last?.body ?? "Nouvelle conversation"}</p>
+                      </div>
+                      <time className="shrink-0 text-xs text-muted">
+                        {new Date(c.lastMessageAt).toLocaleDateString("fr-FR")}
+                      </time>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
         )}
       </div>
     </VendorShell>

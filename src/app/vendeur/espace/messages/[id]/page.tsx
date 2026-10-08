@@ -35,7 +35,6 @@ export default async function VendorConversationPage({ params }: Props) {
           undefined
         }
         backHref="/vendeur/espace/messages"
-        dark
         initialMessages={conv.messages.map((m) => ({
           id: m.id,
           sender: m.sender,

@@ -8,7 +8,15 @@ import {
   VENDOR_NICHE_OPTIONS,
 } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
-import { ImagePlus, Loader2, Pencil, Plus, X } from "lucide-react";
+import { ChevronDown, ImagePlus, Loader2, Package, Pencil, Plus, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Field, Input, Select, Textarea } from "@/components/ui/field";
+import { Drawer } from "@/components/ui/overlay";
+import { DataTable } from "@/components/ui/data-table";
+import { StatusBadge } from "@/components/ui/badge";
+import { Alert } from "@/components/ui/alert";
+import { EmptyState } from "@/components/ui/feedback";
+import { cn } from "@/lib/utils";
 
 type Props = {
   products: Product[];
@@ -26,9 +34,6 @@ const emptyForm = {
   images: [] as string[],
   statut: "actif" as ProductStatus,
 };
-
-const field =
-  "w-full rounded-lg border border-white/10 bg-[#0c0d12] px-3 py-2.5 text-sm text-white outline-none focus:border-amber-500/50";
 
 export function VendorProducts({ products, canPublish }: Props) {
   const [open, setOpen] = useState(false);
@@ -128,45 +133,99 @@ export function VendorProducts({ products, canPublish }: Props) {
         setMessage(res.error ?? "Erreur");
         return;
       }
-      setMessage(editId ? "Produit mis à jour" : "Produit publié");
       setOpen(false);
       window.location.reload();
     });
   }
 
+  const set = (patch: Partial<typeof form>) => setForm({ ...form, ...patch });
+  const nicheLabel = (value: string) => VENDOR_NICHE_OPTIONS.find((o) => o.value === value)?.label ?? (value || "—");
+
   return (
     <div className="space-y-4">
       {!canPublish && (
-        <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
-          Compte en attente de validation Coin229 — tu peux préparer tes
-          produits ; la vitrine s’ouvrira après activation.
-        </p>
+        <Alert tone="warning" title="Compte en attente de validation Coin229">
+          Tu peux déjà préparer tes produits ; ta vitrine s’ouvrira après activation.
+        </Alert>
       )}
 
       <div className="flex items-center justify-between">
-        <p className="text-sm text-white/45">{products.length} produit(s)</p>
-        <button
-          type="button"
-          onClick={startCreate}
-          className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-2 text-sm font-semibold text-[#0c0d12] hover:bg-amber-400"
-        >
-          <Plus className="h-4 w-4 stroke-[1.5]" />
+        <p className="text-sm text-muted">{products.length} produit(s)</p>
+        <Button size="sm" onClick={startCreate}>
+          <Plus className="h-4 w-4" />
           Ajouter
-        </button>
+        </Button>
       </div>
 
-      {open && (
-        <form
-          onSubmit={onSubmit}
-          className="space-y-3 rounded-xl border border-white/10 bg-[#1a1c24] p-4"
-        >
-          <h3 className="font-semibold text-white">
-            {editId ? "Modifier le produit" : "Nouveau produit"}
-          </h3>
-          <p className="text-xs text-white/40">
-            Photo → nom → prix → niche. C’est tout pour publier.
-          </p>
+      <DataTable
+        caption="Mes produits"
+        rows={products}
+        rowKey={(p) => p.id}
+        empty={
+          <EmptyState
+            icon={<Package />}
+            title="Aucun produit"
+            description="Photo, nom, prix : quelques secondes pour apparaître dans la boutique."
+            action={
+              <Button size="sm" onClick={startCreate}>
+                <Plus className="h-4 w-4" /> Ajouter un produit
+              </Button>
+            }
+          />
+        }
+        columns={[
+          {
+            key: "produit",
+            header: "Produit",
+            primary: true,
+            cell: (p) => (
+              <span className="flex min-w-0 items-center gap-3">
+                {p.images[0] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.images[0]} alt="" className="h-10 w-10 shrink-0 rounded-control object-cover" />
+                ) : (
+                  <span className="h-10 w-10 shrink-0 rounded-control bg-background" />
+                )}
+                <span className="min-w-0 font-medium">{p.nom}</span>
+              </span>
+            ),
+          },
+          { key: "niche", header: "Collection", cell: (p) => nicheLabel(p.niche) },
+          { key: "prix", header: "Prix", align: "right", cell: (p) => formatPrice(p.prixPromo ?? p.prix) },
+          { key: "stock", header: "Stock", align: "right", cell: (p) => p.stockQuantite },
+          { key: "statut", header: "Statut", cell: (p) => <StatusBadge kind="product" status={p.statut} /> },
+          {
+            key: "actions",
+            header: <span className="sr-only">Actions</span>,
+            actions: true,
+            align: "right",
+            cell: (p) => (
+              <Button size="sm" variant="outline" onClick={() => startEdit(p)} aria-label={`Modifier ${p.nom}`}>
+                <Pencil className="h-4 w-4" />
+                <span className="md:sr-only">Modifier</span>
+              </Button>
+            ),
+          },
+        ]}
+      />
 
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title={editId ? "Modifier le produit" : "Nouveau produit"}
+        description="Photo → nom → prix → collection. C’est tout pour publier."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setOpen(false)}>
+              Annuler
+            </Button>
+            <Button type="submit" form="vendor-product-form" loading={pending} disabled={uploading}>
+              Enregistrer
+            </Button>
+          </>
+        }
+      >
+        <form id="vendor-product-form" onSubmit={onSubmit} className="space-y-4">
           <div>
             <input
               ref={fileRef}
@@ -180,31 +239,22 @@ export function VendorProducts({ products, canPublish }: Props) {
               type="button"
               disabled={uploading || form.images.length >= 8}
               onClick={() => fileRef.current?.click()}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-white/20 bg-[#0c0d12] px-3 py-6 text-sm text-white/70 hover:border-amber-500/40 hover:text-amber-200 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-control border border-dashed border-border-strong bg-surface-muted px-3 py-6 text-sm font-medium text-fg-secondary transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
             >
-              {uploading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <ImagePlus className="h-5 w-5" />
-              )}
-              {uploading ? "Envoi…" : "Ajouter des photos"}
+              {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImagePlus className="h-5 w-5" />}
+              {uploading ? "Envoi…" : "Ajouter des photos (8 max)"}
             </button>
             {form.images.length > 0 && (
-              <ul className="mt-2 flex flex-wrap gap-2">
+              <ul className="mt-3 flex flex-wrap gap-2">
                 {form.images.map((src) => (
-                  <li key={src} className="relative h-16 w-16 overflow-hidden rounded-md border border-white/10">
+                  <li key={src} className="relative h-16 w-16 overflow-hidden rounded-control border border-border">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="h-full w-full object-cover" />
                     <button
                       type="button"
-                      aria-label="Retirer"
-                      onClick={() =>
-                        setForm((f) => ({
-                          ...f,
-                          images: f.images.filter((u) => u !== src),
-                        }))
-                      }
-                      className="absolute right-0.5 top-0.5 rounded bg-black/70 p-0.5 text-white"
+                      aria-label="Retirer la photo"
+                      onClick={() => setForm((f) => ({ ...f, images: f.images.filter((u) => u !== src) }))}
+                      className="absolute right-0.5 top-0.5 rounded-full bg-surface/90 p-1 text-fg shadow-card hover:text-error"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -214,171 +264,74 @@ export function VendorProducts({ products, canPublish }: Props) {
             )}
           </div>
 
-          <input
-            required
-            placeholder="Nom du produit"
-            value={form.nom}
-            onChange={(e) => setForm({ ...form, nom: e.target.value })}
-            className={field}
-          />
-          <textarea
-            placeholder="Description courte (optionnel)"
-            rows={2}
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className={`${field} resize-none`}
-          />
-          <select
-            required
-            value={form.niche}
-            onChange={(e) => setForm({ ...form, niche: e.target.value })}
-            className={field}
-          >
-            {VENDOR_NICHE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              required
-              min={0}
-              placeholder="Prix (FCFA)"
-              value={form.prix}
-              onChange={(e) =>
-                setForm({ ...form, prix: Number(e.target.value) })
-              }
-              className={field}
-            />
-            <input
-              type="number"
-              required
-              min={0}
-              placeholder="Stock"
-              value={form.stockQuantite}
-              onChange={(e) =>
-                setForm({ ...form, stockQuantite: Number(e.target.value) })
-              }
-              className={field}
-            />
+          <Field label="Nom du produit" required>
+            <Input value={form.nom} onChange={(e) => set({ nom: e.target.value })} />
+          </Field>
+          <Field label="Description courte" hint="Optionnel">
+            <Textarea rows={2} value={form.description} onChange={(e) => set({ description: e.target.value })} />
+          </Field>
+          <Field label="Collection" required>
+            <Select value={form.niche} onChange={(e) => set({ niche: e.target.value })}>
+              {VENDOR_NICHE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Prix (FCFA)" required>
+              <Input type="number" min={0} value={form.prix} onChange={(e) => set({ prix: Number(e.target.value) })} />
+            </Field>
+            <Field label="Stock" required>
+              <Input
+                type="number"
+                min={0}
+                value={form.stockQuantite}
+                onChange={(e) => set({ stockQuantite: Number(e.target.value) })}
+              />
+            </Field>
           </div>
 
           <button
             type="button"
             onClick={() => setAdvanced((v) => !v)}
-            className="text-xs text-white/40 underline-offset-2 hover:text-white/70 hover:underline"
+            aria-expanded={advanced}
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
           >
-            {advanced ? "Masquer les options" : "Options (promo, genre…)"}
+            Options (promo, public, statut)
+            <ChevronDown className={cn("h-4 w-4 transition-transform", advanced && "rotate-180")} />
           </button>
 
           {advanced && (
-            <div className="space-y-2 rounded-lg border border-white/5 bg-black/20 p-3">
-              <input
-                type="number"
-                min={0}
-                placeholder="Prix promo (optionnel)"
-                value={form.prixPromo}
-                onChange={(e) =>
-                  setForm({ ...form, prixPromo: e.target.value })
-                }
-                className={field}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <select
-                  value={form.genre}
-                  onChange={(e) =>
-                    setForm({ ...form, genre: e.target.value as Genre })
-                  }
-                  className={field}
-                >
-                  {(Object.keys(GENRE_LABELS) as Genre[]).map((g) => (
-                    <option key={g} value={g}>
-                      {GENRE_LABELS[g]}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={form.statut}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      statut: e.target.value as ProductStatus,
-                    })
-                  }
-                  className={field}
-                >
-                  <option value="actif">Actif</option>
-                  <option value="rupture">Rupture</option>
-                  <option value="archive">Archivé</option>
-                </select>
+            <div className="space-y-4 rounded-card bg-surface-muted p-4">
+              <Field label="Prix promo" hint="Vide = pas de promo">
+                <Input type="number" min={0} value={form.prixPromo} onChange={(e) => set({ prixPromo: e.target.value })} />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Public">
+                  <Select value={form.genre} onChange={(e) => set({ genre: e.target.value as Genre })}>
+                    {(Object.keys(GENRE_LABELS) as Genre[]).map((g) => (
+                      <option key={g} value={g}>
+                        {GENRE_LABELS[g]}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label="Statut">
+                  <Select value={form.statut} onChange={(e) => set({ statut: e.target.value as ProductStatus })}>
+                    <option value="actif">En vente</option>
+                    <option value="rupture">Épuisé</option>
+                    <option value="archive">Retiré</option>
+                  </Select>
+                </Field>
               </div>
             </div>
           )}
 
-          {message && <p className="text-sm text-amber-300">{message}</p>}
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={pending || uploading}
-              className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-[#0c0d12] disabled:opacity-60"
-            >
-              {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Enregistrer
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="rounded-lg border border-white/15 px-4 py-2 text-sm text-white/70"
-            >
-              Annuler
-            </button>
-          </div>
+          {message && <Alert tone="error">{message}</Alert>}
         </form>
-      )}
-
-      <ul className="divide-y divide-white/10 rounded-xl border border-white/10 bg-[#1a1c24]">
-        {products.map((p) => (
-          <li
-            key={p.id}
-            className="flex items-center justify-between gap-3 px-4 py-3"
-          >
-            <div className="flex min-w-0 items-center gap-3">
-              {p.images[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={p.images[0]}
-                  alt=""
-                  className="h-10 w-10 shrink-0 rounded object-cover"
-                />
-              ) : (
-                <div className="h-10 w-10 shrink-0 rounded bg-white/5" />
-              )}
-              <div className="min-w-0">
-                <p className="truncate font-medium text-white">{p.nom}</p>
-                <p className="text-xs text-white/45">
-                  {p.niche || "—"} · {formatPrice(p.prix)} · stock{" "}
-                  {p.stockQuantite}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => startEdit(p)}
-              className="rounded-lg border border-white/10 p-2 text-white/60 hover:bg-white/5 hover:text-white"
-              aria-label="Modifier"
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
-          </li>
-        ))}
-        {products.length === 0 && (
-          <li className="px-4 py-8 text-center text-sm text-white/45">
-            Aucun produit — clique sur Ajouter pour commencer.
-          </li>
-        )}
-      </ul>
+      </Drawer>
     </div>
   );
 }

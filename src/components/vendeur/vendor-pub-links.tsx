@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Copy, MessageCircle } from "lucide-react";
+import { Check, Copy, Link2, MessageCircle } from "lucide-react";
+import { Card, CardHeader } from "@/components/ui/card";
+import { Button, buttonClasses } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/feedback";
 import { SITE, productShareUrl, whatsappLink } from "@/lib/site";
 
 type ProductShare = {
@@ -36,84 +39,53 @@ export function VendorPubLinks({ slug, boutique, products }: Props) {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-white/10 bg-[#1a1c24] p-4 space-y-3">
-        <h2 className="font-semibold text-white">Lien vitrine</h2>
-        <p className="break-all text-sm text-white/60">{storeUrl}</p>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => copy(storeUrl, "store")}
-            className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-2 text-sm font-semibold text-[#0c0d12]"
-          >
-            {copied === "store" ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-            Copier
-          </button>
-          <a
-            href={whatsappStore}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-sm text-white hover:bg-white/5"
-          >
+      <Card as="section">
+        <CardHeader title="Lien vitrine" description="À mettre dans ta bio Instagram, TikTok ou ton statut WhatsApp" icon={<Link2 />} />
+        <p className="break-all rounded-control bg-surface-muted px-3 py-2 text-sm text-fg-secondary">{storeUrl}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button size="sm" onClick={() => copy(storeUrl, "store")}>
+            {copied === "store" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied === "store" ? "Copié" : "Copier"}
+          </Button>
+          <a href={whatsappStore} target="_blank" rel="noreferrer" className={buttonClasses({ size: "sm", variant: "outline" })}>
             <MessageCircle className="h-4 w-4" />
             WhatsApp
           </a>
         </div>
-      </section>
+      </Card>
 
-      <section className="space-y-3">
-        <h2 className="font-semibold text-white">Liens produits (pub)</h2>
+      <section className="space-y-4">
+        <h2 className="font-display text-lg font-semibold text-fg">Liens produits (pub)</h2>
         {products.length === 0 ? (
-          <p className="text-sm text-white/45">
-            Ajoute un produit pour générer des liens de partage.
-          </p>
+          <EmptyState title="Aucun produit" description="Ajoute un produit pour générer des liens de partage." />
         ) : (
-          <ul className="space-y-2">
+          <ul className="grid gap-4 md:grid-cols-2">
             {products.map((p) => {
               const url = productShareUrl(p.id, slug);
               const wa = whatsappLink(`Regarde ma pièce « ${p.nom} » sur Coin229 👉 ${url}`);
               return (
-                <li
-                  key={p.id}
-                  className="rounded-xl border border-white/10 bg-[#1a1c24] p-3"
-                >
-                  <p className="font-medium text-white">{p.nom}</p>
-                  <p className="mt-1 break-all text-xs text-white/40">{url}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => copy(url, p.id)}
-                      className="flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1.5 text-xs text-white/80 hover:bg-white/5"
-                    >
-                      {copied === p.id ? (
-                        <Check className="h-3.5 w-3.5" />
-                      ) : (
-                        <Copy className="h-3.5 w-3.5" />
-                      )}
-                      Copier le lien pub
-                    </button>
-                    <a
-                      href={wa}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1.5 text-xs text-white/80 hover:bg-white/5"
-                    >
-                      <MessageCircle className="h-3.5 w-3.5" />
+                <Card as="li" key={p.id} padding="sm" className="space-y-2">
+                  <p className="font-medium text-fg">{p.nom}</p>
+                  <p className="break-all text-xs text-muted">{url}</p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <Button size="sm" variant="outline" onClick={() => copy(url, p.id)}>
+                      {copied === p.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      {copied === p.id ? "Copié" : "Copier le lien pub"}
+                    </Button>
+                    <a href={wa} target="_blank" rel="noreferrer" className={buttonClasses({ size: "sm", variant: "ghost" })}>
+                      <MessageCircle className="h-4 w-4" />
                       WhatsApp
                     </a>
                     <a
                       href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-md border border-white/10 px-2.5 py-1.5 text-xs text-white/80 hover:bg-white/5"
+                      className={buttonClasses({ size: "sm", variant: "ghost" })}
                     >
                       Facebook
                     </a>
                   </div>
-                </li>
+                </Card>
               );
             })}
           </ul>

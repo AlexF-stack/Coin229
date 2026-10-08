@@ -1,4 +1,6 @@
 import { VendorShell } from "@/components/vendeur/vendor-shell";
+import { PageHeader } from "@/components/ui/page-header";
+import { Alert } from "@/components/ui/alert";
 import { VendorPubLinks } from "@/components/vendeur/vendor-pub-links";
 import { requireVendorPage } from "@/lib/require-vendor-page";
 import { getMyVendorProducts } from "@/lib/vendor-actions";
@@ -19,9 +21,9 @@ export default async function VendorPubPage() {
         statut={session.statut}
         unreadMessages={unreadMessages}
       >
-        <p className="text-sm text-white/60">
-          Slug boutique manquant — contacte le support Coin229.
-        </p>
+        <Alert tone="warning" title="Adresse de boutique manquante">
+          Contacte le support Coin229 pour activer tes liens de partage.
+        </Alert>
       </VendorShell>
     );
   }
@@ -36,13 +38,7 @@ export default async function VendorPubPage() {
       unreadMessages={unreadMessages}
     >
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Liens pub</h1>
-          <p className="mt-1 text-sm text-white/45">
-            Partage WhatsApp, Facebook ou TikTok — le trafic revient sur
-            Coin229.
-          </p>
-        </div>
+        <PageHeader title="Liens pub" description="Partage WhatsApp, Facebook ou TikTok — le trafic revient sur Coin229." />
         <VendorPubLinks
           slug={session.slug}
           boutique={session.nomBoutique}
