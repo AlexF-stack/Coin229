@@ -55,7 +55,7 @@ function waitingNote(o: OrderRow): string | null {
 
 export function VendorOrders({ orders }: Props) {
   const [pending, startTransition] = useTransition();
-  const [confirm, dialog] = useConfirm("dark");
+  const [confirm, dialog] = useConfirm();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 

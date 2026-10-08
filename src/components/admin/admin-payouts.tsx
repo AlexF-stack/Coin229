@@ -34,7 +34,7 @@ const PAYOUT_LABEL = {
 
 export function AdminPayouts({ unpaidVendors, recentPayouts }: Props) {
   const [pending, startTransition] = useTransition();
-  const [confirm, dialog] = useConfirm("dark");
+  const [confirm, dialog] = useConfirm();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   async function markPaid(v: UnpaidVendor) {

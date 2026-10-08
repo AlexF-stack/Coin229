@@ -18,7 +18,7 @@ const STATUT_LABEL: Record<string, string> = {
 /** Modération admin des produits des vendeurs marketplace */
 export function AdminMarketplaceProducts({ products }: { products: Row[] }) {
   const [pending, startTransition] = useTransition();
-  const [confirm, dialog] = useConfirm("dark");
+  const [confirm, dialog] = useConfirm();
   const [local, setLocal] = useState(products);
   const [errors, setErrors] = useState<Record<string, string>>({});
 

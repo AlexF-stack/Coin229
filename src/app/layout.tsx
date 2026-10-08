@@ -4,6 +4,7 @@ import "./globals.css";
 import { ShopShell } from "@/components/layout/shop-shell";
 import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/components/seo/json-ld";
 import { CookieBanner } from "@/components/legal/cookie-banner";
+import { ToastProvider } from "@/components/ui/toast";
 import { PwaInstallPrompt } from "@/components/pwa/install-prompt";
 import { SITE } from "@/lib/site";
 
@@ -125,9 +126,11 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
-        <ShopShell>{children}</ShopShell>
-        <CookieBanner />
-        <PwaInstallPrompt />
+        <ToastProvider>
+          <ShopShell>{children}</ShopShell>
+          <CookieBanner />
+          <PwaInstallPrompt />
+        </ToastProvider>
       </body>
     </html>
   );

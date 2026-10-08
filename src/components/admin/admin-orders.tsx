@@ -35,7 +35,7 @@ type Props = {
 
 export function AdminOrders({ orders }: Props) {
   const [pending, startTransition] = useTransition();
-  const [confirm, dialog] = useConfirm("dark");
+  const [confirm, dialog] = useConfirm();
   const [local, setLocal] = useState(orders);
   const [errors, setErrors] = useState<Record<string, string>>({});
 

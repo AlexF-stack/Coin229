@@ -45,7 +45,7 @@ export function AdminVendors({ vendors }: Props) {
 
   const [resetLinks, setResetLinks] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [confirm, dialog] = useConfirm("dark");
+  const [confirm, dialog] = useConfirm();
 
   async function setStatus(id: string, statut: VendorStatus) {
     const v = vendors.find((x) => x.id === id);

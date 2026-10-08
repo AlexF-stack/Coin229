@@ -84,6 +84,11 @@
     overflow-x: clip;
   }
 
+  /* Page figée derrière une fenêtre ou un tiroir ouvert */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
   ::selection {
     background: color-mix(in oklab, var(--color-accent) 40%, transparent);
     color: var(--color-primary);
@@ -261,6 +266,27 @@
   }
   100% {
     transform: translateX(300%);
+  }
+}
+
+/* Fenêtres et tiroirs (src/components/ui/overlay.tsx) */
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
   }
 }
 

@@ -1,5 +1,15 @@
 import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+/** tailwind-merge connaît les tokens du design system (rounded-control, shadow-card…) */
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      radius: ["badge", "control", "card", "panel", "pill"],
+      shadow: ["card", "raised", "overlay"],
+    },
+  },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

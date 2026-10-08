@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { cn } from "@/lib/utils";
+import { useCallback, useState } from "react";
+import { Modal } from "@/components/ui/overlay";
+import { Button } from "@/components/ui/button";
 
 export type ConfirmOptions = {
   title: string;
@@ -14,18 +14,15 @@ export type ConfirmOptions = {
   danger?: boolean;
 };
 
-type Theme = "dark" | "light";
-
 type Pending = ConfirmOptions & { resolve: (ok: boolean) => void };
 
 /**
- * Remplace window.confirm / window.alert par une vraie fenêtre (<dialog> natif :
- * focus piégé, Échap, fond assombri).
- *   const [confirm, dialog] = useConfirm("dark");
+ * Remplace window.confirm / window.alert par une fenêtre du design system.
+ *   const [confirm, dialog] = useConfirm();
  *   if (!(await confirm({ title: "Supprimer ?" }))) return;
  *   …et rendre {dialog} dans le composant.
  */
-export function useConfirm(theme: Theme = "light") {
+export function useConfirm() {
   const [pending, setPending] = useState<Pending | null>(null);
 
   const confirm = useCallback(
@@ -44,101 +41,37 @@ export function useConfirm(theme: Theme = "light") {
     [pending]
   );
 
-  // Portail : la fenêtre ne doit pas se retrouver dans un <a> ou un <ul>
-  const dialog = pending
-    ? createPortal(<ConfirmDialog options={pending} theme={theme} onClose={close} />, document.body)
-    : null;
-
+  const dialog = pending ? <ConfirmDialog options={pending} onClose={close} /> : null;
   return [confirm, dialog] as const;
 }
 
-function ConfirmDialog({
-  options,
-  theme,
-  onClose,
-}: {
-  options: ConfirmOptions;
-  theme: Theme;
-  onClose: (ok: boolean) => void;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const {
-    title,
-    message,
-    confirmLabel = "Confirmer",
-    cancelLabel = "Annuler",
-    danger = false,
-  } = options;
-  const dark = theme === "dark";
-
-  useEffect(() => {
-    const el = ref.current;
-    if (el && !el.open) el.showModal();
-  }, []);
-
+function ConfirmDialog({ options, onClose }: { options: ConfirmOptions; onClose: (ok: boolean) => void }) {
+  const { title, message, confirmLabel = "Confirmer", cancelLabel = "Annuler", danger = false } = options;
   return (
-    <dialog
-      ref={ref}
-      aria-labelledby="confirm-dialog-title"
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose(false);
-      }}
-      // Clic sur le fond (hors du contenu) = Annuler. stopPropagation : le
-      // composant appelant peut être dans un <Link> (carte produit).
-      onClick={(e) => {
-        e.stopPropagation();
-        if (e.target === e.currentTarget) onClose(false);
-      }}
-      className={cn(
-        "m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl p-0 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm",
-        dark ? "border border-white/10 bg-[#161920] text-[#e8eaed]" : "border border-border bg-white text-primary"
-      )}
-    >
-      <div className="p-5">
-        <h2
-          id="confirm-dialog-title"
-          className={cn("text-base font-semibold", dark ? "text-white" : "text-primary")}
-        >
-          {title}
-        </h2>
-        {message && (
-          <p className={cn("mt-2 whitespace-pre-line text-sm", dark ? "text-white/65" : "text-muted")}>
-            {message}
-          </p>
-        )}
-        <div className="mt-5 flex flex-wrap justify-end gap-2">
+    <Modal
+      open
+      size="sm"
+      hideClose
+      title={title}
+      description={message}
+      onClose={() => onClose(false)}
+      footer={
+        <>
           {cancelLabel !== null && (
-            <button
-              type="button"
-              // Action dangereuse : Entrée ne doit pas la valider par réflexe
-              autoFocus={danger}
-              onClick={() => onClose(false)}
-              className={cn(
-                "rounded-lg px-4 py-2 text-sm font-medium",
-                dark ? "text-white/70 hover:bg-white/5 hover:text-white" : "text-primary hover:bg-primary/5"
-              )}
-            >
+            // Action dangereuse : le focus va sur « Annuler », Entrée ne valide pas par réflexe
+            <Button variant="ghost" autoFocus={danger} onClick={() => onClose(false)}>
               {cancelLabel}
-            </button>
+            </Button>
           )}
-          <button
-            type="button"
+          <Button
+            variant={danger ? "destructive" : "primary"}
             autoFocus={!danger || cancelLabel === null}
             onClick={() => onClose(true)}
-            className={cn(
-              "rounded-lg px-4 py-2 text-sm font-semibold",
-              danger
-                ? "bg-red-600 text-white hover:bg-red-500"
-                : dark
-                  ? "bg-emerald-600 text-white hover:bg-emerald-500"
-                  : "bg-primary text-white hover:bg-primary/90"
-            )}
           >
             {confirmLabel}
-          </button>
-        </div>
-      </div>
-    </dialog>
+          </Button>
+        </>
+      }
+    />
   );
 }

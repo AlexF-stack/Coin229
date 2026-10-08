@@ -27,7 +27,7 @@ export function AddToCartButton({
   onBlocked,
 }: Props) {
   const router = useRouter();
-  const [confirm, dialog] = useConfirm("light");
+  const [confirm, dialog] = useConfirm();
   const addItem = useCartStore((s) => s.addItem);
   const [added, setAdded] = useState(false);
 
