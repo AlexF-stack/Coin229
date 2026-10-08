@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, BellOff, Loader2 } from "lucide-react";
+import { Bell, BellOff } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/feedback";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -194,19 +197,11 @@ export function PushOptInCard({
     }
   }
 
-  // Espaces admin / vendeur : thème sombre
-  const dark = audience !== "client";
-  const boxClass = dark
-    ? "rounded-xl border border-white/10 bg-[#1a1c24] text-white"
-    : "rounded-2xl border border-border bg-surface/80";
-  const mutedClass = dark ? "text-white/55" : "text-muted";
-
   if (status === "loading") {
     return (
-      <div className={`flex items-center gap-2 px-4 py-3 text-sm ${boxClass} ${mutedClass}`}>
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Notifications…
-      </div>
+      <Card padding="sm">
+        <Spinner label="Notifications…" />
+      </Card>
     );
   }
 
@@ -214,48 +209,36 @@ export function PushOptInCard({
     return null;
   }
 
+  // Même carte pour les clients, l'admin et les vendeurs
   return (
-    <section className={`p-4 ${boxClass}`}>
+    <Card as="section">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
-          {status === "on" ? (
-            <Bell className="h-5 w-5 stroke-[1.5]" />
-          ) : (
-            <BellOff className="h-5 w-5 stroke-[1.5]" />
-          )}
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+          {status === "on" ? <Bell className="h-5 w-5 stroke-[1.75]" /> : <BellOff className="h-5 w-5 stroke-[1.75]" />}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold">{copy.title}</p>
-          <p className={`mt-0.5 text-xs ${mutedClass}`}>
+          <p className="text-sm font-semibold text-fg">{copy.title}</p>
+          <p className="mt-0.5 text-xs text-muted">
             {status === "on"
               ? copy.on
               : status === "denied"
                 ? "Bloquées par le navigateur. Autorise Coin229 dans les réglages du site."
                 : copy.off}
           </p>
-          {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+          {error && <p className="mt-2 text-xs font-medium text-error">{error}</p>}
           {status !== "denied" && (
-            <button
-              type="button"
-              disabled={busy}
+            <Button
+              size="sm"
+              variant={status === "on" ? "outline" : "primary"}
+              className="mt-3"
+              loading={busy}
               onClick={() => void (status === "on" ? disable() : enable())}
-              className={
-                dark
-                  ? "mt-3 inline-flex h-9 items-center rounded-lg border border-white/15 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10"
-                  : "btn btn-secondary mt-3 h-9 px-4 text-sm"
-              }
             >
-              {busy ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : status === "on" ? (
-                "Désactiver"
-              ) : (
-                "Activer les notifications"
-              )}
-            </button>
+              {status === "on" ? "Désactiver" : "Activer les notifications"}
+            </Button>
           )}
         </div>
       </div>
-    </section>
+    </Card>
   );
 }

@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, Loader2, Send } from "lucide-react";
+import { Bell, Send } from "lucide-react";
+import { Card, StatCard } from "@/components/ui/card";
+import { Field, Input, Textarea } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
 
 type Stats = {
   configured: boolean;
@@ -70,88 +74,51 @@ export function AdminPushPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-white/10 bg-[#161920] p-4">
-        <div className="flex items-center gap-2 text-white/45">
-          <Bell className="h-4 w-4" />
-          <span className="text-xs uppercase tracking-wide">Abonnés clients</span>
-        </div>
-        <p className="mt-2 text-3xl font-semibold text-white">
-          {stats?.subscribers ?? "—"}
-        </p>
-        <p className="mt-1 text-xs text-white/40">
-          {stats?.configured
-            ? "Web Push prêt (VAPID)"
-            : "Configurer NEXT_PUBLIC_VAPID_PUBLIC_KEY + VAPID_PRIVATE_KEY"}
-        </p>
-      </div>
+      <StatCard
+        icon={<Bell />}
+        label="Abonnés clients"
+        value={stats?.subscribers ?? "—"}
+        hint={stats?.configured ? "Web Push prêt (VAPID)" : "Configurer NEXT_PUBLIC_VAPID_PUBLIC_KEY + VAPID_PRIVATE_KEY"}
+        tone={stats && !stats.configured ? "warning" : undefined}
+      />
 
-      <form
-        className="space-y-4 rounded-xl border border-white/10 bg-[#161920] p-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void send();
-        }}
-      >
-        <div>
-          <label className="text-xs text-white/45" htmlFor="push-title">
-            Titre
-          </label>
-          <input
-            id="push-title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={80}
-            required
-            className="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="text-xs text-white/45" htmlFor="push-body">
-            Message
-          </label>
-          <textarea
-            id="push-body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            maxLength={240}
-            required
-            rows={3}
-            placeholder="Ex. -15 % sur les lunettes aujourd’hui"
-            className="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="text-xs text-white/45" htmlFor="push-url">
-            Lien (chemin relatif)
-          </label>
-          <input
-            id="push-url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="/boutique"
-            className="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50"
-          />
-        </div>
-
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        {result && <p className="text-sm text-emerald-400">{result}</p>}
-
-        <button
-          type="submit"
-          disabled={busy || !stats?.configured || !body.trim()}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-[#0a0b0f] hover:bg-emerald-400 disabled:opacity-40"
+      <Card>
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void send();
+          }}
         >
-          {busy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-          Envoyer aux clients abonnés
-        </button>
-        <p className="text-xs text-white/35">
-          Envoie aux clients qui ont activé les alertes nouveautés & promos (pas aux admins ni aux vendeurs). Teste d’abord avec 1 téléphone.
-        </p>
-      </form>
+          <Field label="Titre" required>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} />
+          </Field>
+          <Field label="Message" required hint="240 caractères maximum">
+            <Textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              maxLength={240}
+              rows={3}
+              placeholder="Ex. -15 % sur les montres aujourd’hui"
+            />
+          </Field>
+          <Field label="Lien" hint="Chemin du site, ex. /boutique">
+            <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="/boutique" />
+          </Field>
+
+          {error && <Alert tone="error">{error}</Alert>}
+          {result && <Alert tone="success">{result}</Alert>}
+
+          <Button type="submit" loading={busy} disabled={!stats?.configured || !body.trim()}>
+            {!busy && <Send className="h-4 w-4" />}
+            Envoyer aux clients abonnés
+          </Button>
+          <p className="text-xs text-muted">
+            Envoie aux clients qui ont activé les alertes nouveautés & promos (pas aux admins ni aux vendeurs). Teste
+            d’abord avec un téléphone.
+          </p>
+        </form>
+      </Card>
     </div>
   );
 }

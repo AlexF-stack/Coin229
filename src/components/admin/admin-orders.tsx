@@ -14,19 +14,17 @@ import { allowedNextStatuses } from "@/lib/order-status-rules";
 import { ZONE_LABELS } from "@/lib/shipping";
 import { formatPrice } from "@/lib/utils";
 import { useConfirm } from "@/components/common/confirm-dialog";
+import { Card } from "@/components/ui/card";
+import { StatusBadge, Badge } from "@/components/ui/badge";
+import { Select } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/feedback";
+import { ShoppingCart } from "lucide-react";
 
 type OrderWithRelations = Order & {
   items: (OrderItem & { product: Product })[];
   client: Client;
   vendor?: { id: string; nomBoutique: string };
-};
-
-const statusTone: Record<OrderStatus, string> = {
-  en_attente: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  confirmee: "bg-sky-500/15 text-sky-300 border-sky-500/30",
-  en_livraison: "bg-violet-500/15 text-violet-300 border-violet-500/30",
-  livree: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  annulee: "bg-white/5 text-white/40 border-white/10",
 };
 
 type Props = {
@@ -106,101 +104,82 @@ export function AdminOrders({ orders }: Props) {
   }
 
   if (!local.length) {
-    return (
-      <p className="rounded-xl border border-white/10 bg-[#161920] p-6 text-sm text-white/45">
-        Aucune commande pour le moment.
-      </p>
-    );
+    return <EmptyState icon={<ShoppingCart />} title="Aucune commande pour le moment" description="Les commandes de toutes les boutiques apparaîtront ici." />;
   }
 
   return (
     <>
       {dialog}
-      <ul className="space-y-3">
-        {local.map((order) => (
-          <li
-            key={order.id}
-            className="space-y-3 rounded-xl border border-white/10 bg-[#161920] p-4"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                {order.vendor && (
-                  <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300/80">
-                    {order.vendor.nomBoutique}
+      <ul className="grid gap-4 lg:grid-cols-2">
+        {local.map((order) => {
+          const next = allowedNextStatuses(order, "admin");
+          return (
+            <Card as="li" key={order.id} className="flex flex-col gap-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  {order.vendor && (
+                    <p className="text-xs font-semibold uppercase tracking-wide text-accent-ink">{order.vendor.nomBoutique}</p>
+                  )}
+                  <p className="font-medium text-fg">{order.nomClient}</p>
+                  <p className="text-xs text-muted">{order.telephone}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {ZONE_LABELS[order.zoneLivraison]} · {order.adresseLivraison}
                   </p>
-                )}
-                <p className="font-medium text-white">{order.nomClient}</p>
-                <p className="text-xs text-white/40">{order.telephone}</p>
-                <p className="mt-1 text-xs text-white/40">
-                  {ZONE_LABELS[order.zoneLivraison]} · {order.adresseLivraison}
-                </p>
+                </div>
+                <StatusBadge kind="order" status={order.statut} />
               </div>
-              <span
-                className={`rounded-md border px-2 py-0.5 text-xs font-medium ${statusTone[order.statut]}`}
-              >
-                {ORDER_STATUS_LABELS[order.statut]}
-              </span>
-            </div>
-            <ul className="text-sm text-white/50">
-              {order.items.map((item) => (
-                <li key={item.id}>
-                  {item.quantite}× {item.product.nom} —{" "}
-                  {formatPrice(item.prixUnitaireAuMomentCommande)}
-                </li>
-              ))}
-            </ul>
-            <div className="flex items-center justify-between">
-              <p className="font-semibold text-emerald-300">
-                {formatPrice(order.montantTotal)}
-              </p>
-              <p className="text-xs text-white/40">
-                {order.modePaiement === "livraison"
-                  ? "À la livraison"
-                  : "Mobile Money"}
-              </p>
-            </div>
-            {allowedNextStatuses(order, "admin").length > 0 ? (
-              <select
-                disabled={pending}
-                value={order.statut}
-                onChange={(e) => changeStatus(order, e.target.value as OrderStatus)}
-                className="w-full rounded-lg border border-white/10 bg-[#0a0b0f] px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-500/50"
-              >
-                {/* Statut actuel + seuls passages autorisés (src/lib/order-status-rules.ts) */}
-                {[order.statut, ...allowedNextStatuses(order, "admin")].map((s) => (
-                  <option key={s} value={s}>
-                    {s === order.statut ? ORDER_STATUS_LABELS[s] : `→ ${ORDER_STATUS_LABELS[s]}`}
-                  </option>
+
+              <ul className="space-y-1 rounded-control bg-surface-muted px-3 py-2 text-sm text-fg-secondary">
+                {order.items.map((item) => (
+                  <li key={item.id}>
+                    {item.quantite}× {item.product.nom} — {formatPrice(item.prixUnitaireAuMomentCommande)}
+                  </li>
                 ))}
-              </select>
-            ) : (
-              <p className="text-xs text-white/40">
-                {order.payoutId ? "Reversée au vendeur — statut verrouillé." : "Statut définitif."}
-              </p>
-            )}
-            {order.refundStatus === "pending" && (
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-xs font-medium text-amber-300">Remboursement à faire</p>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => markRefunded(order)}
-                  className="rounded-md border border-amber-400/30 px-2.5 py-1 text-xs text-amber-200 hover:bg-amber-400/10 disabled:opacity-50"
-                >
-                  Marquer remboursé
-                </button>
+              </ul>
+
+              <div className="flex items-center justify-between">
+                <p className="font-display text-lg font-semibold text-fg">{formatPrice(order.montantTotal)}</p>
+                <Badge tone="neutral">{order.modePaiement === "livraison" ? "À la livraison" : "Mobile Money"}</Badge>
               </div>
-            )}
-            {order.refundStatus === "done" && (
-              <p className="text-xs text-white/45">Remboursé</p>
-            )}
-            {errors[order.id] && (
-              <p role="alert" className="text-xs text-red-300">
-                {errors[order.id]}
-              </p>
-            )}
-          </li>
-        ))}
+
+              {next.length > 0 ? (
+                <Select
+                  aria-label="Changer le statut"
+                  controlSize="sm"
+                  disabled={pending}
+                  value={order.statut}
+                  onChange={(e) => changeStatus(order, e.target.value as OrderStatus)}
+                >
+                  {/* Statut actuel + seuls passages autorisés (src/lib/order-status-rules.ts) */}
+                  {[order.statut, ...next].map((st) => (
+                    <option key={st} value={st}>
+                      {st === order.statut ? ORDER_STATUS_LABELS[st] : `→ ${ORDER_STATUS_LABELS[st]}`}
+                    </option>
+                  ))}
+                </Select>
+              ) : (
+                <p className="text-xs text-muted">
+                  {order.payoutId ? "Reversée au vendeur — statut verrouillé." : "Statut définitif."}
+                </p>
+              )}
+
+              {order.refundStatus === "pending" && (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-control bg-warning-soft px-3 py-2">
+                  <StatusBadge kind="refund" status="pending" className="bg-transparent px-0" />
+                  <Button size="sm" variant="outline" disabled={pending} onClick={() => markRefunded(order)}>
+                    Marquer remboursé
+                  </Button>
+                </div>
+              )}
+              {order.refundStatus === "done" && <StatusBadge kind="refund" status="done" />}
+              {errors[order.id] && (
+                <p role="alert" className="text-xs font-medium text-error">
+                  {errors[order.id]}
+                </p>
+              )}
+            </Card>
+          );
+        })}
       </ul>
     </>
   );

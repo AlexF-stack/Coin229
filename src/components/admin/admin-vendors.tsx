@@ -4,7 +4,11 @@ import { useState, useTransition } from "react";
 import type { VendorStatus } from "@prisma/client";
 import type { SafeVendor } from "@/lib/constants";
 import { createVendorResetLink, setVendorStatus } from "@/lib/actions";
-import { KeyRound, Loader2 } from "lucide-react";
+import { KeyRound, Store } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge, StatusBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState, Spinner } from "@/components/ui/feedback";
 import { useConfirm } from "@/components/common/confirm-dialog";
 
 type Row = SafeVendor & {
@@ -13,12 +17,6 @@ type Row = SafeVendor & {
 
 type Props = {
   vendors: Row[];
-};
-
-const LABELS: Record<VendorStatus, string> = {
-  actif: "Actif",
-  en_attente: "En attente",
-  suspendu: "Suspendu",
 };
 
 /** Informations KYC attendues avant d'activer un vendeur */
@@ -34,8 +32,8 @@ function missingKyc(v: Row): string[] {
 function KycLine({ label, value }: { label: string; value: string | null }) {
   return (
     <span>
-      <span className="text-white/35">{label} </span>
-      <span className={value ? "text-white/75" : "text-red-300"}>{value || "manquant"}</span>
+      <span className="text-muted">{label} </span>
+      <span className={value ? "text-fg" : "font-medium text-error"}>{value || "manquant"}</span>
     </span>
   );
 }
@@ -101,42 +99,29 @@ export function AdminVendors({ vendors }: Props) {
   }
 
   if (vendors.length === 0) {
-    return (
-      <p className="text-sm text-white/45">Aucun vendeur inscrit.</p>
-    );
+    return <EmptyState icon={<Store />} title="Aucun vendeur inscrit" description="Les marques qui s’inscrivent apparaîtront ici pour validation." />;
   }
 
   return (
     <>
       {dialog}
-      <ul className="space-y-3">
+      <ul className="space-y-4">
         {vendors.map((v) => (
-          <li
-            key={v.id}
-            className="rounded-xl border border-white/10 bg-[#161920] p-4"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="font-medium text-white">{v.nomBoutique}</p>
-                <p className="text-xs text-white/45">
+          <Card as="li" key={v.id}>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-display font-semibold text-fg">{v.nomBoutique}</p>
+                  <StatusBadge kind="vendor" status={v.statut} />
+                </div>
+                <p className="text-sm text-fg-secondary">
                   {v.email ?? "sans email"} · {v.contact}
                   {v.slug ? ` · /vendeur/${v.slug}` : ""}
                 </p>
-                <p className="mt-1 text-xs text-white/40">
-                  {v._count.products} produits · {v._count.orders} commandes ·{" "}
-                  <span
-                    className={
-                      v.statut === "actif"
-                        ? "text-emerald-400"
-                        : v.statut === "en_attente"
-                          ? "text-amber-400"
-                          : "text-red-400"
-                    }
-                  >
-                    {LABELS[v.statut]}
-                  </span>
+                <p className="text-xs text-muted">
+                  {v._count.products} produits · {v._count.orders} commandes
                 </p>
-                <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                <p className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-xs">
                   <KycLine label="IFU" value={v.ifu} />
                   <KycLine label="RCCM" value={v.rccm} />
                   <KycLine label="Mobile Money" value={v.mobileMoney} />
@@ -146,80 +131,59 @@ export function AdminVendors({ vendors }: Props) {
                   />
                 </p>
                 {v.resetRequestedAt && (
-                  <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-300">
-                    <KeyRound className="h-3.5 w-3.5" />
+                  <Badge tone="warning" icon={<KeyRound />} className="mt-2 whitespace-normal">
                     Nouveau mot de passe demandé le{" "}
-                    {new Date(v.resetRequestedAt).toLocaleString("fr-FR", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}
-                  </p>
+                    {new Date(v.resetRequestedAt).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}
+                  </Badge>
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {v.statut !== "actif" && (
-                  <button
-                    type="button"
-                    disabled={pending}
-                    onClick={() => setStatus(v.id, "actif")}
-                    className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-[#0a0b0f] disabled:opacity-60"
-                  >
+                  <Button size="sm" disabled={pending} onClick={() => setStatus(v.id, "actif")}>
                     Activer
-                  </button>
+                  </Button>
                 )}
                 {v.statut !== "suspendu" && (
-                  <button
-                    type="button"
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-error/30 text-error hover:border-error hover:bg-error-soft"
                     disabled={pending}
                     onClick={() => setStatus(v.id, "suspendu")}
-                    className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5 disabled:opacity-60"
                   >
                     Suspendre
-                  </button>
+                  </Button>
                 )}
                 {v.statut === "suspendu" && (
-                  <button
-                    type="button"
-                    disabled={pending}
-                    onClick={() => setStatus(v.id, "en_attente")}
-                    className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5 disabled:opacity-60"
-                  >
+                  <Button size="sm" variant="outline" disabled={pending} onClick={() => setStatus(v.id, "en_attente")}>
                     Remettre en attente
-                  </button>
+                  </Button>
                 )}
                 {v.email && (
-                  <button
-                    type="button"
+                  <Button
+                    size="sm"
+                    variant={v.resetRequestedAt ? "primary" : "outline"}
                     disabled={pending}
                     onClick={() => sendResetLink(v)}
-                    className={
-                      v.resetRequestedAt
-                        ? "rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-[#0a0b0f] disabled:opacity-60"
-                        : "rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5 disabled:opacity-60"
-                    }
                   >
                     Envoyer un lien sur WhatsApp
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
             {resetLinks[v.id] && (
-              <p className="mt-2 break-all text-xs text-white/55">
+              <p className="mt-3 break-all rounded-control bg-surface-muted px-3 py-2 text-xs text-fg-secondary">
                 Lien créé (WhatsApp ouvert dans un nouvel onglet). Si besoin, copie-le :{" "}
-                <span className="select-all text-white/80">{resetLinks[v.id]}</span>
+                <span className="select-all font-medium text-fg">{resetLinks[v.id]}</span>
               </p>
             )}
             {errors[v.id] && (
-              <p role="alert" className="mt-2 text-xs text-red-300">
+              <p role="alert" className="mt-3 text-xs font-medium text-error">
                 {errors[v.id]}
               </p>
             )}
-            {pending && (
-              <p className="mt-2 flex items-center gap-1 text-xs text-emerald-300">
-                <Loader2 className="h-3 w-3 animate-spin" /> Mise à jour…
-              </p>
-            )}
-          </li>
+            {pending && <Spinner label="Mise à jour…" className="mt-3 text-xs" />}
+          </Card>
         ))}
       </ul>
     </>

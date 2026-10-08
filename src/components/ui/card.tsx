@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -67,16 +68,19 @@ export function StatCard({
   hint,
   icon,
   tone,
+  href,
 }: {
   label: ReactNode;
   value: ReactNode;
   hint?: ReactNode;
   icon?: ReactNode;
   /** Mise en avant d'une valeur qui demande une action */
-  tone?: "warning" | "success";
+  tone?: "warning" | "success" | "error";
+  /** Indicateur cliquable (vers la liste concernée) */
+  href?: string;
 }) {
-  return (
-    <Card>
+  const card = (
+    <Card interactive={Boolean(href)} className="h-full">
       <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted [&_svg]:h-4 [&_svg]:w-4">
         {icon}
         {label}
@@ -86,12 +90,25 @@ export function StatCard({
         <p
           className={cn(
             "mt-1 text-xs",
-            tone === "warning" ? "font-medium text-warning" : tone === "success" ? "text-success" : "text-muted"
+            tone === "warning"
+              ? "font-medium text-warning"
+              : tone === "error"
+                ? "font-medium text-error"
+                : tone === "success"
+                  ? "text-success"
+                  : "text-muted"
           )}
         >
           {hint}
         </p>
       )}
     </Card>
+  );
+  return href ? (
+    <Link href={href} className="block h-full rounded-card">
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }

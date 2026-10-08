@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/admin/admin-shell";
+import { PageHeader } from "@/components/ui/page-header";
 import { AdminPushPanel } from "@/components/admin/admin-push-panel";
 import { PushOptInCard } from "@/components/pwa/push-opt-in-card";
 import { getDefaultVendor } from "@/lib/actions";
@@ -21,14 +22,7 @@ export default async function AdminNotificationsPage() {
   return (
     <AdminShell boutique={boutique}>
       <div className="mx-auto max-w-xl space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">
-            Notifications push
-          </h1>
-          <p className="mt-1 text-sm text-white/45">
-            Envoie une annonce aux clients qui ont activé les notifications.
-          </p>
-        </div>
+        <PageHeader title="Notifications push" description="Envoie une annonce aux clients qui ont activé les notifications." />
         <PushOptInCard audience="admin" />
         <AdminPushPanel />
       </div>

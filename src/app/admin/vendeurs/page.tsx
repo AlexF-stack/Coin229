@@ -1,5 +1,6 @@
 import { listMarketplaceVendors, getDefaultVendor } from "@/lib/actions";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { PageHeader } from "@/components/ui/page-header";
 import { AdminVendors } from "@/components/admin/admin-vendors";
 
 export const metadata = { title: "Vendeurs" };
@@ -18,12 +19,7 @@ export default async function AdminVendorsPage() {
   return (
     <AdminShell boutique={boutique}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Vendeurs</h1>
-          <p className="mt-1 text-sm text-white/45">
-            Valider ou suspendre les marques marketplace.
-          </p>
-        </div>
+        <PageHeader title="Vendeurs" description="Valider ou suspendre les marques marketplace." />
         <AdminVendors vendors={vendors} />
       </div>
     </AdminShell>

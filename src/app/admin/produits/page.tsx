@@ -3,6 +3,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminProducts } from "@/components/admin/admin-products";
 import { AdminMarketplaceProducts } from "@/components/admin/admin-marketplace-products";
 import { DEMO_VENDOR_ID, DEMO_PRODUCTS } from "@/lib/demo-data";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata = {
   title: "Produits · Admin",
@@ -29,25 +30,18 @@ export default async function AdminProductsPage() {
 
   return (
     <AdminShell boutique={boutique}>
-      <div className="mx-auto max-w-3xl space-y-6">
+      <PageHeader title="Produits" description="Catalogue, stock et tarifs de la boutique Coin229" />
+      <AdminProducts products={products} vendorId={vendorId} />
+
+      <section className="mt-10 space-y-4 border-t border-border pt-8">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Produits</h1>
-          <p className="mt-1 text-sm text-white/45">
-            Catalogue, stock et tarifs
+          <h2 className="font-display text-lg font-semibold text-fg">Produits des vendeurs</h2>
+          <p className="mt-1 text-sm text-muted">
+            Modération : retirer de la vente un produit non conforme, ou le remettre en vente.
           </p>
         </div>
-        <AdminProducts products={products} vendorId={vendorId} />
-
-        <section className="space-y-3 border-t border-white/10 pt-6">
-          <div>
-            <h2 className="text-lg font-semibold text-white">Produits des vendeurs</h2>
-            <p className="mt-1 text-sm text-white/45">
-              Modération : retirer de la vente un produit non conforme, ou le remettre en vente.
-            </p>
-          </div>
-          <AdminMarketplaceProducts products={marketplaceProducts} />
-        </section>
-      </div>
+        <AdminMarketplaceProducts products={marketplaceProducts} />
+      </section>
     </AdminShell>
   );
 }

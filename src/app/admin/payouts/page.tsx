@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/admin/admin-shell";
+import { PageHeader } from "@/components/ui/page-header";
 import { AdminPayouts } from "@/components/admin/admin-payouts";
 import { getDefaultVendor, listAdminPayoutData } from "@/lib/actions";
 
@@ -19,12 +20,7 @@ export default async function AdminPayoutsPage() {
   return (
     <AdminShell boutique={boutique}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Reversements</h1>
-          <p className="mt-1 text-sm text-white/45">
-            Marquer les reversements manuels aux vendeurs marketplace.
-          </p>
-        </div>
+        <PageHeader title="Reversements" description="Marquer les reversements manuels aux vendeurs marketplace." />
         <AdminPayouts
           unpaidVendors={unpaidVendors}
           recentPayouts={recentPayouts}
