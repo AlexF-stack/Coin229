@@ -74,7 +74,7 @@ export function AdminOrders({ orders }: Props) {
                       refundStatus:
                         o.modePaiement === "mobile_money" && o.statut !== "en_attente"
                           ? "pending"
-                          : "n/a",
+                          : "not_applicable",
                     }
                   : {}),
               }

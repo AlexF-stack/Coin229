@@ -49,7 +49,7 @@ export async function changeOrderStatus(opts: {
           ? {
               statut: "annulee",
               cancelReason: opts.actor,
-              refundStatus: isPaidOnline(order) ? "pending" : "n/a",
+              refundStatus: isPaidOnline(order) ? "pending" : "not_applicable",
             }
           : { statut: opts.to },
     });
