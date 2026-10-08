@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { DEMO_PRODUCTS, filterDemoProducts } from "@/lib/demo-data";
 import { allowDemoCatalog } from "@/lib/runtime-flags";
@@ -190,7 +191,8 @@ const PUBLIC_VENDOR_SELECT = {
   statut: true,
 } as const;
 
-export async function fetchProductById(id: string) {
+/** cache() : generateMetadata et la page partagent la même requête */
+export const fetchProductById = cache(async (id: string) => {
   await maybeReleaseExpiredReservations();
   try {
     const product = await withTimeout(
@@ -228,7 +230,7 @@ export async function fetchProductById(id: string) {
     },
     source: "demo" as const,
   };
-}
+});
 
 export async function fetchActiveNiches(
   limit = 24,

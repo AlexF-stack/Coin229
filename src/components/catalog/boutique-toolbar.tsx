@@ -48,6 +48,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
   const enStock = params.get("enStock") === "1";
 
   function pushParams(next: URLSearchParams) {
+    next.delete("page");
     const qs = next.toString();
     startTransition(() => {
       router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });

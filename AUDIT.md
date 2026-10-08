@@ -141,7 +141,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P3-4 | ✅ | « Quatre chemins » alors que 5 catégories ; catégories Sacs / Lunettes vides — accueil et filtres boutique n’affichent que les rayons qui ont des produits (`fetchActiveCategories`), titre « Votre style. Votre rayon. ». Reste (contenu, voir P2-17) : les textes « montres, bijoux, sacs et lunettes » (accueil, SEO, à propos) |
 | P3-5 | ✅ | Indicateur de chargement sur les filtres boutique — « Chargement… » à la place du nombre de produits, fine barre de progression en haut, liste estompée et non cliquable pendant le chargement ; la page ne remonte plus en haut à chaque filtre |
 | P3-6 | ✅ | Galerie produit : flèches + zoom desktop — flèches et miniatures sur ordinateur, flèches du clavier, zoom plein écran au clic (Échap / Fermer, navigation dans le zoom), glisser conservé sur mobile |
-| P3-7 | ⬜ | Pagination du catalogue ; `React.cache` sur `fetchProductById` (requête doublée) |
+| P3-7 | ✅ | Pagination du catalogue ; `React.cache` sur `fetchProductById` (requête doublée) — 24 produits puis bouton « Voir plus » (garde filtres et tri, sans remonter la page ; un nouveau filtre revient à la 1re page) ; `fetchProductById` en `cache()` : une seule requête par fiche. À terme (catalogue de plusieurs milliers de produits) : tri et pagination en SQL |
 | P3-8 | ⬜ | Index Prisma (orders, conversations, products) ; `refundStatus` en enum |
 | P3-9 | 🔄 | Supprimer code mort (`getProducts`, ~~`getProductById`~~ supprimé en P0-2, `getSimilarProducts`, `listPayoutQueue`, `benefit-chips.tsx`…) et doublons (niches, UTM, lien WhatsApp) |
 | P3-10 | ⬜ | Migrer `next lint` → ESLint CLI ; corriger les 2 warnings |
@@ -244,3 +244,4 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P3-4 | voir `git log` | Accueil et filtres : seulement les rayons avec produits |
 | 08/10/2026 | P3-5 | voir `git log` | Indicateur de chargement sur les filtres boutique |
 | 08/10/2026 | P3-6 | voir `git log` | Galerie produit : flèches, miniatures, clavier, zoom plein écran |
+| 08/10/2026 | P3-7 | voir `git log` | Catalogue paginé (« Voir plus »), fiche produit chargée une seule fois |

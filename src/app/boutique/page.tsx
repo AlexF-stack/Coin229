@@ -15,7 +15,12 @@ type SearchParams = Promise<{
   genre?: string;
   sort?: string;
   enStock?: string;
+  page?: string;
 }>;
+
+/** Produits affichés par « page » (le bouton Voir plus en ajoute autant) */
+const PAGE_SIZE = 24;
+const MAX_PAGES = 50;
 
 export async function generateMetadata({
   searchParams,
@@ -72,6 +77,7 @@ export default async function BoutiquePage({
       : "pertinence"
   ) as "pertinence" | "nouveautes" | "prix_asc" | "prix_desc";
   const enStock = params.enStock === "1";
+  const page = Math.min(Math.max(Number.parseInt(params.page ?? "1", 10) || 1, 1), MAX_PAGES);
 
   const [{ products, source }, niches, activeCategories] = await Promise.all([
     fetchProducts({
@@ -87,6 +93,15 @@ export default async function BoutiquePage({
   ]);
   // Base injoignable : page d'erreur temporaire, pas un faux « aucun résultat »
   if (source === "unavailable") throw new Error("CATALOG_UNAVAILABLE");
+
+  const visible = products.slice(0, page * PAGE_SIZE);
+  const remaining = products.length - visible.length;
+  const moreParams = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (typeof v === "string" && v && k !== "page") moreParams.set(k, v);
+  }
+  moreParams.set("page", String(page + 1));
+  const moreHref = `/boutique?${moreParams.toString()}`;
 
   const heading = niche
     ? nicheLabel(niche) || niche
@@ -139,7 +154,19 @@ export default async function BoutiquePage({
       {/* Estompé pendant qu'un nouveau filtre charge (voir data-loading de la barre) */}
       <div className="transition-opacity duration-200 peer-data-[loading=true]:pointer-events-none peer-data-[loading=true]:opacity-50">
         {products.length > 0 ? (
-          <ProductGrid products={products} />
+          <>
+            <ProductGrid products={visible} />
+            {remaining > 0 && (
+              <div className="mt-8 flex flex-col items-center gap-2 px-4">
+                <p className="text-sm text-muted">
+                  {visible.length} sur {products.length} produits
+                </p>
+                <Link href={moreHref} scroll={false} className="btn btn-secondary">
+                  Voir plus ({Math.min(remaining, PAGE_SIZE)})
+                </Link>
+              </div>
+            )}
+          </>
         ) : (
           <div className="mx-auto flex max-w-md flex-col items-center px-6 py-14 text-center">
             <p className="font-display text-xl font-semibold text-navy">
