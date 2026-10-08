@@ -94,7 +94,7 @@ export function KkiaPayCheckout({ orderId, amount, phone, email }: Props) {
   }
 
   return (
-    <div className="space-y-3 rounded-2xl border border-border bg-surface p-4 text-center">
+    <div className="space-y-3 rounded-panel border border-border bg-surface p-4 text-center">
       <Script
         src="https://cdn.kkiapay.me/k.js"
         strategy="afterInteractive"

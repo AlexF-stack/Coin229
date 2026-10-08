@@ -19,9 +19,11 @@ import { PhoneAuthForm } from "./phone-auth-form";
 import { SocialAuthButtons } from "./social-auth-buttons";
 import { getAccountSession, getMyOrders } from "@/lib/actions";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from "@/lib/constants";
 import { ZONE_LABELS } from "@/lib/shipping";
-import { formatPrice, cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
+import { Badge, StatusBadge } from "@/components/ui/badge";
+import { buttonClasses } from "@/components/ui/button";
+import { EmptyState, Skeleton } from "@/components/ui/feedback";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { InstallAppCard } from "@/components/pwa/install-app-card";
@@ -117,7 +119,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
   if (!ready) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16">
-        <div className="h-40 animate-pulse rounded-3xl bg-surface" />
+        <Skeleton className="h-40 rounded-card" />
       </div>
     );
   }
@@ -125,13 +127,9 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
   if (!identity) {
     return (
       <div className="relative overflow-hidden pb-10">
-        <div className="relative isolate overflow-hidden px-4 pb-10 pt-8 md:px-0 md:pt-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,rgba(239,159,39,0.28),transparent),radial-gradient(ellipse_50%_40%_at_100%_20%,rgba(216,90,48,0.18),transparent)]"
-          />
+        <div className="px-4 pb-8 pt-8 md:px-0 md:pt-12">
           <div className="mx-auto max-w-md text-center">
-            <p className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+            <p className="font-display text-3xl font-bold tracking-tight text-primary md:text-4xl">
               Coin<span className="text-accent">229</span>
             </p>
             <h1 className="mt-4 font-display text-2xl font-bold md:text-3xl">
@@ -144,7 +142,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
         </div>
 
         <div className="mx-auto max-w-md space-y-6 px-4 md:px-0">
-          <div className="space-y-5 rounded-3xl border border-border bg-background p-5 shadow-surface md:p-6">
+          <div className="space-y-5 rounded-card border border-border bg-surface p-5 shadow-card md:p-6">
             <SocialAuthButtons next={next} />
             <PhoneAuthForm onAuthenticated={onPhoneAuth} />
           </div>
@@ -153,9 +151,9 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
             {BENEFITS.map(({ icon: Icon, title, text }) => (
               <li
                 key={title}
-                className="flex items-start gap-3 rounded-2xl bg-surface/80 px-4 py-3"
+                className="flex items-start gap-3 rounded-card border border-border bg-surface px-4 py-3"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
                   <Icon className="h-4 w-4 stroke-[1.5]" />
                 </span>
                 <div>
@@ -223,15 +221,15 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pb-10 pt-5 md:px-0 md:pt-8">
-      <section className="overflow-hidden rounded-3xl border border-border bg-background shadow-surface">
-        <div className="relative bg-[linear-gradient(135deg,#1a1916_0%,#3d2a1a_55%,#d4890f_120%)] px-5 py-6 text-white md:px-6">
+      <section className="overflow-hidden rounded-card border border-border bg-surface shadow-card">
+        <div className="relative bg-surface-inverse px-5 py-6 text-inverse md:px-6">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 backdrop-blur">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-accent">
                 <UserRound className="h-6 w-6 stroke-[1.5]" />
               </span>
               <div>
-                <p className="font-display text-xl font-bold">
+                <p className="font-display text-xl font-bold text-inverse">
                   {client?.nom ?? "Bonjour"}
                 </p>
                 <p className="text-sm text-white/75">{identity.label}</p>
@@ -243,14 +241,14 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
             <button
               type="button"
               onClick={() => void logout()}
-              className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur hover:bg-white/20"
+              className="flex min-h-9 items-center gap-1.5 rounded-control bg-white/10 px-3 text-xs font-medium text-inverse hover:bg-white/20"
             >
               <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
               Sortir
             </button>
           </div>
           <p className="mt-4 flex items-center gap-1.5 text-xs text-white/80">
-            <Sparkles className="h-3.5 w-3.5 stroke-[1.5]" />
+            <Sparkles className="h-3.5 w-3.5 stroke-[1.5] text-accent" />
             Membre Coin229 · paiement à la livraison disponible
           </p>
         </div>
@@ -260,9 +258,9 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
             <Link
               key={label}
               href={href}
-              className="flex flex-col items-center gap-1.5 rounded-2xl px-1 py-3 text-center transition hover:bg-background"
+              className="flex flex-col items-center gap-1.5 rounded-control px-1 py-3 text-center transition hover:bg-background"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-primary">
                 <Icon className="h-5 w-5 stroke-[1.5]" />
               </span>
               <span className="text-[11px] font-medium leading-tight">
@@ -294,32 +292,29 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
 
         {loading && (
           <div className="space-y-2">
-            <div className="h-24 animate-pulse rounded-2xl bg-surface" />
-            <div className="h-24 animate-pulse rounded-2xl bg-surface" />
+            <Skeleton className="h-24 rounded-card" />
+            <Skeleton className="h-24 rounded-card" />
           </div>
         )}
 
         {!client?.orders.length && !loading && (
-          <div className="rounded-2xl border border-dashed border-border bg-surface/50 px-4 py-10 text-center">
-            <Package className="mx-auto h-8 w-8 stroke-[1.5] text-muted" />
-            <p className="mt-3 text-sm font-medium">Aucune commande</p>
-            <p className="mt-1 text-xs text-muted">
-              Tes achats apparaîtront ici après validation.
-            </p>
-            <Link
-              href="/boutique"
-              className="mt-4 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-primary"
-            >
-              Explorer la boutique
-            </Link>
-          </div>
+          <EmptyState
+            icon={<Package />}
+            title="Aucune commande"
+            description="Tes achats apparaîtront ici après validation."
+            action={
+              <Link href="/boutique" className={buttonClasses()}>
+                Explorer la boutique
+              </Link>
+            }
+          />
         )}
 
         <ul className="space-y-3">
           {client?.orders.map((order) => (
             <li
               key={order.id}
-              className="rounded-2xl border border-border bg-surface p-4 shadow-surface"
+              className="rounded-card border border-border bg-surface p-4 shadow-card"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -330,18 +325,11 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
                       year: "numeric",
                     })}
                   </p>
-                  <p className="mt-0.5 font-display text-lg font-semibold text-accent-ink">
+                  <p className="mt-0.5 font-display text-lg font-semibold text-fg">
                     {formatPrice(order.montantTotal)}
                   </p>
                 </div>
-                <span
-                  className={cn(
-                    "rounded-full border px-2.5 py-0.5 text-xs font-medium",
-                    ORDER_STATUS_COLORS[order.statut]
-                  )}
-                >
-                  {ORDER_STATUS_LABELS[order.statut]}
-                </span>
+                <StatusBadge kind="order" status={order.statut} />
               </div>
               <ul className="mt-3 space-y-1 border-t border-border pt-3 text-sm text-muted">
                 {order.items.map((item) => (
@@ -359,11 +347,11 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
 
       <section className="space-y-3">
         <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
-          <MapPin className="h-5 w-5 stroke-[1.5] text-info" />
+          <MapPin className="h-5 w-5 stroke-[1.5] text-primary" />
           Adresses
         </h2>
         {!client?.adresses.length && !loading && (
-          <p className="rounded-2xl bg-surface p-4 text-sm text-muted">
+          <p className="rounded-card border border-border bg-surface p-4 text-sm text-muted">
             Les adresses sont enregistrées à la première commande.
           </p>
         )}
@@ -371,15 +359,13 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
           {client?.adresses.map((addr) => (
             <li
               key={addr.id}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4 text-sm"
+              className="flex items-center justify-between gap-3 rounded-card border border-border bg-surface p-4 text-sm"
             >
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{ZONE_LABELS[addr.zone]}</span>
                   {addr.estPrincipale && (
-                    <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-medium text-accent-ink">
-                      Principale
-                    </span>
+                    <Badge tone="brand">Principale</Badge>
                   )}
                 </div>
                 <p className="mt-1 text-muted">{addr.adresseComplete}</p>

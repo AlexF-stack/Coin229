@@ -102,9 +102,9 @@ export function CartView({ suggestions }: Props) {
   if (!mounted) {
     return (
       <div className="space-y-4 px-4 py-6 md:px-0">
-        <div className="h-24 animate-pulse rounded-xl bg-background" />
-        <div className="h-28 animate-pulse rounded-xl bg-background" />
-        <div className="h-28 animate-pulse rounded-xl bg-background" />
+        <div className="h-24 animate-pulse rounded-card bg-background" />
+        <div className="h-28 animate-pulse rounded-card bg-background" />
+        <div className="h-28 animate-pulse rounded-card bg-background" />
       </div>
     );
   }
@@ -158,7 +158,7 @@ export function CartView({ suggestions }: Props) {
         <div className="space-y-4">
           <CartChangesNotice changes={cartSync.changes} onDismiss={cartSync.dismiss} />
           {multiVendor && (
-            <p className="rounded-xl border border-error/30 bg-error/10 px-3 py-2.5 text-sm text-primary">
+            <p className="rounded-controll border border-error/30 bg-error/10 px-3 py-2.5 text-sm text-primary">
               Ton panier contient déjà des articles d’une autre marque — vide ou
               commande d’abord.
             </p>
@@ -171,7 +171,7 @@ export function CartView({ suggestions }: Props) {
             subtotal={subtotal}
           />
 
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm">
+          <div className="flex items-center justify-between gap-3 rounded-card border border-border bg-background/60 px-3 py-2.5 text-sm">
             <label className="flex cursor-pointer items-center gap-2.5 font-medium text-primary">
               <input
                 type="checkbox"
@@ -201,7 +201,7 @@ export function CartView({ suggestions }: Props) {
                 <li
                   key={item.productId}
                   className={cn(
-                    "flex gap-3 rounded-xl border bg-white p-3 transition md:p-4",
+                    "flex gap-3 rounded-card border bg-white p-3 transition md:p-4",
                     checked
                       ? "border-border"
                       : "border-border/60 opacity-70"
@@ -219,7 +219,7 @@ export function CartView({ suggestions }: Props) {
 
                   <Link
                     href={`/produit/${item.productId}`}
-                    className="relative h-24 w-20 shrink-0 overflow-hidden rounded-[10px] bg-background md:h-28 md:w-24"
+                    className="relative h-24 w-20 shrink-0 overflow-hidden rounded-control bg-background md:h-28 md:w-24"
                   >
                     <Image
                       src={item.image || "/placeholder-product.svg"}
@@ -247,7 +247,7 @@ export function CartView({ suggestions }: Props) {
                         type="button"
                         aria-label="Retirer"
                         onClick={() => removeItem(item.productId)}
-                        className="shrink-0 rounded-[10px] p-1 text-muted hover:bg-background hover:text-error"
+                        className="shrink-0 rounded-control p-1 text-muted hover:bg-background hover:text-error"
                       >
                         <Trash2 className="h-4 w-4 stroke-[1.5]" />
                       </button>
@@ -294,7 +294,7 @@ export function CartView({ suggestions }: Props) {
         <aside className="hidden space-y-4 md:sticky md:top-24 md:block">
           <ZoneSelector value={zone} onChange={setZone} />
 
-          <div className="space-y-3 rounded-xl border border-border bg-background/40 p-5">
+          <div className="space-y-3 rounded-card border border-border bg-background/40 p-5">
             <p className="font-display text-lg font-semibold text-primary">
               Récapitulatif
             </p>

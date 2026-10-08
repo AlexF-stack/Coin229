@@ -100,7 +100,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
       </p>
 
       {order && (
-        <div className="mt-6 w-full rounded-[12px] bg-background p-5 text-left text-sm">
+        <div className="mt-6 w-full rounded-card bg-background p-5 text-left text-sm">
           <div className="flex items-baseline justify-between gap-3">
             <span className="text-muted">Total</span>
             <span className="font-display text-lg font-semibold text-primary">
@@ -140,7 +140,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
           rel="noreferrer"
           className="btn btn-ghost w-full text-sm"
         >
-          <MessageCircle className="h-4 w-4 stroke-[1.5] text-[#25D366]" />
+          <MessageCircle className="h-4 w-4 stroke-[1.5] text-whatsapp" />
           Besoin d&apos;aide ? WhatsApp
         </a>
       </div>

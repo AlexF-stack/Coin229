@@ -140,7 +140,7 @@ export default async function ProductPage({ params }: Props) {
           <div className="absolute right-3 top-3 z-10 md:right-0 md:top-0">
             <WishlistButton productId={product.id} />
           </div>
-          <div className="md:overflow-hidden md:rounded-[12px]">
+          <div className="md:overflow-hidden md:rounded-card">
             <ProductGallery images={product.images} alt={product.nom} />
           </div>
         </div>

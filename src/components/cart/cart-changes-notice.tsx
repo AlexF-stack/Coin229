@@ -29,12 +29,12 @@ export function CartChangesNotice({
   return (
     <div
       role="status"
-      className="relative flex gap-3 rounded-[12px] border border-accent/40 bg-accent/10 px-4 py-3 pr-10 text-sm text-fg"
+      className="relative flex gap-3 rounded-card border border-warning/25 bg-warning-soft px-4 py-3 pr-10 text-sm text-fg"
     >
-      <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-accent-ink" />
+      <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-warning" />
       <div className="space-y-1">
         <p className="font-semibold">Ton panier a été mis à jour</p>
-        <ul className="space-y-0.5 text-muted">
+        <ul className="space-y-0.5 text-fg-secondary">
           {changes.map((c, i) => (
             <li key={i}>{describe(c)}</li>
           ))}
@@ -44,7 +44,7 @@ export function CartChangesNotice({
         type="button"
         onClick={onDismiss}
         aria-label="Fermer"
-        className="absolute right-2 top-2 rounded-full p-1.5 text-muted hover:bg-black/5"
+        className="absolute right-2 top-2 rounded-badge p-1.5 text-muted hover:bg-warning/10 hover:text-fg"
       >
         <X className="h-4 w-4" />
       </button>

@@ -38,7 +38,7 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label="Informations cookies"
-      className="fixed inset-x-0 top-0 z-[60] flex items-center gap-3 border-b border-border bg-white/95 px-4 py-2.5 shadow-[0_8px_30px_rgba(2,11,38,0.08)] backdrop-blur-md md:inset-x-auto md:bottom-4 md:left-4 md:top-auto md:block md:max-w-md md:rounded-2xl md:border md:p-4"
+      className="fixed inset-x-0 top-0 z-[60] flex items-center gap-3 border-b border-border bg-white/95 px-4 py-2.5 shadow-raised backdrop-blur-md md:inset-x-auto md:bottom-4 md:left-4 md:top-auto md:block md:max-w-md md:rounded-cardxl md:border md:p-4"
     >
       <p className="min-w-0 flex-1 text-xs text-primary md:text-sm">
         <span className="md:hidden">Cookies techniques uniquement, pas de pub.</span>

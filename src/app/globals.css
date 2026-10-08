@@ -48,6 +48,10 @@
   --color-neutral: #4b5563;
   --color-neutral-soft: #f3f4f6;
 
+  /* — Marques tierces (couleurs imposées par leur charte, seule exception) — */
+  --color-whatsapp: #25d366;
+  --color-facebook: #1877f2;
+
   /* — Typographie — */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif; /* texte, formulaires, tableaux */
   --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif; /* titres, navigation, boutons */
@@ -63,6 +67,7 @@
   --shadow-card: 0 1px 2px rgb(17 17 17 / 0.04), 0 8px 24px rgb(15 45 38 / 0.06);
   --shadow-raised: 0 2px 4px rgb(17 17 17 / 0.05), 0 12px 32px rgb(15 45 38 / 0.1);
   --shadow-overlay: 0 24px 64px rgb(15 45 38 / 0.25);
+  --shadow-bar: 0 -8px 30px rgb(15 45 38 / 0.08); /* barres fixées en bas d'écran */
 
   /* — Mouvement — */
   --default-transition-duration: 150ms;

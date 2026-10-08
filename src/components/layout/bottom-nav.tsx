@@ -25,7 +25,7 @@ export function BottomNav() {
   }, [items]);
 
   return (
-    <nav className="safe-pb fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 shadow-[0_-8px_30px_rgba(15,45,38,0.06)] backdrop-blur-md md:hidden">
+    <nav className="safe-pb fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 shadow-bar backdrop-blur-md md:hidden">
       <div className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-2">
         {links.map(({ href, label, icon: Icon }) => {
           const active =
@@ -37,7 +37,7 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                "relative flex min-h-12 min-w-[3.75rem] flex-col items-center justify-center gap-0.5 rounded-[10px] px-2 py-1.5 text-[10px] transition-colors",
+                "relative flex min-h-12 min-w-[3.75rem] flex-col items-center justify-center gap-0.5 rounded-control px-2 py-1.5 text-[10px] transition-colors",
                 active ? "text-primary" : "text-muted hover:text-primary"
               )}
             >

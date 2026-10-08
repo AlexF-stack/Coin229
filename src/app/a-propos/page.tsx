@@ -43,7 +43,7 @@ export default function AboutPage() {
         ].map((item) => (
           <div
             key={item.title}
-            className="rounded-[12px] bg-background p-5"
+            className="rounded-card bg-background p-5"
           >
             <h2 className="font-display text-lg font-semibold text-primary">
               {item.title}
@@ -53,7 +53,7 @@ export default function AboutPage() {
         ))}
       </div>
 
-      <section className="max-w-2xl rounded-[12px] bg-background p-5 text-sm text-muted">
+      <section className="max-w-2xl rounded-card bg-background p-5 text-sm text-muted">
         <h2 className="font-display text-lg font-semibold text-primary">Contact</h2>
         <p className="mt-2">
           {SITE.legalName} · {SITE.address}

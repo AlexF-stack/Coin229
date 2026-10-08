@@ -99,7 +99,7 @@ export function InstallAppCard({
           className
         )}
       >
-        <div className="rounded-2xl border border-border bg-white p-4 shadow-[0_16px_50px_rgba(15,45,38,0.15)]">
+        <div className="rounded-cardxl border border-border bg-white p-4 shadow-overlay">
           <CardBody
             title={title}
             description={
@@ -120,7 +120,7 @@ export function InstallAppCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-accent/30 bg-background/80 p-4 text-left",
+        "rounded-cardxl border border-accent/30 bg-background/80 p-4 text-left",
         variant === "inline" && "p-3",
         className
       )}
@@ -168,7 +168,7 @@ function CardBody({
           width={compact ? 40 : 48}
           height={compact ? 40 : 48}
           className={cn(
-            "shrink-0 rounded-xl object-cover",
+            "shrink-0 rounded-card object-cover",
             compact ? "h-10 w-10" : "h-12 w-12"
           )}
         />

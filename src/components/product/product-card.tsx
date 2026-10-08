@@ -52,13 +52,13 @@ export function ProductCard({ product, className }: Props) {
   return (
     <article
       className={cn(
-        "group flex h-full flex-col rounded-[12px] bg-white",
+        "group flex h-full flex-col rounded-card bg-white",
         className
       )}
     >
       <Link
         href={`/produit/${product.id}`}
-        className="relative block aspect-[4/5] overflow-hidden rounded-[12px] bg-background"
+        className="relative block aspect-[4/5] overflow-hidden rounded-card bg-background"
       >
         <Image
           src={image}
@@ -121,7 +121,7 @@ export function ProductCard({ product, className }: Props) {
             <div className="opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
               <AddToCartButton
                 product={product}
-                className="btn btn-primary w-full !rounded-[10px] !py-2.5 text-xs"
+                className="btn btn-primary min-h-10 w-full !py-2.5 text-xs"
               />
             </div>
           )}

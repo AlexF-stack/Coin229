@@ -39,7 +39,7 @@ export default function LivraisonPage() {
           return (
             <div
               key={zone}
-              className="rounded-[12px] bg-background p-5"
+              className="rounded-card bg-background p-5"
             >
               <MapPin className="h-5 w-5 stroke-[1.5] text-accent-ink" />
               <h2 className="mt-3 font-display text-lg font-semibold text-primary">
@@ -54,7 +54,7 @@ export default function LivraisonPage() {
         })}
       </div>
 
-      <div className="flex items-start gap-3 rounded-[12px] border border-success/25 bg-success/10 p-5">
+      <div className="flex items-start gap-3 rounded-card border border-success/25 bg-success/10 p-5">
         <Gift className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-success" />
         <div>
           <p className="font-semibold text-primary">Livraison gratuite</p>
@@ -65,7 +65,7 @@ export default function LivraisonPage() {
         </div>
       </div>
 
-      <div className="rounded-[12px] bg-background p-5">
+      <div className="rounded-card bg-background p-5">
         <div className="flex items-center gap-2">
           <Truck className="h-5 w-5 stroke-[1.5] text-accent-ink" />
           <h2 className="font-display text-lg font-semibold text-primary">

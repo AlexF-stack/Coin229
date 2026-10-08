@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buttonClasses } from "@/components/ui/button";
 
 type Props = {
   searchParams: Promise<{ reason?: string }>;
@@ -21,7 +22,7 @@ export default async function AuthErrorPage({ searchParams }: Props) {
       <p className="mt-3 text-sm text-muted">{message}</p>
       <Link
         href="/compte"
-        className="mt-8 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-primary"
+        className={buttonClasses({ className: "mt-8" })}
       >
         Retour à la connexion
       </Link>

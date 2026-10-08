@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { assertClient } from "@/lib/assert-client";
@@ -39,7 +40,7 @@ export default async function ClientMessagesPage() {
           </Link>
         </div>
       ) : (
-        <ul className="divide-y divide-border border-y border-border md:rounded-xl md:border">
+        <ul className="divide-y divide-border border-y border-border md:rounded-controll md:border">
           {conversations.map((c) => {
             const last = c.messages[0];
             return (
@@ -52,9 +53,9 @@ export default async function ClientMessagesPage() {
                     <p className="font-medium text-primary">
                       {c.vendor.nomBoutique}
                       {c.clientUnread > 0 && (
-                        <span className="ml-2 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                        <Badge tone="accent" variant="solid" className="ml-2" aria-label={`${c.clientUnread} non lu(s)`}>
                           {c.clientUnread}
-                        </span>
+                        </Badge>
                       )}
                     </p>
                     {c.subject && (

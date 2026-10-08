@@ -47,7 +47,7 @@ export function SocialAuthButtons({ next = "/compte" }: { next?: string } = {}) 
     <div className="space-y-3">
       <div className="relative py-1 text-center">
         <span className="absolute inset-x-0 top-1/2 h-px bg-border" />
-        <span className="relative bg-background px-3 text-xs text-muted">
+        <span className="relative bg-surface px-3 text-xs text-muted">
           ou continuer avec
         </span>
       </div>
@@ -56,7 +56,7 @@ export function SocialAuthButtons({ next = "/compte" }: { next?: string } = {}) 
         type="button"
         disabled={Boolean(pending)}
         onClick={() => void signIn("google")}
-        className="flex w-full items-center justify-center gap-2.5 rounded-full border border-border bg-surface py-3 text-sm font-semibold transition hover:border-accent disabled:opacity-60"
+        className="flex min-h-11 w-full items-center justify-center gap-2.5 rounded-control border border-border-strong bg-surface text-sm font-semibold text-fg transition-colors hover:border-primary hover:bg-background disabled:opacity-60"
       >
         {pending === "google" ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -70,7 +70,7 @@ export function SocialAuthButtons({ next = "/compte" }: { next?: string } = {}) 
         type="button"
         disabled={Boolean(pending)}
         onClick={() => void signIn("facebook")}
-        className="flex w-full items-center justify-center gap-2.5 rounded-full border border-border bg-[#1877F2] py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+        className="flex min-h-11 w-full items-center justify-center gap-2.5 rounded-control bg-facebook text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
       >
         {pending === "facebook" ? (
           <Loader2 className="h-4 w-4 animate-spin text-white" />

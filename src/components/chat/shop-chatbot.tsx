@@ -185,7 +185,7 @@ export function ShopChatbot() {
     <>
       {open && (
         <div
-          className="fixed bottom-24 right-4 z-50 flex w-[min(100vw-2rem,22rem)] flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-[0_20px_50px_rgba(15,45,38,0.18)] md:bottom-24 md:right-8"
+          className="fixed bottom-24 right-4 z-50 flex w-[min(100vw-2rem,22rem)] flex-col overflow-hidden rounded-panel border border-border bg-white shadow-overlay md:bottom-24 md:right-8"
           role="dialog"
           aria-label="Assistant Coin229"
         >
@@ -216,10 +216,10 @@ export function ShopChatbot() {
               <div key={m.id} className="flex flex-col gap-2">
                 <div
                   className={cn(
-                    "max-w-[92%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm leading-relaxed",
+                    "max-w-[92%] whitespace-pre-wrap rounded-panel px-3 py-2 text-sm leading-relaxed",
                     m.role === "bot"
-                      ? "self-start bg-surface text-fg shadow-surface md:border md:border-border"
-                      : "self-end bg-accent text-primary"
+                      ? "self-start bg-surface text-fg shadow-card md:border md:border-border"
+                      : "self-end bg-primary text-inverse"
                   )}
                 >
                   {m.text}
@@ -234,9 +234,9 @@ export function ShopChatbot() {
                           key={p.id}
                           href={p.href}
                           onClick={() => setOpen(false)}
-                          className="flex gap-2.5 rounded-xl border border-border bg-surface p-2 transition hover:border-accent"
+                          className="flex gap-2.5 rounded-card border border-border bg-surface p-2 transition hover:border-accent"
                         >
-                          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-surface">
+                          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-control bg-surface">
                             {p.image ? (
                               <Image
                                 src={p.image}
@@ -276,7 +276,7 @@ export function ShopChatbot() {
             ))}
 
             {typing && (
-              <div className="self-start rounded-2xl bg-surface px-3 py-2 text-xs text-muted md:border md:border-border">
+              <div className="self-start rounded-panel bg-surface px-3 py-2 text-xs text-muted md:border md:border-border">
                 Je cherche les meilleures pièces…
               </div>
             )}
@@ -305,7 +305,7 @@ export function ShopChatbot() {
                         )}
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded-full bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white"
+                        className="rounded-full bg-whatsapp px-3 py-1.5 text-xs font-semibold text-white"
                       >
                         WhatsApp
                       </a>
@@ -330,7 +330,7 @@ export function ShopChatbot() {
                 href={whatsappHref(`Bonjour Coin229 — page ${pathname}`)}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-2.5 text-sm font-semibold text-white"
+                className="flex items-center justify-center gap-2 rounded-card bg-whatsapp py-2.5 text-sm font-semibold text-white"
               >
                 <MessageCircle className="h-4 w-4 stroke-[1.5]" />
                 Continuer sur WhatsApp
@@ -348,13 +348,13 @@ export function ShopChatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ex. montre homme 20 000…"
-              className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm outline-none focus:border-accent"
+              className="min-h-11 min-w-0 flex-1 rounded-control border border-border-strong bg-surface px-3 text-base outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15 md:text-sm"
             />
             <button
               type="submit"
               aria-label="Envoyer"
               disabled={typing}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-primary disabled:opacity-50"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-primary text-inverse hover:bg-primary-hover disabled:opacity-50"
             >
               <Send className="h-4 w-4 stroke-[1.5]" />
             </button>
@@ -367,7 +367,7 @@ export function ShopChatbot() {
           className="fixed bottom-[5.75rem] right-4 z-[60] flex w-[min(100vw-5.25rem,18rem)] animate-[fab-in_0.45s_ease-out_both] flex-col items-end md:bottom-28 md:right-8"
           role="status"
         >
-          <div className="relative w-full rounded-2xl rounded-br-md border border-primary/12 bg-white px-3.5 py-3 shadow-[0_12px_32px_rgba(15,45,38,0.14)]">
+          <div className="relative w-full rounded-panel rounded-br-md border border-primary/12 bg-white px-3.5 py-3 shadow-raised">
             <button
               type="button"
               onClick={dismissNudge}
@@ -400,7 +400,7 @@ export function ShopChatbot() {
         onClick={() => (open ? setOpen(false) : openChat())}
         aria-label={open ? "Fermer le chat" : "Ouvrir l’assistant"}
         className={cn(
-          "fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-[0_10px_30px_rgba(212,175,55,0.35)] transition hover:scale-105 active:scale-95 md:bottom-8 md:right-8",
+          "fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-raised transition hover:scale-105 active:scale-95 md:bottom-8 md:right-8",
           // Au-dessus de la barre d'achat fixe des pages produit / panier / commande
           onPurchasePage && "max-md:bottom-32",
           "animate-[fab-in_0.5s_ease-out_both]",

@@ -63,7 +63,7 @@ export function ProductGallery({ images, alt }: Props) {
   return (
     <div className="space-y-3">
       <div
-        className="group relative aspect-square overflow-hidden rounded-b-[20px] bg-surface md:rounded-[20px]"
+        className="group relative aspect-square overflow-hidden rounded-b-panel bg-surface md:rounded-panel"
         role="region"
         aria-roledescription="galerie"
         aria-label={`Photos : ${alt}`}
@@ -157,7 +157,7 @@ export function ProductGallery({ images, alt }: Props) {
               aria-label={`Voir la photo ${i + 1}`}
               aria-current={i === index}
               className={cn(
-                "relative h-16 w-16 overflow-hidden rounded-[10px] bg-surface ring-offset-2 transition",
+                "relative h-16 w-16 overflow-hidden rounded-control bg-surface ring-offset-2 transition",
                 i === index ? "ring-2 ring-primary" : "opacity-70 hover:opacity-100"
               )}
             >

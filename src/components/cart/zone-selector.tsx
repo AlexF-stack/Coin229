@@ -26,7 +26,7 @@ export function ZoneSelector({ value, onChange }: Props) {
               type="button"
               onClick={() => onChange(zone)}
               className={cn(
-                "flex items-center justify-between gap-3 rounded-[16px] border px-4 py-3 text-left text-sm transition-colors",
+                "flex items-center justify-between gap-3 rounded-panel border px-4 py-3 text-left text-sm transition-colors",
                 value === zone
                   ? "border-accent bg-accent/10 text-fg"
                   : "border-border bg-surface text-muted"

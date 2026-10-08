@@ -11,13 +11,13 @@ type Props = {
 
 export function QuantitySelector({ value, min = 1, max, onChange }: Props) {
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-[16px] bg-surface px-1.5 py-1 sm:gap-3 sm:px-2 sm:py-1.5">
+    <div className="inline-flex items-center gap-1.5 rounded-panel bg-surface px-1.5 py-1 sm:gap-3 sm:px-2 sm:py-1.5">
       <button
         type="button"
         aria-label="Diminuer"
         disabled={value <= min}
         onClick={() => onChange(Math.max(min, value - 1))}
-        className="flex h-9 w-9 items-center justify-center rounded-xl text-fg disabled:opacity-30"
+        className="flex h-9 w-9 items-center justify-center rounded-card text-fg disabled:opacity-30"
       >
         <Minus className="h-4 w-4 stroke-[1.5]" />
       </button>
@@ -29,7 +29,7 @@ export function QuantitySelector({ value, min = 1, max, onChange }: Props) {
         aria-label="Augmenter"
         disabled={value >= max}
         onClick={() => onChange(Math.min(max, value + 1))}
-        className="flex h-9 w-9 items-center justify-center rounded-xl text-fg disabled:opacity-30"
+        className="flex h-9 w-9 items-center justify-center rounded-card text-fg disabled:opacity-30"
       >
         <Plus className="h-4 w-4 stroke-[1.5]" />
       </button>

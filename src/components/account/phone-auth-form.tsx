@@ -1,5 +1,6 @@
 "use client";
 
+import { buttonClasses } from "@/components/ui/button";
 import { useState, useTransition, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, ShieldCheck } from "lucide-react";
@@ -164,8 +165,8 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
               onChange={(e) => onDigitChange(i, e.target.value)}
               onKeyDown={(e) => onDigitKeyDown(i, e)}
               className={cn(
-                "h-12 w-10 rounded-xl border bg-surface text-center text-xl font-semibold outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/25 md:h-14 md:w-12",
-                d ? "border-accent text-fg" : "border-border text-fg"
+                "h-12 w-10 rounded-control border bg-surface text-center text-xl font-semibold outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15 md:h-14 md:w-12",
+                d ? "border-primary text-fg" : "border-border-strong text-fg"
               )}
               aria-label={`Chiffre ${i + 1}`}
             />
@@ -173,12 +174,16 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
         </div>
 
         {info && <p className="text-center text-xs text-info">{info}</p>}
-        {error && <p className="text-center text-sm text-error">{error}</p>}
+        {error && (
+          <p role="alert" className="text-center text-sm font-medium text-error">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"
           disabled={pending || otp.length < 6}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 text-sm font-semibold text-primary transition active:scale-[0.98] disabled:opacity-50"
+          className={buttonClasses({ size: "lg", fullWidth: true })}
         >
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}
           Se connecter
@@ -189,7 +194,7 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
             type="button"
             disabled={resendIn > 0 || pending}
             onClick={() => sendOtp()}
-            className="text-accent-ink disabled:text-muted"
+            className="font-medium text-accent-ink hover:underline disabled:text-muted disabled:no-underline"
           >
             {resendIn > 0 ? `Renvoyer dans ${resendIn}s` : "Renvoyer le code"}
           </button>
@@ -218,7 +223,7 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
     <form onSubmit={sendOtp} className="space-y-4">
       <label className="block space-y-2 text-sm">
         <span className="font-medium text-fg">Numéro de téléphone</span>
-        <div className="flex overflow-hidden rounded-2xl border border-border bg-surface focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20">
+        <div className="flex min-h-11 overflow-hidden rounded-control border border-border-strong bg-surface transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 hover:border-fg-secondary/40">
           <span className="flex items-center border-r border-border bg-background px-3 text-sm font-medium text-muted">
             +229
           </span>
@@ -228,17 +233,21 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
             inputMode="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="min-w-0 flex-1 bg-transparent px-3 py-3.5 outline-none"
+            className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-base outline-none md:text-sm"
             placeholder={BJ_PHONE_PLACEHOLDER}
             autoComplete="tel"
           />
         </div>
       </label>
-      {error && <p className="text-sm text-error">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm font-medium text-error">
+          {error}
+        </p>
+      )}
       <button
         type="submit"
         disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 text-sm font-semibold text-primary transition active:scale-[0.98] disabled:opacity-60"
+        className={buttonClasses({ size: "lg", fullWidth: true })}
       >
         {pending && <Loader2 className="h-4 w-4 animate-spin" />}
         Continuer

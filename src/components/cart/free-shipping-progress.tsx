@@ -19,7 +19,7 @@ export function FreeShippingProgress({
   const progress = Math.min(100, (subtotal / threshold) * 100);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-primary/10 bg-background p-3.5 md:p-4">
+    <div className="overflow-hidden rounded-card border border-primary/10 bg-background p-3.5 md:p-4">
       <div className="flex items-start gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-accent">
           <Truck className="h-4 w-4 stroke-[1.5]" />

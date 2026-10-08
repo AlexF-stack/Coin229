@@ -47,7 +47,7 @@ export default function ErrorPage({
         rel="noreferrer"
         className="btn btn-ghost mt-3 text-sm"
       >
-        <MessageCircle className="h-4 w-4 stroke-[1.5] text-[#25D366]" />
+        <MessageCircle className="h-4 w-4 stroke-[1.5] text-whatsapp" />
         Prévenir sur WhatsApp
       </a>
       {error.digest && (

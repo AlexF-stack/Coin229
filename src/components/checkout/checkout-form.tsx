@@ -202,7 +202,7 @@ export function CheckoutForm() {
   }
 
   const fieldClass =
-    "w-full rounded-[10px] border border-border bg-white px-3 py-3 text-fg outline-none transition focus:border-primary";
+    "w-full rounded-control border border-border bg-white px-3 py-3 text-fg outline-none transition focus:border-primary";
 
   return (
     <form
@@ -211,7 +211,7 @@ export function CheckoutForm() {
     >
       <CartChangesNotice changes={cartSync.changes} onDismiss={cartSync.dismiss} />
 
-      <section className="space-y-2 rounded-[12px] bg-background p-5">
+      <section className="space-y-2 rounded-card bg-background p-5">
         <ZoneSelector value={zone} onChange={setZone} />
         <p className="text-xs text-muted">
           {ZONE_LABELS[zone]} · {shipping.etaLabel}
@@ -219,7 +219,7 @@ export function CheckoutForm() {
         </p>
       </section>
 
-      <section className="space-y-4 rounded-[12px] bg-background p-5">
+      <section className="space-y-4 rounded-card bg-background p-5">
         <h2 className="font-display text-base font-semibold text-primary">
           Vos informations
         </h2>
@@ -276,7 +276,7 @@ export function CheckoutForm() {
           type="button"
           onClick={() => setMode("livraison")}
           className={cn(
-            "flex w-full items-start gap-3 rounded-[12px] border p-4 text-left transition-colors",
+            "flex w-full items-start gap-3 rounded-card border p-4 text-left transition-colors",
             mode === "livraison"
               ? "border-primary bg-background"
               : "border-border bg-white hover:border-primary/30"
@@ -292,7 +292,7 @@ export function CheckoutForm() {
           type="button"
           onClick={() => setMode("mobile_money")}
           className={cn(
-            "flex w-full items-start gap-3 rounded-[12px] border p-4 text-left transition-colors",
+            "flex w-full items-start gap-3 rounded-card border p-4 text-left transition-colors",
             mode === "mobile_money"
               ? "border-primary bg-background"
               : "border-border bg-white hover:border-primary/30"
@@ -306,7 +306,7 @@ export function CheckoutForm() {
         </button>
       </section>
 
-      <section className="space-y-2 rounded-[12px] border border-border bg-white p-5 text-sm">
+      <section className="space-y-2 rounded-card border border-border bg-white p-5 text-sm">
         <h2 className="mb-3 font-display text-base font-semibold text-primary">
           Récapitulatif
         </h2>
@@ -333,12 +333,12 @@ export function CheckoutForm() {
       </section>
 
       {error && (
-        <p className="rounded-[10px] bg-error/15 px-3 py-2 text-sm text-error">
+        <p className="rounded-control bg-error/15 px-3 py-2 text-sm text-error">
           {error}
         </p>
       )}
 
-      <label className="flex items-start gap-3 rounded-[12px] border border-border bg-background/60 p-4 text-sm">
+      <label className="flex items-start gap-3 rounded-card border border-border bg-background/60 p-4 text-sm">
         <input
           type="checkbox"
           checked={acceptCgv}

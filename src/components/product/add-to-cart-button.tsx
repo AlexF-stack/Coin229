@@ -83,7 +83,7 @@ export function AddToCartButton({
           onClick={handleClick}
           aria-label="Ajouter au panier"
           className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-[10px] bg-primary text-white transition-transform active:scale-90",
+            "flex h-9 w-9 items-center justify-center rounded-control bg-primary text-white transition-transform active:scale-90",
             added && "bg-success animate-[pop_0.4s_ease-out]",
             className
           )}

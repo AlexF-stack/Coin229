@@ -11,7 +11,7 @@ export function LegalPage({
 }) {
   return (
     <article className="mx-auto max-w-3xl space-y-6 px-4 py-8 md:px-0 md:py-12">
-      <header className="rounded-[12px] bg-background px-5 py-6 md:px-8">
+      <header className="rounded-card bg-background px-5 py-6 md:px-8">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-primary md:text-4xl">
           {title}
         </h1>

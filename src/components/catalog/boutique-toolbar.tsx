@@ -2,9 +2,12 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState, useTransition } from "react";
-import { Filter, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
+import { Filter, Loader2, Search, SlidersHorizontal } from "lucide-react";
 import { CATEGORIES, CATEGORIE_LABELS, nicheLabel } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { Drawer } from "@/components/ui/overlay";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/field";
 import type { Categorie, Genre } from "@prisma/client";
 
 type Props = {
@@ -115,7 +118,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Rechercher une montre, un bijou, une sandale…"
-            className="w-full rounded-[10px] border border-border bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-primary"
+            className="w-full rounded-control border border-border bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-primary"
           />
         </label>
       </form>
@@ -126,7 +129,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
             type="button"
             onClick={clearCategoryFilters}
             className={cn(
-              "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
+              "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-control md:px-3.5 md:text-sm",
               !categorie && !niche
                 ? "bg-primary text-white"
                 : "border border-border bg-white text-muted hover:text-primary"
@@ -141,7 +144,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
               type="button"
               onClick={() => setParam("categorie", c)}
               className={cn(
-                "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
+                "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-control md:px-3.5 md:text-sm",
                 categorie === c
                   ? "bg-primary text-white"
                   : "border border-border bg-white text-muted hover:text-primary"
@@ -163,9 +166,9 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
                 type="button"
                 onClick={() => setParam("niche", n)}
                 className={cn(
-                  "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
+                  "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-control md:px-3.5 md:text-sm",
                   niche.toLowerCase() === n.toLowerCase()
-                    ? "bg-accent text-primary"
+                    ? "bg-primary text-inverse"
                     : "border border-border bg-white text-muted hover:text-primary"
                 )}
               >
@@ -193,7 +196,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[10px] border border-border bg-white px-2.5 py-2 text-sm font-medium text-primary md:hidden"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-control border border-border bg-white px-2.5 py-2 text-sm font-medium text-primary md:hidden"
           >
             <Filter className="h-4 w-4" />
             Filtrer
@@ -203,7 +206,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
             <select
               value={sort}
               onChange={(e) => setParam("sort", e.target.value)}
-              className="rounded-[10px] border border-border bg-white px-3 py-2 text-sm outline-none focus:border-primary"
+              className="rounded-control border border-border bg-white px-3 py-2 text-sm outline-none focus:border-primary"
               aria-label="Trier par"
             >
               {sorts.map((s) => (
@@ -216,7 +219,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
           <select
             value={sort}
             onChange={(e) => setParam("sort", e.target.value)}
-            className="min-w-0 max-w-[9.5rem] rounded-[10px] border border-border bg-white px-2 py-2 text-sm outline-none focus:border-primary md:hidden"
+            className="min-w-0 max-w-[9.5rem] rounded-control border border-border bg-white px-2 py-2 text-sm outline-none focus:border-primary md:hidden"
             aria-label="Trier par"
           >
             {sorts.map((s) => (
@@ -239,7 +242,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
             type="button"
             onClick={() => setParam("genre", g.value)}
             className={cn(
-              "rounded-[10px] border px-3 py-1.5 text-xs font-medium",
+              "rounded-control border px-3 py-1.5 text-xs font-medium",
               genre === g.value || (!genre && !g.value)
                 ? "border-accent bg-accent/15 text-primary"
                 : "border-border text-muted hover:text-primary"
@@ -252,7 +255,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
           type="button"
           onClick={() => setParam("enStock", enStock ? "" : "1")}
           className={cn(
-            "ml-auto rounded-[10px] border px-3 py-1.5 text-xs font-medium",
+            "ml-auto rounded-control border px-3 py-1.5 text-xs font-medium",
             enStock
               ? "border-accent bg-accent/15 text-primary"
               : "border-border text-muted hover:text-primary"
@@ -264,90 +267,58 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
           <button
             type="button"
             onClick={clearAll}
-            className="rounded-[10px] border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-primary"
+            className="rounded-control border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-primary"
           >
             Tout effacer
           </button>
         ) : null}
       </div>
 
-      {/* Mobile drawer */}
-      {drawerOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden">
-          <button
-            type="button"
-            className="absolute inset-0 bg-primary/40"
-            aria-label="Fermer les filtres"
-            onClick={() => setDrawerOpen(false)}
-          />
-          <div className="safe-pb absolute inset-x-0 bottom-0 rounded-t-2xl bg-white p-5 shadow-surface">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="font-display text-lg font-semibold text-primary">
-                Filtrer
-              </p>
-              <button
-                type="button"
-                onClick={() => setDrawerOpen(false)}
-                className="rounded-[10px] p-2 text-muted"
-                aria-label="Fermer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <p className="text-xs font-medium uppercase tracking-wider text-muted">
-              Genre
-            </p>
+      {/* Mobile : filtres dans le tiroir du design system */}
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title="Filtrer"
+        footer={
+          <>
+            <Button variant="outline" onClick={clearFilters}>
+              Réinitialiser
+            </Button>
+            <Button onClick={() => setDrawerOpen(false)} loading={loading}>
+              Voir {resultCount} résultat{resultCount !== 1 ? "s" : ""}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <fieldset>
+            <legend className="text-xs font-medium uppercase tracking-wider text-muted">Genre</legend>
             <div className="mt-2 flex flex-wrap gap-2">
               {genres.map((g) => (
                 <button
                   key={g.label}
                   type="button"
+                  aria-pressed={genre === g.value || (!genre && !g.value)}
                   onClick={() => setParam("genre", g.value)}
                   className={cn(
-                    "rounded-[10px] border px-3 py-2 text-sm",
+                    "min-h-10 rounded-control border px-3 text-sm font-medium transition-colors",
                     genre === g.value || (!genre && !g.value)
-                      ? "border-primary bg-primary text-white"
-                      : "border-border"
+                      ? "border-primary bg-primary text-inverse"
+                      : "border-border-strong bg-surface text-fg hover:border-primary"
                   )}
                 >
                   {g.label}
                 </button>
               ))}
             </div>
-            <label className="mt-5 flex items-center gap-2 text-sm text-primary">
-              <input
-                type="checkbox"
-                checked={enStock}
-                onChange={(e) =>
-                  setParam("enStock", e.target.checked ? "1" : "")
-                }
-                className="h-4 w-4 accent-primary"
-              />
-              En stock uniquement
-            </label>
-            <div className="mt-6 flex gap-2">
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="btn btn-secondary flex-1"
-              >
-                Réinitialiser
-              </button>
-              <button
-                type="button"
-                onClick={() => setDrawerOpen(false)}
-                className="btn btn-primary flex-1"
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>Voir {resultCount} résultat{resultCount !== 1 ? "s" : ""}</>
-                )}
-              </button>
-            </div>
-          </div>
+          </fieldset>
+          <Checkbox
+            label="En stock uniquement"
+            checked={enStock}
+            onChange={(e) => setParam("enStock", e.target.checked ? "1" : "")}
+          />
         </div>
-      )}
+      </Drawer>
     </div>
   );
 }
