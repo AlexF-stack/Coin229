@@ -32,6 +32,8 @@ export function BrandLogo({
         alt="Coin229"
         width={height}
         height={height}
+        // Arrondi de l’icône d’application (identique à l’icône installée) : exception assumée
+        // eslint-disable-next-line no-restricted-syntax
         className={cn("shrink-0 rounded-[22%] object-cover", className)}
         style={{ width: height, height }}
         priority={priority}

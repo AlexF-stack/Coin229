@@ -9,6 +9,11 @@
  */
 
 @theme {
+  /* Palette Tailwind par défaut désactivée (emerald, orange…) : seuls les tokens ci-dessous existent */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #111111;
+
   /* — Marque — */
   --color-primary: #0f2d26; /* Deep Green : actions, navigation, marque */
   --color-primary-hover: #163a32;

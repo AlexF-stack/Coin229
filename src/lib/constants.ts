@@ -131,13 +131,7 @@ export const ORDER_STATUS_LABELS = {
   annulee: "Annulée",
 } as const;
 
-export const ORDER_STATUS_COLORS = {
-  en_attente: "bg-accent/20 text-accent border-accent/40",
-  confirmee: "bg-info/20 text-info border-info/40",
-  en_livraison: "bg-error/20 text-error border-error/40",
-  livree: "bg-success/20 text-success border-success/40",
-  annulee: "bg-background text-muted border-border",
-} as const;
+// Couleurs de statut : src/lib/status.ts (StatusBadge)
 
 export function isProductAvailable(statut: ProductStatus, stock: number) {
   return statut === "actif" && stock > 0;

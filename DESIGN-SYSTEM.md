@@ -14,10 +14,10 @@
 | 2. Incohérences public / espaces internes | ✅ |
 | 3. Tokens globaux | ✅ |
 | 4. Composants partagés | ✅ |
-| 5. Migration des pages | 🔄 |
-| 6. Vérification par espace | ⬜ |
-| 7. Responsive | ⬜ |
-| 8. Non-régression fonctionnelle | ⬜ |
+| 5. Migration des pages | ✅ |
+| 6. Vérification par espace | ✅ |
+| 7. Responsive | ✅ |
+| 8. Non-régression fonctionnelle | ✅ |
 
 ---
 
@@ -185,6 +185,45 @@ Le site public garde son fond blanc principal ; les espaces internes passent sur
 
 ---
 
+## 6. Utiliser le design system (nouvelle page, nouveau composant)
+
+Règle : **on n’invente rien**. Tout existe déjà dans `src/app/globals.css` (tokens) et `src/components/ui/` (composants). Référence visuelle complète : **`/admin/design-system`** (accès admin).
+
+| Besoin | À utiliser |
+|---|---|
+| Page interne (admin, vendeur) | `AdminShell` / `VendorShell` (basés sur `AppShell`) + `PageHeader` |
+| Page de connexion / inscription | `AuthCard` |
+| Bouton | `<Button variant="primary|secondary|outline|accent|ghost|destructive" size="sm|md|lg" loading>`, ou `buttonClasses()` sur un `<Link>` |
+| Champ de formulaire | `<Field label hint error success required>` + `Input` / `Textarea` / `Select` ; `Checkbox`, `Radio` |
+| Carte, indicateur chiffré | `Card`, `CardHeader`, `StatCard` |
+| Statut (commande, produit, vendeur, reversement, remboursement) | `<StatusBadge kind status>` — libellés et couleurs dans `src/lib/status.ts`, nulle part ailleurs |
+| Étiquette | `<Badge tone="success|warning|error|info|neutral|brand|accent">` |
+| Liste de données | `DataTable` (tableau sur ordinateur, cartes sur mobile) |
+| Fenêtre, tiroir | `Modal`, `Drawer` ; confirmation : `useConfirm()` |
+| Message dans la page / notification courte | `Alert` / `useToast()` |
+| Onglets, menu d’actions, pagination | `Tabs`, `Dropdown`, `Pagination` |
+| Chargement, vide, erreur | `Skeleton`, `Spinner`, `EmptyState`, `ErrorState` |
+
+**Couleurs** : uniquement les tokens (`bg-primary`, `text-fg-secondary`, `bg-surface`, `text-success`…). La palette Tailwind par défaut est désactivée : `emerald`, `orange`, `amber-500`… n’existent plus. Seuls `white` et `black` (#111111) restent comme couleurs de base.
+
+**Gold** : accent de marque (filets, CTA sur fond Deep Green, badge promo). Jamais en texte sur fond clair → `text-accent-ink`.
+
+**Fond sombre** : uniquement `bg-surface-inverse` (Deep Green) — sidebar, bandeau, pied de page, bloc « action principale ». Jamais de noir.
+
+**Garde-fous automatiques** (`npm run lint`) : une couleur hexadécimale ou un rayon écrit en dur dans une classe est refusé.
+
+**Exceptions documentées** : couleurs de marques tierces (`bg-whatsapp`, `bg-facebook`, imposées par leur charte) ; arrondi de l’icône d’application (`rounded-[22%]`, identique à l’icône installée).
+
+---
+
+## 7. Résultat
+
+- **0** couleur hexadécimale écrite en dur dans les composants (101 au départ), **0** fond noir, **0** accent émeraude / orange.
+- Un seul style de champ, de bouton, de carte, de statut, de fenêtre et de tiroir pour tout le produit.
+- Vérifié : captures avant / après (ordinateur, tablette, mobile) dans `.audit-private/ds/`, build de production, parcours complet sans violation CSP, 20 suites de tests unitaires et 13 tests navigateur.
+
+---
+
 ## Journal
 
 | Date | Étape | Commit | Résumé |
@@ -196,3 +235,4 @@ Le site public garde son fond blanc principal ; les espaces internes passent sur
 | 08/10/2026 | 5 (lot B) | voir `git log` | Admin : tableau de bord (StatCard), commandes (cartes + StatusBadge + onglets par boutique), produits (DataTable + formulaire en tiroir avec labels), modération, vendeurs, reversements, notifications ; carte notifications commune aux 3 publics |
 | 08/10/2026 | 5 (lot C) | voir `git log` | Espace vendeur : tableau de bord (prochaine étape en Deep Green + Gold, StatCard), produits (DataTable + tiroir avec labels), commandes, messages, finances, profil (bug du message d’erreur en vert corrigé), liens pub ; fil de discussion commun client / vendeur sans thème sombre |
 | 08/10/2026 | 5 (lot D) | voir `git log` | Espace client : dégradés orange / rose et brun retirés, en-tête Deep Green, StatusBadge, boutons Deep Green (le Gold reste pour les CTA sur fond Deep Green), connexion SMS / Google / Facebook alignées sur les champs et boutons. Site : rayons écrits en dur → tokens (73), ombres → `shadow-card/raised/overlay/bar`, couleurs WhatsApp / Facebook en tokens d’exception, filtre actif et bulles du chatbot en Deep Green, tiroir de filtres sur `Drawer`. Correctif : `shadow-card` cassé par le renommage de l’étape 3 |
+| 08/10/2026 | 5-8 (lot E) | voir `git log` | Palette Tailwind par défaut désactivée, règle ESLint contre couleurs et rayons en dur, `ORDER_STATUS_COLORS` retiré ; vérifications finales (build, CSP, 33 tests, tablette) ; guide d’utilisation |
