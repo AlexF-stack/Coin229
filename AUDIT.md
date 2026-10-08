@@ -140,7 +140,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P3-3 | ✅ | Libellés FR des statuts côté vendeur (au lieu de `en_attente`, `confirmee`) — corrigé avec P1-3 (statut en français + boutons d'action) |
 | P3-4 | ✅ | « Quatre chemins » alors que 5 catégories ; catégories Sacs / Lunettes vides — accueil et filtres boutique n’affichent que les rayons qui ont des produits (`fetchActiveCategories`), titre « Votre style. Votre rayon. ». Reste (contenu, voir P2-17) : les textes « montres, bijoux, sacs et lunettes » (accueil, SEO, à propos) |
 | P3-5 | ✅ | Indicateur de chargement sur les filtres boutique — « Chargement… » à la place du nombre de produits, fine barre de progression en haut, liste estompée et non cliquable pendant le chargement ; la page ne remonte plus en haut à chaque filtre |
-| P3-6 | ⬜ | Galerie produit : flèches + zoom desktop |
+| P3-6 | ✅ | Galerie produit : flèches + zoom desktop — flèches et miniatures sur ordinateur, flèches du clavier, zoom plein écran au clic (Échap / Fermer, navigation dans le zoom), glisser conservé sur mobile |
 | P3-7 | ⬜ | Pagination du catalogue ; `React.cache` sur `fetchProductById` (requête doublée) |
 | P3-8 | ⬜ | Index Prisma (orders, conversations, products) ; `refundStatus` en enum |
 | P3-9 | 🔄 | Supprimer code mort (`getProducts`, ~~`getProductById`~~ supprimé en P0-2, `getSimilarProducts`, `listPayoutQueue`, `benefit-chips.tsx`…) et doublons (niches, UTM, lien WhatsApp) |
@@ -243,3 +243,4 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P3-2 | voir `git log` | Fenêtres de confirmation (admin, vendeur, panier) à la place des boîtes du navigateur |
 | 08/10/2026 | P3-4 | voir `git log` | Accueil et filtres : seulement les rayons avec produits |
 | 08/10/2026 | P3-5 | voir `git log` | Indicateur de chargement sur les filtres boutique |
+| 08/10/2026 | P3-6 | voir `git log` | Galerie produit : flèches, miniatures, clavier, zoom plein écran |
