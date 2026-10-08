@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { runShopAgent, type AgentPrefs } from "@/lib/shop-agent";
-import { rateLimitAsync } from "@/lib/rate-limit";
+import { clientIp, rateLimitAsync } from "@/lib/rate-limit";
 
 const bodySchema = z.object({
   message: z.string().trim().min(1).max(500),
@@ -15,15 +15,13 @@ const bodySchema = z.object({
         .optional(),
       genre: z.enum(["homme", "femme", "unisexe"]).optional(),
       mode: z.enum(["guide"]).nullable().optional(),
+      offset: z.number().int().min(0).max(500).optional(),
     })
     .optional(),
 });
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "anon";
+  const ip = clientIp(request);
 
   const limited = await rateLimitAsync({
     key: `chat:${ip}`,

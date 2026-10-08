@@ -1,5 +1,6 @@
 import type { Categorie, Genre } from "@prisma/client";
-import { fetchProducts } from "@/lib/catalog";
+import { fetchActiveCategories, fetchProducts } from "@/lib/catalog";
+import { CATEGORIE_LABELS } from "@/lib/constants";
 import { formatPrice, getEffectivePrice } from "@/lib/utils";
 import { getShippingConfig, ZONE_LABELS, getZoneEta } from "@/lib/shipping";
 import type { DeliveryZone } from "@prisma/client";
@@ -8,9 +9,10 @@ export type AgentPrefs = {
   budgetMax?: number;
   budgetMin?: number;
   categorie?: Categorie;
-  niche?: string;
   genre?: Genre;
   mode?: "guide" | null;
+  /** Nombre de suggestions déjà montrées (« Autre suggestion » → les suivantes) */
+  offset?: number;
 };
 
 export type ChatProductCard = {
@@ -77,7 +79,8 @@ export function parseBudget(q: string): { min?: number; max?: number } | null {
   const bare = normalized.match(
     /(?:^|\s)(\d[\d\s.]*)\s*(k)?\s*(?:fcfa|f\b|francs?)?/
   );
-  if (bare && /budget|fcfa|k\b|\d{4,}/.test(normalized)) {
+  // « 15 000 » écrit avec espace compte aussi comme un montant
+  if (bare && /budget|fcfa|k\b|\d{4,}|\d{1,3}(?:[\s.]\d{3})+/.test(normalized)) {
     const max = parseAmount(bare[1]!, bare[2]);
     if (max && max >= 1000) return { max };
   }
@@ -103,21 +106,19 @@ export function parseCategorie(q: string): Categorie | undefined {
   return undefined;
 }
 
-/** Niches libres fréquentes (marketplace) — hors des 4 catégories mode. */
-export function parseNicheHint(q: string): string | undefined {
-  if (/cosmet|cosmétique|beauté|maquillage|skincare/.test(q))
-    return "cosmétique";
-  if (/electro|électronique|phone|téléphone|gadget/.test(q))
-    return "électronique";
-  if (/\bkids\b|enfant|bébé|jouet/.test(q)) return "kids";
-  if (/maison|déco|cuisine/.test(q)) return "maison";
-  if (/sport|fitness/.test(q)) return "sport";
+/** Produits que Coin229 ne vend pas (réponse honnête au lieu d'une recherche vide) */
+export function parseOutOfScope(q: string): string | undefined {
+  if (/cosm[ée]ti|beaut[ée]|maquillage|parfum|skincare/.test(q)) return "cosmétiques";
+  if (/électronique|electronique|smartphone|\bt[ée]l[ée]phone|gadget|écouteur/.test(q)) return "électronique";
+  if (/\bkids\b|enfant|bébé|jouet/.test(q)) return "articles pour enfants";
+  if (/\bmaison\b|déco|cuisine/.test(q)) return "articles pour la maison";
+  if (/vêtement|\brobe|chemise|pantalon|t-shirt|tee-shirt/.test(q)) return "vêtements";
   return undefined;
 }
 
 export function parseGenre(q: string): Genre | undefined {
-  if (/homme|garçon|masculin|lui\b|papa|père/.test(q)) return "homme";
-  if (/femme|fille|féminin|elle\b|maman|mère|dame/.test(q)) return "femme";
+  if (/homme|garçon|masculin|\blui\b|papa|(?:^|\s)père\b/.test(q)) return "homme";
+  if (/femme|fille|féminin|\belle\b|maman|(?:^|\s)mère\b|dame/.test(q)) return "femme";
   if (/unisexe|mixte|neutre/.test(q)) return "unisexe";
   return undefined;
 }
@@ -125,8 +126,8 @@ export function parseGenre(q: string): Genre | undefined {
 function parseStyleHint(q: string): string | null {
   if (/cadeau|offrir|anniversaire|noël|fête/.test(q)) return "cadeau";
   if (/chic|élégant|soirée|classe|luxe/.test(q)) return "chic";
-  if (/sport|casu|quotidien|simple|basique/.test(q)) return "casual";
-  if (/bureau|travail|pro|formel/.test(q)) return "pro";
+  if (/\bsport|casu|quotidien|simple|basique/.test(q)) return "casual";
+  if (/bureau|travail|\bpro\b|professionnel|formel/.test(q)) return "pro";
   return null;
 }
 
@@ -153,7 +154,6 @@ function pageContextHint(pathname?: string): string | null {
 async function recommend(prefs: AgentPrefs, limit = 4): Promise<ChatProductCard[]> {
   const { products } = await fetchProducts({
     categorie: prefs.categorie,
-    niche: prefs.niche,
     genre: prefs.genre,
     enStock: true,
     sort: "pertinence",
@@ -178,7 +178,8 @@ async function recommend(prefs: AgentPrefs, limit = 4): Promise<ChatProductCard[
   }
 
   // Style soft-ranking
-  return list.slice(0, limit).map(({ effective, ...card }) => {
+  const offset = prefs.offset ?? 0;
+  return list.slice(offset, offset + limit).map(({ effective, ...card }) => {
     void effective; // champ de tri interne, pas envoyé au client
     return card;
   });
@@ -190,17 +191,11 @@ function mergePrefs(base: AgentPrefs, q: string): AgentPrefs {
   if (budget?.max) next.budgetMax = budget.max;
   if (budget?.min) next.budgetMin = budget.min;
   const cat = parseCategorie(q);
-  if (cat) {
-    next.categorie = cat;
-    next.niche = undefined;
-  }
-  const niche = parseNicheHint(q);
-  if (niche && !cat) {
-    next.niche = niche;
-    next.categorie = undefined;
-  }
+  if (cat) next.categorie = cat;
   const genre = parseGenre(q);
   if (genre) next.genre = genre;
+  // Nouveau critère → on repart des premières suggestions
+  if (budget || cat || genre) next.offset = 0;
   if (/aide.?moi|choisir|conseille|idée|recommande|quoi acheter|guide/.test(q)) {
     next.mode = "guide";
   }
@@ -209,8 +204,7 @@ function mergePrefs(base: AgentPrefs, q: string): AgentPrefs {
 
 function prefsSummary(prefs: AgentPrefs): string {
   const bits: string[] = [];
-  if (prefs.categorie) bits.push(prefs.categorie + "s");
-  if (prefs.niche) bits.push(prefs.niche);
+  if (prefs.categorie) bits.push(CATEGORIE_LABELS[prefs.categorie].toLowerCase());
   if (prefs.genre) bits.push(`pour ${prefs.genre}`);
   if (prefs.budgetMax) bits.push(`≤ ${formatPrice(prefs.budgetMax)}`);
   if (prefs.budgetMin && !prefs.budgetMax) bits.push(`≥ ${formatPrice(prefs.budgetMin)}`);
@@ -218,6 +212,27 @@ function prefsSummary(prefs: AgentPrefs): string {
     /* already have max */
   }
   return bits.length ? bits.join(" · ") : "sélection du moment";
+}
+
+/** « Bonjour », « salut »… en début de message */
+const GREETING = /^(?:bonjour|bonsoir|salut|hello|hey|coucou)\b[\s,!.]*/;
+/** Message qui n'est QUE un remerciement / acquiescement (« ok merci », « super ! ») */
+const ACK = /^(?:(?:merci|ok|okay|d'accord|d’accord|super|parfait|cool|top|beaucoup|bien)[\s,!.]*)+$/;
+const MORE = /autre suggestion|autres? id[ée]es?|d'autres|d’autres|encore|autre chose/;
+
+function categoryReplies(active: Categorie[]): string[] {
+  return active.map((c) => CATEGORIE_LABELS[c]);
+}
+
+/** Catégorie par défaut d'un style, parmi celles qui ont des produits */
+function styleCategorie(style: string | null, active: Categorie[]): Categorie | undefined {
+  const order: Categorie[] =
+    style === "chic" || style === "pro"
+      ? ["montre", "bijou"]
+      : style === "casual"
+        ? ["chaussure", "lunette", "sac"]
+        : [];
+  return order.find((c) => active.includes(c));
 }
 
 /**
@@ -229,16 +244,34 @@ export async function runShopAgent(input: {
   pathname?: string;
 }): Promise<AgentReply> {
   const raw = input.message.trim();
-  const q = raw.toLowerCase();
+  const full = raw.toLowerCase();
+  // Une salutation ne doit pas masquer la vraie demande (« Bonjour, une montre à 20k »)
+  const greeted = GREETING.test(full);
+  const q = greeted ? full.replace(GREETING, "").trim() : full;
+  const hello = greeted ? "Bonjour ! " : "";
   let prefs = mergePrefs(input.prefs ?? {}, q);
   const ctx = pageContextHint(input.pathname);
   const style = parseStyleHint(q);
+  const active = await fetchActiveCategories();
 
-  if (!q) {
+  if (!full) {
     return {
       text: ctx
         ? `${ctx}\n\nDis-moi un budget, une catégorie, ou choisis une option.`
         : "Dis-moi ce dont tu as besoin — budget, style, livraison…",
+      quickReplies: CHAT_STARTERS,
+      products: [],
+      prefs,
+      whatsappHint: false,
+    };
+  }
+
+  // Salutation seule (ou « ça va ? »)
+  if (greeted && (!q || /^(?:ça va|ca va|comment (?:ça|ca) va)\s*\??[\s!.]*$/.test(q))) {
+    return {
+      text:
+        (ctx ? ctx + "\n\n" : "") +
+        "Hello — je t’aide à choisir. Budget, style, livraison ou paiement : par où on commence ?",
       quickReplies: CHAT_STARTERS,
       products: [],
       prefs,
@@ -252,7 +285,7 @@ export async function runShopAgent(input: {
     q === "parler à un humain"
   ) {
     return {
-      text: "Avec plaisir. Un conseiller Coin229 te répond sur WhatsApp — tu peux aussi continuer ici pour un conseil produit.",
+      text: hello + "Avec plaisir. Un conseiller Coin229 te répond sur WhatsApp — tu peux aussi continuer ici pour un conseil produit.",
       quickReplies: ["Aide-moi à choisir", "Livraison", "Voir la boutique"],
       products: [],
       prefs,
@@ -262,7 +295,7 @@ export async function runShopAgent(input: {
 
   if (/livraison|livrer|délai|frais|gratuit|shipping|expédition/.test(q)) {
     return {
-      text: (ctx ? ctx + "\n\n" : "") + shippingBlurb(),
+      text: hello + (ctx ? ctx + "\n\n" : "") + shippingBlurb(),
       quickReplies: ["Paiement", "Zones desservies", "Aide-moi à choisir"],
       products: [],
       prefs,
@@ -272,7 +305,7 @@ export async function runShopAgent(input: {
 
   if (/zone|cotonou|porto|godomey|abomey|calavi|où livrez/.test(q)) {
     return {
-      text: "On livre à Cotonou, Porto-Novo et Godomey / Abomey-Calavi. Choisis ta zone dans le panier pour le prix exact.",
+      text: hello + "On livre à Cotonou, Porto-Novo et Godomey / Abomey-Calavi. Choisis ta zone dans le panier pour le prix exact.",
       quickReplies: ["Livraison", "Paiement", "Aide-moi à choisir"],
       products: [],
       prefs,
@@ -280,9 +313,9 @@ export async function runShopAgent(input: {
     };
   }
 
-  if (/paiement|payer|mobile money|mtn|moov|espèces|cash/.test(q)) {
+  if (/paiement|payer|mobile money|\bmtn\b|\bmoov\b|espèces|cash/.test(q)) {
     return {
-      text: "Tu peux payer :\n• À la livraison (recommandé)\n• Mobile Money (MTN MoMo ou Moov Money)\n\nLe choix se fait au checkout.",
+      text: hello + "Tu peux payer :\n• À la livraison (recommandé)\n• Mobile Money (MTN MoMo ou Moov Money)\n\nLe choix se fait au checkout.",
       quickReplies: ["Livraison", "Suivre ma commande", "Aide-moi à choisir"],
       products: [],
       prefs,
@@ -290,9 +323,10 @@ export async function runShopAgent(input: {
     };
   }
 
-  if (/commande|suivi|suivre|où est|statut|historique/.test(q)) {
+  // Suivi (« commander une montre » n'est pas une question de suivi)
+  if (/suivi|suivre|où est|ma commande|mes commandes|statut|historique/.test(q)) {
     return {
-      text: "Pour le suivi : ouvre Mon compte et connecte-toi (SMS ou Google). Sinon WhatsApp avec ton nom + numéro.",
+      text: hello + "Pour le suivi : ouvre Mon compte et connecte-toi (SMS ou Google). Sinon WhatsApp avec ton nom + numéro.",
       quickReplies: ["Parler à un humain", "Aide-moi à choisir", "Paiement"],
       products: [],
       prefs,
@@ -302,7 +336,7 @@ export async function runShopAgent(input: {
 
   if (/retour|échanger|rembours/.test(q)) {
     return {
-      text: "Retours sous 48 h si l’article n’est pas porté. Détails sur la page Retours, ou WhatsApp avec ta commande.",
+      text: hello + "Retours sous 48 h si l’article n’est pas porté. Détails sur la page Retours, ou WhatsApp avec ta commande.",
       quickReplies: ["Parler à un humain", "Livraison", "Aide-moi à choisir"],
       products: [],
       prefs,
@@ -310,19 +344,7 @@ export async function runShopAgent(input: {
     };
   }
 
-  if (/bonjour|salut|hello|bonsoir|hey|coucou/.test(q)) {
-    return {
-      text:
-        (ctx ? ctx + "\n\n" : "") +
-        "Hello — je t’aide à choisir. Budget, style, livraison ou paiement : par où on commence ?",
-      quickReplies: CHAT_STARTERS,
-      products: [],
-      prefs,
-      whatsappHint: false,
-    };
-  }
-
-  if (/merci|ok|d'accord|super|parfait/.test(q)) {
+  if (ACK.test(q)) {
     return {
       text: "Avec plaisir. Tu veux une autre idée produit, ou une info livraison ?",
       quickReplies: CHAT_STARTERS,
@@ -332,26 +354,61 @@ export async function runShopAgent(input: {
     };
   }
 
+  // Ce que Coin229 ne vend pas
+  const outOfScope = parseOutOfScope(q);
+  const askedCategorie = parseCategorie(q);
+  if (outOfScope && !askedCategorie) {
+    return {
+      text: `${hello}Coin229 ne propose pas de ${outOfScope} pour l’instant. On a : ${categoryReplies(active).join(", ").toLowerCase()}.`,
+      quickReplies: [...categoryReplies(active), "Parler à un humain"],
+      products: [],
+      prefs,
+      whatsappHint: false,
+    };
+  }
+  // Rayon sans produit (ex. sacs)
+  if (askedCategorie && !active.includes(askedCategorie)) {
+    prefs = { ...prefs, categorie: undefined };
+    return {
+      text: `${hello}Pas encore de ${CATEGORIE_LABELS[askedCategorie].toLowerCase()} en boutique. Je peux te montrer : ${categoryReplies(active).join(", ").toLowerCase()}.`,
+      quickReplies: categoryReplies(active),
+      products: [],
+      prefs,
+      whatsappHint: false,
+    };
+  }
+
+  // « Autre suggestion » : les pièces suivantes, pas les mêmes
+  if (MORE.test(q)) {
+    prefs = { ...prefs, mode: "guide", offset: (prefs.offset ?? 0) + 4 };
+    const products = await recommend(prefs, 4);
+    if (!products.length) prefs = { ...prefs, offset: 0 };
+    return {
+      text: products.length
+        ? "D’autres options dans la même logique :"
+        : "J’ai fait le tour de ce filtre. Change de budget ou de catégorie ?",
+      quickReplies: products.length
+        ? ["Autre suggestion", "Voir la boutique", "Parler à un humain"]
+        : ["Budget 25 000", ...categoryReplies(active)],
+      products,
+      prefs,
+      whatsappHint: !products.length,
+    };
+  }
+
   // Guided shopping
   const wantsGuide =
     prefs.mode === "guide" ||
-    /aide.?moi|choisir|conseille|idée|recommande|quoi acheter|guide|cadeau/.test(
-      q
-    ) ||
-    Boolean(prefs.budgetMax || prefs.categorie || prefs.niche || prefs.genre || style);
+    /aide.?moi|choisir|conseille|idée|recommande|quoi acheter|guide|cadeau/.test(q) ||
+    Boolean(prefs.budgetMax || prefs.categorie || prefs.genre || style);
 
   if (wantsGuide) {
     prefs = { ...prefs, mode: "guide" };
 
     if (style === "cadeau" && !prefs.genre && !prefs.categorie) {
       return {
-        text: "Un cadeau, parfait. Pour qui ? Et tu as un budget en tête ?",
-        quickReplies: [
-          "Pour elle · 15 000",
-          "Pour lui · 25 000",
-          "Budget 10 000",
-          "Montres",
-        ],
+        text: hello + "Un cadeau, parfait. Pour qui ? Et tu as un budget en tête ?",
+        quickReplies: ["Pour elle · 15 000", "Pour lui · 25 000", "Budget 10 000", ...categoryReplies(active).slice(0, 1)],
         products: [],
         prefs,
         whatsappHint: false,
@@ -361,30 +418,24 @@ export async function runShopAgent(input: {
     if (!prefs.budgetMax && !prefs.budgetMin && !prefs.categorie) {
       return {
         text:
+          hello +
           (ctx ? ctx + "\n\n" : "") +
           "Je te trouve les meilleures pièces. Quel budget max (FCFA) ?",
-        quickReplies: [
-          "Budget 10 000",
-          "Budget 15 000",
-          "Budget 25 000",
-          "Budget 50 000",
-        ],
+        quickReplies: ["Budget 10 000", "Budget 15 000", "Budget 25 000", "Budget 50 000"],
         products: [],
         prefs,
         whatsappHint: false,
       };
     }
 
-    if (prefs.budgetMax && !prefs.categorie && !parseCategorie(q)) {
-      // Ask category unless they already said style that maps
-      if (style === "chic" || style === "pro") {
-        prefs.categorie = prefs.categorie ?? "montre";
-      } else if (style === "casual") {
-        prefs.categorie = prefs.categorie ?? "lunette";
+    if (prefs.budgetMax && !prefs.categorie) {
+      const fromStyle = styleCategorie(style, active);
+      if (fromStyle) {
+        prefs.categorie = fromStyle;
       } else {
         return {
-          text: `Budget ≤ ${formatPrice(prefs.budgetMax)}. Tu cherches plutôt…`,
-          quickReplies: ["Montres", "Bijoux", "Sacs", "Lunettes"],
+          text: `${hello}Budget ≤ ${formatPrice(prefs.budgetMax)}. Tu cherches plutôt…`,
+          quickReplies: categoryReplies(active),
           products: [],
           prefs,
           whatsappHint: false,
@@ -395,52 +446,31 @@ export async function runShopAgent(input: {
     const products = await recommend(prefs, 4);
     if (!products.length) {
       return {
-        text: `Rien en stock pour « ${prefsSummary(prefs)} ». On élargit le budget ou on change de catégorie ?`,
-        quickReplies: [
-          "Budget 25 000",
-          "Budget 50 000",
-          "Voir la boutique",
-          "Parler à un humain",
-        ],
+        text: `${hello}Rien en stock pour « ${prefsSummary(prefs)} ». On élargit le budget ou on change de catégorie ?`,
+        quickReplies: ["Budget 25 000", "Budget 50 000", "Voir la boutique", "Parler à un humain"],
         products: [],
-        prefs: { ...prefs, budgetMax: undefined },
+        prefs: { ...prefs, budgetMax: undefined, offset: 0 },
         whatsappHint: true,
       };
     }
 
-    const styleNote = style
-      ? ` Style ${style} pris en compte.`
-      : "";
+    const styleNote = style ? ` Style ${style} pris en compte.` : "";
     return {
-      text: `Voici ${products.length} idée(s) pour toi (${prefsSummary(prefs)}).${styleNote}\nTape sur une pièce, ou affine (ex. « homme », « lunettes », « 20k »).`,
-      quickReplies: [
-        "Autre suggestion",
-        "Voir la boutique",
-        "Livraison",
-        "Parler à un humain",
-      ],
+      text: `${hello}Voici ${products.length} idée(s) pour toi (${prefsSummary(prefs)}).${styleNote}\nTape sur une pièce, ou affine (ex. « homme », « bijoux », « 20k »).`,
+      quickReplies: ["Autre suggestion", "Voir la boutique", "Livraison", "Parler à un humain"],
       products,
       prefs,
       whatsappHint: false,
     };
   }
 
-  // Direct catalog keywords without guide mode
-  if (/montre|bijou|sac|lunette|chaussure|sandale|claquette|catalogue|produit|promo|acheter|boutique/.test(q)) {
-    prefs = mergePrefs(prefs, q);
-    const products = await recommend(
-      { ...prefs, mode: "guide" },
-      4
-    );
+  // Mots du catalogue sans mode guidé
+  if (/montre|bijou|sac|lunette|chaussure|sandale|claquette|catalogue|produit|promo|acheter|commander|boutique/.test(q)) {
+    const products = await recommend({ ...prefs, mode: "guide" }, 4);
     if (products.length) {
       return {
-        text: `Voici ce que j’ai trouvé (${prefsSummary({ ...prefs, mode: "guide" })}). Tu peux préciser un budget pour affiner.`,
-        quickReplies: [
-          "Budget 15 000",
-          "Aide-moi à choisir",
-          "Voir la boutique",
-          "Livraison",
-        ],
+        text: `${hello}Voici ce que j’ai trouvé (${prefsSummary({ ...prefs, mode: "guide" })}). Tu peux préciser un budget pour affiner.`,
+        quickReplies: ["Budget 15 000", "Autre suggestion", "Voir la boutique", "Livraison"],
         products,
         prefs: { ...prefs, mode: "guide" },
         whatsappHint: false,
@@ -448,24 +478,9 @@ export async function runShopAgent(input: {
     }
   }
 
-  if (/autre suggestion|encore|autres idées/.test(q)) {
-    prefs = { ...prefs, mode: "guide" };
-    const products = await recommend(prefs, 4);
-    return {
-      text: products.length
-        ? "D’autres options dans la même logique :"
-        : "Je n’ai plus d’autres pièces sur ce filtre. Change budget ou catégorie ?",
-      quickReplies: products.length
-        ? ["Budget 25 000", "Voir la boutique", "Parler à un humain"]
-        : ["Budget 25 000", "Montres", "Bijoux", "Lunettes"],
-      products,
-      prefs,
-      whatsappHint: !products.length,
-    };
-  }
-
   return {
     text:
+      hello +
       (ctx ? ctx + "\n\n" : "") +
       "Je peux te guider (budget + style), ou répondre sur livraison, paiement et commandes. Que veux-tu faire ?",
     quickReplies: CHAT_STARTERS,
