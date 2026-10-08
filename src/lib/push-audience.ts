@@ -15,10 +15,6 @@ import {
 
 export type PushAudience = "client" | "admin" | "vendor";
 
-export function isPushAudience(v: unknown): v is PushAudience {
-  return v === "client" || v === "admin" || v === "vendor";
-}
-
 export function pushWhere(target: {
   roles: PushRole[];
   vendorId?: string;

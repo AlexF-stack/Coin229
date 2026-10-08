@@ -158,9 +158,3 @@ export async function verifyAdminSessionToken(
   }
 }
 
-/** Redirection safe : uniquement chemins /admin internes */
-export function safeAdminNext(next: string | null | undefined): string {
-  if (!next || !next.startsWith("/admin")) return "/admin";
-  if (next.startsWith("//") || next.includes("://")) return "/admin";
-  return next;
-}

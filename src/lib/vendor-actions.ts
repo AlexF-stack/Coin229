@@ -9,10 +9,10 @@ import type {
 } from "@prisma/client";
 import { requireVendor } from "@/lib/assert-vendor";
 import { prisma } from "@/lib/prisma";
+import { categorieFromNiche } from "@/lib/constants";
 import { changeOrderStatus } from "@/lib/order-status";
 import { isAllowedImageUrl, parseProductInput } from "@/lib/product-schema";
 import { getVendorFinanceSummary, SOLD_STATUSES } from "@/lib/payouts";
-import { nicheToCategorie } from "@/lib/vendor-auth";
 import { getMarketplaceCommissionPct } from "@/lib/marketplace-finance";
 
 export async function getMyVendorProfile() {
@@ -20,15 +20,6 @@ export async function getMyVendorProfile() {
   return prisma.vendor.findUnique({
     where: { id: session.vendorId },
   });
-}
-
-export async function getMyVendorUnreadCount() {
-  const { vendorId } = await requireVendor();
-  const rows = await prisma.conversation.findMany({
-    where: { vendorId, vendorUnread: { gt: 0 } },
-    select: { vendorUnread: true },
-  });
-  return rows.reduce((s, r) => s + r.vendorUnread, 0);
 }
 
 export async function getMyVendorProducts() {
@@ -140,7 +131,7 @@ export async function upsertVendorProduct(data: {
   if (!niche || !allowed.includes(niche)) {
     return { success: false as const, error: "Choisis une niche dans la liste" };
   }
-  const categorie = nicheToCategorie(niche);
+  const categorie = categorieFromNiche(niche);
 
   // Compte non actif : produits en archive (modération à l’activation)
   let statut: ProductStatus =

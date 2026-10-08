@@ -2,18 +2,13 @@
 
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { safeNextPath } from "@/lib/safe-next";
 import { Loader2, Lock } from "lucide-react";
-
-function safeNext(raw: string | null): string {
-  if (!raw || !raw.startsWith("/admin")) return "/admin";
-  if (raw.startsWith("//") || raw.includes("://")) return "/admin";
-  return raw;
-}
 
 export function AdminLoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = safeNext(params.get("next"));
+  const next = safeNextPath(params.get("next"), "/admin", "/admin");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();

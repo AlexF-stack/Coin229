@@ -1,10 +1,10 @@
+import { safeNextPath } from "@/lib/safe-next";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { clientIp, rateLimitAsync } from "@/lib/rate-limit";
 import {
   createVendorSessionToken,
-  safeVendorNext,
   vendorCookieName,
   vendorCookieOptions,
   verifyVendorPassword,
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
 
   const res = NextResponse.json({
     ok: true,
-    next: safeVendorNext(parsed.data.next),
+    next: safeNextPath(parsed.data.next, "/vendeur/espace", "/vendeur/espace"),
     statut: vendor.statut,
   });
   res.cookies.set(vendorCookieName(), token, vendorCookieOptions());

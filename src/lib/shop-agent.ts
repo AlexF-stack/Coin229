@@ -39,18 +39,6 @@ export const CHAT_STARTERS = [
   "Parler à un humain",
 ];
 
-const WHATSAPP =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "") || "";
-
-export function getWhatsAppHref(prefill?: string) {
-  const text =
-    prefill ?? "Bonjour Coin229 👋 J’ai une question sur ma commande.";
-  if (!WHATSAPP || WHATSAPP === "22990000000") {
-    return `https://wa.me/?text=${encodeURIComponent(text)}`;
-  }
-  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
-}
-
 function shippingBlurb() {
   const { fees, freeShippingThreshold } = getShippingConfig();
   const zones = (Object.keys(ZONE_LABELS) as DeliveryZone[])

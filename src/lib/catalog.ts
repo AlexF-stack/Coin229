@@ -6,6 +6,7 @@ import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import {
   CATEGORIES,
   CATEGORIE_SORT_ORDER,
+  NICHES,
   NICHES_BY_CATEGORIE,
 } from "@/lib/constants";
 import type { Categorie, Genre } from "@prisma/client";
@@ -33,14 +34,7 @@ function withTimeout<T>(promise: Promise<T>, ms = DB_QUERY_TIMEOUT_MS): Promise<
 
 function nicheSortKey(niche: string | null | undefined): number {
   const key = (niche ?? "").trim().toLowerCase();
-  const priority = [
-    "montre luxe",
-    "montre",
-    "bijou",
-    "sandale luxe",
-    "sandale",
-  ];
-  const idx = priority.indexOf(key);
+  const idx = NICHES.findIndex((n) => n.value === key);
   return idx === -1 ? 50 : idx;
 }
 

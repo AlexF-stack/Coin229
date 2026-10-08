@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Check, Link2 } from "lucide-react";
-import { SITE } from "@/lib/site";
+import { productShareUrl } from "@/lib/site";
 
 type Props = {
   productId: string;
@@ -16,7 +16,7 @@ export function ProductShareLink({
   campaignSlug,
 }: Props) {
   const [copied, setCopied] = useState(false);
-  const url = `${SITE.url}/produit/${productId}?utm_source=vendor&utm_medium=share&utm_campaign=${encodeURIComponent(campaignSlug)}`;
+  const url = productShareUrl(productId, campaignSlug);
 
   async function copy() {
     try {

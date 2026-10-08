@@ -46,14 +46,6 @@ export const CATEGORIE_LABELS: Record<Categorie, string> = {
   chaussure: "Chaussures",
 };
 
-export const CATEGORIE_TAGLINES: Record<Categorie, string> = {
-  montre: "Le temps, avec style.",
-  bijou: "Les détails qui comptent.",
-  sac: "Pratique, urbain, affirmé.",
-  lunette: "Cadrez votre look.",
-  chaussure: "Claquettes & sandales.",
-};
-
 export const CATEGORIES: Categorie[] = [
   "montre",
   "bijou",
@@ -71,16 +63,30 @@ export const CATEGORIE_SORT_ORDER: Record<Categorie, number> = {
   lunette: 4,
 };
 
+/**
+ * Niches marketplace — SOURCE UNIQUE. Libellés, filtres par catégorie, choix
+ * de l'espace vendeur et ordre du catalogue en découlent.
+ */
+export const NICHES: readonly {
+  value: string;
+  label: string;
+  /** Libellé plus précis dans le formulaire vendeur */
+  vendorLabel?: string;
+  categorie: Categorie;
+}[] = [
+  { value: "montre luxe", label: "Montres luxe", categorie: "montre" },
+  { value: "montre", label: "Montres classiques", categorie: "montre" },
+  { value: "bijou", label: "Bijoux", categorie: "bijou" },
+  { value: "sandale luxe", label: "Sandales luxe", categorie: "chaussure" },
+  { value: "sandale", label: "Sandales", vendorLabel: "Sandales / claquettes", categorie: "chaussure" },
+  { value: "sac", label: "Sacs", categorie: "sac" },
+  { value: "lunette", label: "Lunettes", categorie: "lunette" },
+];
+
 /** Libellés lisibles pour les niches marketplace. */
-export const NICHE_LABELS: Record<string, string> = {
-  "montre luxe": "Montres luxe",
-  montre: "Montres classiques",
-  bijou: "Bijoux",
-  "sandale luxe": "Sandales luxe",
-  sandale: "Sandales",
-  sac: "Sacs",
-  lunette: "Lunettes",
-};
+export const NICHE_LABELS: Record<string, string> = Object.fromEntries(
+  NICHES.map((n) => [n.value, n.label])
+);
 
 export function nicheLabel(niche: string | null | undefined): string {
   const key = (niche ?? "").trim().toLowerCase();
@@ -89,33 +95,26 @@ export function nicheLabel(niche: string | null | undefined): string {
 }
 
 /** Niches rattachées à une catégorie (filtres secondaires). */
-export const NICHES_BY_CATEGORIE: Partial<Record<Categorie, string[]>> = {
-  montre: ["montre luxe", "montre"],
-  bijou: ["bijou"],
-  sac: ["sac"],
-  lunette: ["lunette"],
-  chaussure: ["sandale luxe", "sandale"],
-};
+export const NICHES_BY_CATEGORIE: Partial<Record<Categorie, string[]>> = {};
+for (const n of NICHES) (NICHES_BY_CATEGORIE[n.categorie] ??= []).push(n.value);
 
 /** Liste fixe pour l’espace vendeur — pas de texte libre. */
-export const VENDOR_NICHE_OPTIONS: {
-  value: string;
-  label: string;
-  categorie: Categorie;
-}[] = [
-  { value: "montre luxe", label: "Montres luxe", categorie: "montre" },
-  { value: "montre", label: "Montres classiques", categorie: "montre" },
-  { value: "bijou", label: "Bijoux", categorie: "bijou" },
-  { value: "sandale luxe", label: "Sandales luxe", categorie: "chaussure" },
-  { value: "sandale", label: "Sandales / claquettes", categorie: "chaussure" },
-  { value: "sac", label: "Sacs", categorie: "sac" },
-  { value: "lunette", label: "Lunettes", categorie: "lunette" },
-];
+export const VENDOR_NICHE_OPTIONS = NICHES.map((n) => ({
+  value: n.value,
+  label: n.vendorLabel ?? n.label,
+  categorie: n.categorie,
+}));
 
+/** Catégorie d'une niche (liste fixe, puis mots-clés des anciens produits en texte libre) */
 export function categorieFromNiche(niche: string): Categorie {
-  const key = niche.trim().toLowerCase();
-  const hit = VENDOR_NICHE_OPTIONS.find((o) => o.value === key);
-  return hit?.categorie ?? "sac";
+  const n = niche.trim().toLowerCase();
+  const hit = NICHES.find((o) => o.value === n);
+  if (hit) return hit.categorie;
+  if (/montre|watch|horloge/.test(n)) return "montre";
+  if (/bijou|bague|collier|bracelet|boucle/.test(n)) return "bijou";
+  if (/lunette|soleil|optic/.test(n)) return "lunette";
+  if (/chaussure|sandale|claquette|mule|slipper|sneaker|basket/.test(n)) return "chaussure";
+  return "sac";
 }
 
 export const GENRE_LABELS: Record<Genre, string> = {

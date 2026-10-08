@@ -132,12 +132,6 @@ export function createVendorSessionToken(
   return `${payload}.${b64urlEncode(hmac)}`;
 }
 
-export function readVendorSessionToken(
-  token: string | undefined | null
-): string | null {
-  return readVendorSession(token)?.vendorId ?? null;
-}
-
 /** Session vendeur signée : identifiant + version (à comparer en base) */
 export function readVendorSession(
   token: string | undefined | null
@@ -178,31 +172,5 @@ export function readVendorSession(
   } catch {
     return null;
   }
-}
-
-export function safeVendorNext(next: string | null | undefined): string {
-  if (!next || !next.startsWith("/vendeur/espace")) return "/vendeur/espace";
-  if (next.startsWith("//") || next.includes("://")) return "/vendeur/espace";
-  return next;
-}
-
-export function nicheToCategorie(
-  niche: string
-): "montre" | "bijou" | "sac" | "lunette" | "chaussure" {
-  // Liste fixe (VENDOR_NICHE_OPTIONS) — évite le mapping magique trompeur.
-  const n = niche.trim().toLowerCase();
-  if (n === "montre luxe" || n === "montre") return "montre";
-  if (n === "bijou") return "bijou";
-  if (n === "lunette") return "lunette";
-  if (n === "sandale luxe" || n === "sandale") return "chaussure";
-  if (n === "sac") return "sac";
-  // Fallback legacy (anciens produits texte libre)
-  if (/montre|watch|horloge/.test(n)) return "montre";
-  if (/bijou|bague|collier|bracelet|boucle/.test(n)) return "bijou";
-  if (/lunette|soleil|optic/.test(n)) return "lunette";
-  if (/chaussure|sandale|claquette|mule|slipper|sneaker|basket/.test(n))
-    return "chaussure";
-  if (/sac|sacoche|pochett|\bbag\b/.test(n)) return "sac";
-  return "sac";
 }
 

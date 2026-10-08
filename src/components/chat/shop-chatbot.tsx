@@ -7,11 +7,11 @@ import { usePathname } from "next/navigation";
 import { MessageCircle, Send, Sparkles, X } from "lucide-react";
 import {
   CHAT_STARTERS,
-  getWhatsAppHref,
   type AgentPrefs,
   type ChatProductCard,
 } from "@/lib/shop-agent";
 import { formatPrice, getEffectivePrice, cn } from "@/lib/utils";
+import { whatsappHref } from "@/lib/site";
 
 type Msg = {
   id: string;
@@ -300,7 +300,7 @@ export function ShopChatbot() {
                     return (
                       <a
                         key={chip}
-                        href={getWhatsAppHref(
+                        href={whatsappHref(
                           `Bonjour Coin229 — page ${pathname}`
                         )}
                         target="_blank"
@@ -327,7 +327,7 @@ export function ShopChatbot() {
 
             {showWhatsAppCta && !typing && (
               <a
-                href={getWhatsAppHref(`Bonjour Coin229 — page ${pathname}`)}
+                href={whatsappHref(`Bonjour Coin229 — page ${pathname}`)}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-2.5 text-sm font-semibold text-white"

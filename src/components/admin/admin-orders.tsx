@@ -8,7 +8,7 @@ import type {
   Client,
   OrderStatus,
 } from "@prisma/client";
-import { updateOrderStatus } from "@/lib/actions";
+import { markOrderRefundDone, updateOrderStatus } from "@/lib/actions";
 import { ORDER_STATUS_LABELS } from "@/lib/constants";
 import { allowedNextStatuses } from "@/lib/order-status-rules";
 import { ZONE_LABELS } from "@/lib/shipping";
@@ -38,6 +38,27 @@ export function AdminOrders({ orders }: Props) {
   const [confirm, dialog] = useConfirm("dark");
   const [local, setLocal] = useState(orders);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  async function markRefunded(order: OrderWithRelations) {
+    if (
+      !(await confirm({
+        title: "Remboursement effectué ?",
+        message: `Confirme que ${formatPrice(order.montantTotal)} ont bien été remboursés à ${order.nomClient} (${order.telephone}).`,
+        confirmLabel: "Oui, remboursé",
+      }))
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      const res = await markOrderRefundDone(order.id);
+      if (!res.success) {
+        setErrors((e) => ({ ...e, [order.id]: res.error }));
+        return;
+      }
+      setErrors((e) => ({ ...e, [order.id]: "" }));
+      setLocal((prev) => prev.map((o) => (o.id === order.id ? { ...o, refundStatus: "done" } : o)));
+    });
+  }
 
   async function changeStatus(order: OrderWithRelations, statut: OrderStatus) {
     if (statut === order.statut) return;
@@ -158,7 +179,20 @@ export function AdminOrders({ orders }: Props) {
               </p>
             )}
             {order.refundStatus === "pending" && (
-              <p className="text-xs font-medium text-amber-300">Remboursement à faire</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-xs font-medium text-amber-300">Remboursement à faire</p>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => markRefunded(order)}
+                  className="rounded-md border border-amber-400/30 px-2.5 py-1 text-xs text-amber-200 hover:bg-amber-400/10 disabled:opacity-50"
+                >
+                  Marquer remboursé
+                </button>
+              </div>
+            )}
+            {order.refundStatus === "done" && (
+              <p className="text-xs text-white/45">Remboursé</p>
             )}
             {errors[order.id] && (
               <p role="alert" className="text-xs text-red-300">

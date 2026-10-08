@@ -11,7 +11,7 @@ import { changeOrderStatus } from "@/lib/order-status";
 import { parseProductInput } from "@/lib/product-schema";
 import { createPayoutForVendor, payableOrderWhere, SOLD_STATUSES } from "@/lib/payouts";
 import { randomBytes } from "crypto";
-import { SITE } from "@/lib/site";
+import { SITE, whatsappToBjContact } from "@/lib/site";
 import { hashResetToken } from "@/lib/vendor-auth";
 import { processPayment } from "@/lib/payment";
 import { calculateShippingFee } from "@/lib/shipping";
@@ -42,37 +42,6 @@ import type {
   ProductSource,
   ProductStatus,
 } from "@prisma/client";
-
-export async function getProducts(filters?: {
-  categorie?: Categorie;
-  genre?: Genre;
-}) {
-  return prisma.product.findMany({
-    where: {
-      statut: { in: ["actif", "rupture"] },
-      ...(filters?.categorie ? { categorie: filters.categorie } : {}),
-      ...(filters?.genre ? { genre: filters.genre } : {}),
-    },
-    orderBy: { dateCreation: "desc" },
-  });
-}
-
-export async function getSimilarProducts(
-  productId: string,
-  categorie: Categorie,
-  limit = 4
-) {
-  return prisma.product.findMany({
-    where: {
-      id: { not: productId },
-      categorie,
-      statut: "actif",
-      stockQuantite: { gt: 0 },
-    },
-    take: limit,
-    orderBy: { dateCreation: "desc" },
-  });
-}
 
 type CheckoutItem = {
   productId: string;
@@ -591,19 +560,6 @@ export async function getAccountSession(): Promise<{
   }
 }
 
-/** @deprecated IDOR — ne plus utiliser ; préfère getMyOrders */
-export async function getClientOrders(telephone: string) {
-  const jar = await cookies();
-  const sessionPhone = await readPhoneFromToken(
-    jar.get(phoneCookieName())?.value
-  );
-  const normalized = normalizeBjPhone(telephone);
-  if (!sessionPhone || !normalized || sessionPhone !== normalized) {
-    return null;
-  }
-  return getMyOrders();
-}
-
 export type CartSnapshotItem = {
   productId: string;
   nom: string;
@@ -704,22 +660,6 @@ export async function getWishlistProducts(
 }
 
 /* ——— Admin / Vendor ——— */
-
-export async function getVendorOrders(vendorId: string) {
-  try {
-    await requireAdmin();
-  } catch {
-    return [];
-  }
-  return prisma.order.findMany({
-    where: { vendorId },
-    include: {
-      items: { include: { product: true } },
-      client: true,
-    },
-    orderBy: { dateCreation: "desc" },
-  });
-}
 
 /** Admin : commandes de TOUTE la marketplace (filtre vendeur optionnel) */
 export async function getAdminOrders(filter?: { vendorId?: string }) {
@@ -1036,11 +976,10 @@ export async function createVendorResetLink(vendorId: string) {
   });
   const resetUrl = `${SITE.url}/vendeur/reinitialiser?token=${token}`;
   const text = `Bonjour ${vendor.nomBoutique}, voici ton lien Coin229 pour choisir un nouveau mot de passe (valable 24 h, une seule fois) : ${resetUrl}`;
-  const phone = normalizeBjPhone(vendor.contact)?.replace("+", "") ?? vendor.contact.replace(/\D/g, "");
   return {
     success: true as const,
     resetUrl,
-    whatsappUrl: phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : null,
+    whatsappUrl: whatsappToBjContact(vendor.contact, text),
   };
 }
 
@@ -1112,56 +1051,20 @@ export async function createVendorPayout(
   return result;
 }
 
-export async function listPayoutQueue() {
-  try {
-    await requireAdmin();
-  } catch {
-    return { vendors: [], payouts: [] };
-  }
-  const vendors = await prisma.vendor.findMany({
-    where: { statut: "actif" },
-    orderBy: { nomBoutique: "asc" },
-  });
-  const unpaid = await prisma.order.groupBy({
-    by: ["vendorId"],
-    where: {
-      payoutId: null,
-      statut: { in: ["livree", "confirmee", "en_livraison"] },
-      vendorNet: { gt: 0 },
-    },
-    _sum: { vendorNet: true },
-    _count: true,
-  });
-  const byId = new Map(unpaid.map((u) => [u.vendorId, u]));
-  const queue = vendors
-    .map((v) => {
-      const u = byId.get(v.id);
-      return {
-        vendor: v,
-        pendingAmount: u?._sum.vendorNet ?? 0,
-        orderCount: u?._count ?? 0,
-      };
-    })
-    .filter((r) => r.pendingAmount > 0);
-
-  const payouts = await prisma.vendorPayout.findMany({
-    include: { vendor: true },
-    orderBy: { dateCreation: "desc" },
-    take: 40,
-  });
-  return { vendors: queue, payouts };
-}
-
 export async function markOrderRefundDone(orderId: string) {
   try {
     await requireAdmin();
   } catch {
     return { success: false as const, error: "Non autorisé" };
   }
-  await prisma.order.update({
-    where: { id: orderId },
+  const { count } = await prisma.order.updateMany({
+    where: { id: orderId, refundStatus: "pending" },
     data: { refundStatus: "done" },
   });
+  if (count === 0) {
+    return { success: false as const, error: "Aucun remboursement en attente pour cette commande" };
+  }
   revalidatePath("/admin");
+  revalidatePath("/admin/commandes");
   return { success: true as const };
 }

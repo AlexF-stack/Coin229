@@ -3,7 +3,7 @@
  * Canaux : webhook ops + push admin et vendeur concerné (jamais les clients).
  */
 import { sendPushTo } from "@/lib/push-audience";
-import { SITE } from "@/lib/site";
+import { SITE, whatsappToBjContact } from "@/lib/site";
 import { formatPrice } from "@/lib/utils";
 
 export type NewOrderNotifyInput = {
@@ -52,7 +52,7 @@ async function notifyWebhook(input: NewOrderNotifyInput, appUrl: string) {
       telephone: input.telephone,
       vendorEspace: `${appUrl}/vendeur/espace/commandes`,
       adminHint: `${appUrl}/admin`,
-      whatsappVendor: whatsappToContact(
+      whatsappVendor: whatsappToBjContact(
         input.vendorContact,
         `Nouvelle commande Coin229 #${input.orderId.slice(-6)} — ${formatPrice(input.montantTotal)}. Ouvre ton espace : ${appUrl}/vendeur/espace/commandes`
       ),
@@ -61,9 +61,3 @@ async function notifyWebhook(input: NewOrderNotifyInput, appUrl: string) {
   });
 }
 
-function whatsappToContact(contact: string, text: string): string | null {
-  const digits = contact.replace(/\D/g, "");
-  if (digits.length < 8) return null;
-  const phone = digits.startsWith("229") ? digits : `229${digits.slice(-8)}`;
-  return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-}

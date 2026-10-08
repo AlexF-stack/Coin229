@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Check, Copy, MessageCircle } from "lucide-react";
-import { SITE } from "@/lib/site";
+import { SITE, productShareUrl, whatsappLink } from "@/lib/site";
 
 type ProductShare = {
   id: string;
@@ -15,17 +15,13 @@ type Props = {
   products: ProductShare[];
 };
 
-function shareUrl(productId: string, slug: string) {
-  return `${SITE.url}/produit/${productId}?utm_source=vendor&utm_medium=share&utm_campaign=${encodeURIComponent(slug)}`;
-}
-
 export function VendorPubLinks({ slug, boutique, products }: Props) {
   const [copied, setCopied] = useState<string | null>(null);
   const storeUrl = `${SITE.url}/vendeur/${slug}`;
 
   const whatsappStore = useMemo(() => {
     const msg = `Découvre ma boutique ${boutique} sur Coin229 👉 ${storeUrl}`;
-    return `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    return whatsappLink(msg);
   }, [boutique, storeUrl]);
 
   async function copy(text: string, key: string) {
@@ -77,10 +73,8 @@ export function VendorPubLinks({ slug, boutique, products }: Props) {
         ) : (
           <ul className="space-y-2">
             {products.map((p) => {
-              const url = shareUrl(p.id, slug);
-              const wa = `https://wa.me/?text=${encodeURIComponent(
-                `Regarde ma pièce « ${p.nom} » sur Coin229 👉 ${url}`
-              )}`;
+              const url = productShareUrl(p.id, slug);
+              const wa = whatsappLink(`Regarde ma pièce « ${p.nom} » sur Coin229 👉 ${url}`);
               return (
                 <li
                   key={p.id}

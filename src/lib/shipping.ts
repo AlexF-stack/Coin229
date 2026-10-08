@@ -88,10 +88,3 @@ export const ZONE_LABELS: Record<DeliveryZone, string> = {
   godomey: "Godomey / Abomey-Calavi",
 };
 
-/** Roadmap expansion Afrique (UEMOA d'abord) */
-export const AFRICA_EXPANSION = [
-  { phase: 1, market: "Bénin", focus: "Cotonou · Porto-Novo · Godomey", status: "actif" },
-  { phase: 2, market: "Togo · Côte d’Ivoire", focus: "UEMOA · XOF · MoMo", status: "prévu" },
-  { phase: 3, market: "Sénégal · Burkina · Niger", focus: "Hubs + partenaires locaux", status: "vision" },
-  { phase: 4, market: "Afrique francophone élargie", focus: "Marketplace multi-vendeurs", status: "vision" },
-] as const;
