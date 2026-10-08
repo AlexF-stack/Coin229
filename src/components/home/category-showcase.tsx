@@ -1,16 +1,36 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Categorie } from "@prisma/client";
-import { CATEGORIES, CATEGORIE_LABELS } from "@/lib/constants";
+import { CATEGORIE_LABELS } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 type Props = {
+  /** Seulement les catégories qui ont des produits */
+  categories: Categorie[];
   images: Partial<Record<Categorie, string>>;
 };
 
 /**
  * Entrées catégories — pastilles mobiles, tuiles image desktop.
  */
-export function CategoryShowcase({ images }: Props) {
+/** Classes complètes (Tailwind ne voit pas les noms construits dynamiquement) */
+const COLS: Record<number, string> = {
+  1: "grid-cols-1 md:max-w-sm",
+  2: "grid-cols-2 md:max-w-2xl",
+  3: "grid-cols-3",
+  4: "grid-cols-4",
+  5: "grid-cols-5",
+};
+const MD_COLS: Record<number, string> = {
+  1: "md:grid-cols-1",
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-3",
+  4: "md:grid-cols-4",
+  5: "md:grid-cols-5",
+};
+
+export function CategoryShowcase({ categories, images }: Props) {
+  const count = Math.min(categories.length, 5);
   return (
     <section aria-labelledby="categories-heading" className="px-4 md:px-0">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -22,7 +42,7 @@ export function CategoryShowcase({ images }: Props) {
             id="categories-heading"
             className="mt-2 font-display text-2xl font-bold tracking-tight text-navy md:text-3xl"
           >
-            Votre style. Quatre chemins.
+            Votre style. Votre rayon.
           </h2>
         </div>
         <Link
@@ -33,8 +53,8 @@ export function CategoryShowcase({ images }: Props) {
         </Link>
       </div>
 
-      <ul className="mt-6 grid grid-cols-4 gap-1.5 md:mt-8 md:gap-4">
-        {CATEGORIES.map((categorie, i) => {
+      <ul className={cn("mt-6 grid gap-1.5 md:mt-8 md:gap-4", COLS[count], MD_COLS[count])}>
+        {categories.map((categorie, i) => {
           const image = images[categorie] ?? "/placeholder-product.svg";
           const label = CATEGORIE_LABELS[categorie];
           const n = String(i + 1).padStart(2, "0");
@@ -49,7 +69,7 @@ export function CategoryShowcase({ images }: Props) {
                     src={image}
                     alt=""
                     fill
-                    sizes="(max-width: 768px) 64px, 25vw"
+                    sizes={`(max-width: 768px) 64px, ${Math.round(100 / count)}vw`}
                     loading="lazy"
                     className="object-cover transition-transform duration-700 ease-out md:group-hover:scale-[1.04]"
                   />

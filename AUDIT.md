@@ -129,7 +129,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P2-14 | ✅ | Bandeau cookies + bulle assistant masquaient les boutons d’achat sur mobile ; « Hello — je t’aide » en anglais — **corrigé** : bandeau cookies en fine barre en **haut** sur mobile (encart en bas à gauche sur ordinateur) ; bulle d’aide désactivée sur produit / panier / commande / paiement et bouton assistant remonté au-dessus de la barre d’achat ; textes en français (« Bonjour ! Je t’aide à choisir », « Besoin d’aide pour choisir ? »). Vérifié : test Edge mobile 375 px (6 contrôles + capture). Compromis : tant que « Compris » n’est pas touché, la barre recouvre l’en-tête sur mobile. | `cookie-banner.tsx`, `shop-chatbot.tsx` |
 | P2-15 | ✅ | Placeholder téléphone (corrigé en P0-3) ; « 21000 FCFA » — **corrigé** : `formatPrice` utilisait l’espace fine insécable d’Intl (U+202F), invisible avec certaines polices / téléphones ; remplacée par l’espace insécable classique, et les 3 montants formatés à la main (`toLocaleString`) passent par `formatPrice`. | `src/lib/utils.ts`, `commande/paiement`, `actions.ts`, `payouts.ts` |
 | P2-16 | ✅ | Upload : repli `public/uploads` impossible sur Vercel ; type de fichier non vérifié par contenu — **corrigé** : type détecté dans le contenu (signature JPEG / PNG / WebP), extension et type de stockage déduits du contenu ; en production : uniquement Supabase avec la clé serveur (plus de repli sur la clé publique ni sur le disque éphémère de Vercel → message clair « envoi de photos non configuré ») ; erreurs du stockage journalisées côté serveur, messages FR pour le vendeur. Vérifié : vraie photo acceptée, texte déguisé en .jpg refusé, PNG annoncé en gif/jpeg enregistré en .png, sans session refusé. Production vérifiée : sans Supabase → 503 « L’envoi de photos n’est pas encore configuré », rien écrit sur le disque. | `api/vendor/upload` |
-| P2-17 | ⏸️ | Contenu à valider : produits nommés Rolex / AP / Patek (authenticité impossible à confirmer → risque juridique), RCCM / IFU « en cours », contacts d'exemple | catalogue, variables d'env |
+| P2-17 | ⏸️ | Contenu à valider : produits nommés Rolex / AP / Patek (authenticité impossible à confirmer → risque juridique), RCCM / IFU « en cours », contacts d'exemple ; textes qui citent « sacs et lunettes » alors que ces rayons sont vides (et oublient les chaussures) | catalogue, variables d'env |
 
 ## 10. P3 — Améliorations
 
@@ -138,7 +138,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P3-1 | ✅ | Bouton Déconnexion visible sur mobile (admin / vendeur) — icône dans l’en-tête mobile ; en-tête qui débordait de l’écran corrigé ; bandeau cookies retiré des espaces de gestion (il couvrait l’en-tête) |
 | P3-2 | ✅ | Remplacer `alert()` / `confirm()` par des modales ; confirmation avant suspension vendeur — composant `useConfirm` (`<dialog>` natif : Échap, focus sur « Annuler » pour les actions dangereuses) ; plus aucun `alert`/`confirm` ; erreurs affichées dans la page ; sur la fiche produit le refus « autre boutique » s’affiche dans la zone d’achat |
 | P3-3 | ✅ | Libellés FR des statuts côté vendeur (au lieu de `en_attente`, `confirmee`) — corrigé avec P1-3 (statut en français + boutons d'action) |
-| P3-4 | ⬜ | « Quatre chemins » alors que 5 catégories ; catégories Sacs / Lunettes vides |
+| P3-4 | ✅ | « Quatre chemins » alors que 5 catégories ; catégories Sacs / Lunettes vides — accueil et filtres boutique n’affichent que les rayons qui ont des produits (`fetchActiveCategories`), titre « Votre style. Votre rayon. ». Reste (contenu, voir P2-17) : les textes « montres, bijoux, sacs et lunettes » (accueil, SEO, à propos) |
 | P3-5 | ⬜ | Indicateur de chargement sur les filtres boutique |
 | P3-6 | ⬜ | Galerie produit : flèches + zoom desktop |
 | P3-7 | ⬜ | Pagination du catalogue ; `React.cache` sur `fetchProductById` (requête doublée) |
@@ -241,3 +241,4 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | — | voir `git log` | Fin de la phase P2 : build production OK (Next 15.5.27), 15 suites de tests, tour Edge complet OK |
 | 08/10/2026 | P3-1 | voir `git log` | Déconnexion sur mobile (admin / vendeur), en-tête mobile sans débordement, bandeau cookies hors back-office |
 | 08/10/2026 | P3-2 | voir `git log` | Fenêtres de confirmation (admin, vendeur, panier) à la place des boîtes du navigateur |
+| 08/10/2026 | P3-4 | voir `git log` | Accueil et filtres : seulement les rayons avec produits |

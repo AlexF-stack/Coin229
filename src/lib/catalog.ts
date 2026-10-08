@@ -3,6 +3,7 @@ import { DEMO_PRODUCTS, filterDemoProducts } from "@/lib/demo-data";
 import { allowDemoCatalog } from "@/lib/runtime-flags";
 import { maybeReleaseExpiredReservations } from "@/lib/order-expiry";
 import {
+  CATEGORIES,
   CATEGORIE_SORT_ORDER,
   NICHES_BY_CATEGORIE,
 } from "@/lib/constants";
@@ -270,6 +271,29 @@ export async function fetchActiveNiches(
     // Fallback statique pour ne jamais laisser le filtre niches vide en prod
     if (categorie) return NICHES_BY_CATEGORIE[categorie] ?? [];
     return Object.values(NICHES_BY_CATEGORIE).flat();
+  }
+}
+
+/**
+ * Catégories qui ont au moins un produit visible (dans l'ordre de CATEGORIES) :
+ * les filtres et l'accueil ne proposent pas de rayon vide.
+ */
+export async function fetchActiveCategories(): Promise<Categorie[]> {
+  try {
+    const rows = await withTimeout(
+      prisma.product.groupBy({
+        by: ["categorie"],
+        where: { statut: { in: ["actif", "rupture"] }, vendor: { statut: "actif" } },
+      })
+    );
+    const present = new Set(rows.map((r) => r.categorie));
+    return CATEGORIES.filter((c) => present.has(c));
+  } catch {
+    if (allowDemoCatalog()) {
+      const present = new Set(DEMO_PRODUCTS.map((p) => p.categorie));
+      return CATEGORIES.filter((c) => present.has(c));
+    }
+    return CATEGORIES;
   }
 }
 

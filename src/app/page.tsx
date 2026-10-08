@@ -85,6 +85,7 @@ export default async function HomePage() {
   const nouveauteIds = new Set(nouveautes.map((p) => p.id));
   const selection = pickSelection(allProducts, nouveauteIds);
   const images = categoryImages(allProducts);
+  const categories = CATEGORIES.filter((c) => allProducts.some((p) => p.categorie === c));
   const slides = heroSlides(allProducts);
 
   const editorialImage =
@@ -101,7 +102,7 @@ export default async function HomePage() {
       <ReassuranceBar />
 
       <Reveal>
-        <CategoryShowcase images={images} />
+        {categories.length > 0 && <CategoryShowcase categories={categories} images={images} />}
       </Reveal>
 
       <Reveal>

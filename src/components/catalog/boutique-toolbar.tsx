@@ -10,6 +10,8 @@ import type { Categorie, Genre } from "@prisma/client";
 type Props = {
   resultCount: number;
   niches?: string[];
+  /** Catégories ayant des produits (défaut : toutes) */
+  categories?: Categorie[];
 };
 
 const genres: { value: Genre | ""; label: string }[] = [
@@ -26,7 +28,7 @@ const sorts = [
   { value: "prix_desc", label: "Prix décroissant" },
 ];
 
-export function BoutiqueToolbar({ resultCount, niches = [] }: Props) {
+export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGORIES }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -121,7 +123,8 @@ export function BoutiqueToolbar({ resultCount, niches = [] }: Props) {
           >
             Toutes
           </button>
-          {CATEGORIES.map((c) => (
+          {/* Catégorie demandée par l'URL gardée même vide, pour voir le filtre actif */}
+          {CATEGORIES.filter((c) => categories.includes(c) || c === categorie).map((c) => (
             <button
               key={c}
               type="button"

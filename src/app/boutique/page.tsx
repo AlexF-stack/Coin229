@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { ProductGrid } from "@/components/catalog/product-grid";
 import { BoutiqueToolbar } from "@/components/catalog/boutique-toolbar";
-import { fetchActiveNiches, fetchProducts } from "@/lib/catalog";
+import { fetchActiveCategories, fetchActiveNiches, fetchProducts } from "@/lib/catalog";
 import { CATEGORIES, CATEGORIE_LABELS, nicheLabel } from "@/lib/constants";
 import { buildPageMetadata } from "@/lib/seo";
 import type { Categorie, Genre } from "@prisma/client";
@@ -73,7 +73,7 @@ export default async function BoutiquePage({
   ) as "pertinence" | "nouveautes" | "prix_asc" | "prix_desc";
   const enStock = params.enStock === "1";
 
-  const [{ products, source }, niches] = await Promise.all([
+  const [{ products, source }, niches, activeCategories] = await Promise.all([
     fetchProducts({
       q: q || undefined,
       categorie,
@@ -83,6 +83,7 @@ export default async function BoutiquePage({
       enStock: enStock || undefined,
     }),
     fetchActiveNiches(24, categorie),
+    fetchActiveCategories(),
   ]);
   // Base injoignable : page d'erreur temporaire, pas un faux « aucun résultat »
   if (source === "unavailable") throw new Error("CATALOG_UNAVAILABLE");
@@ -128,7 +129,11 @@ export default async function BoutiquePage({
       )}
 
       <Suspense fallback={<div className="h-24" />}>
-        <BoutiqueToolbar resultCount={products.length} niches={niches} />
+        <BoutiqueToolbar
+          resultCount={products.length}
+          niches={niches}
+          categories={activeCategories}
+        />
       </Suspense>
 
       {products.length > 0 ? (
