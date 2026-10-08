@@ -135,7 +135,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 
 | ID | Statut | Amélioration |
 |---|---|---|
-| P3-1 | ⬜ | Bouton Déconnexion visible sur mobile (admin / vendeur) |
+| P3-1 | ✅ | Bouton Déconnexion visible sur mobile (admin / vendeur) — icône dans l’en-tête mobile ; en-tête qui débordait de l’écran corrigé ; bandeau cookies retiré des espaces de gestion (il couvrait l’en-tête) |
 | P3-2 | 🔄 | Remplacer `alert()` / `confirm()` par des modales ; confirmation avant suspension vendeur — confirmation avant annulation de commande ajoutée (P1-3), encore via `confirm()` |
 | P3-3 | ✅ | Libellés FR des statuts côté vendeur (au lieu de `en_attente`, `confirmee`) — corrigé avec P1-3 (statut en français + boutons d'action) |
 | P3-4 | ⬜ | « Quatre chemins » alors que 5 catégories ; catégories Sacs / Lunettes vides |
@@ -239,3 +239,4 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P2-3 | `d57d678` | Content-Security-Policy en production |
 | 08/10/2026 | P2-1 | `96ea409` | Dépendances : Next 15.5.27, Supabase 2.117.3, postcss corrigé |
 | 08/10/2026 | — | voir `git log` | Fin de la phase P2 : build production OK (Next 15.5.27), 15 suites de tests, tour Edge complet OK |
+| 08/10/2026 | P3-1 | voir `git log` | Déconnexion sur mobile (admin / vendeur), en-tête mobile sans débordement, bandeau cookies hors back-office |

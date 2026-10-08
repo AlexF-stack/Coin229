@@ -12,6 +12,7 @@ import {
   MessageCircle,
   User,
   Wallet,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +47,10 @@ export function VendorShell({
   children,
 }: Props) {
   const pathname = usePathname();
+  const logout = async () => {
+    await fetch("/api/vendor/login", { method: "DELETE" });
+    window.location.href = "/vendeur/login";
+  };
   const storeHref = slug ? `/vendeur/${slug}` : null;
 
   return (
@@ -113,18 +118,16 @@ export function VendorShell({
           </Link>
           <button
             type="button"
-            onClick={async () => {
-              await fetch("/api/vendor/login", { method: "DELETE" });
-              window.location.href = "/vendeur/login";
-            }}
+            onClick={logout}
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-white/45 hover:bg-white/5 hover:text-white"
           >
+            <LogOut className="h-4 w-4 stroke-[1.5]" />
             Déconnexion
           </button>
         </div>
       </aside>
 
-      <div className="flex min-h-dvh flex-1 flex-col lg:pl-60">
+      <div className="flex min-h-dvh min-w-0 flex-1 flex-col lg:pl-60">
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-[#14161c]/95 px-4 py-3 backdrop-blur-md lg:px-8">
           <div className="flex items-center gap-2 lg:hidden">
             <Store className="h-5 w-5 text-amber-400" />
@@ -133,7 +136,7 @@ export function VendorShell({
           <p className="hidden text-sm text-white/50 lg:block">
             Produits, commandes & partage
           </p>
-          <div className="flex gap-1 overflow-x-auto lg:hidden">
+          <div className="ml-3 flex min-w-0 flex-1 gap-1 overflow-x-auto lg:hidden">
             {links.map(({ href, label, exact, badge }) => {
               const active = exact
                 ? pathname === href
@@ -158,6 +161,15 @@ export function VendorShell({
               );
             })}
           </div>
+          <button
+            type="button"
+            onClick={logout}
+            aria-label="Déconnexion"
+            title="Déconnexion"
+            className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-white/50 hover:bg-white/5 hover:text-white lg:hidden"
+          >
+            <LogOut className="h-4 w-4 stroke-[1.5]" />
+          </button>
         </header>
         <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">{children}</main>
       </div>

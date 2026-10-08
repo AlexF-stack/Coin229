@@ -2,10 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const KEY = "coin229-cookie-consent";
 
+/** Espaces de gestion : le bandeau masquerait leur en-tête (navigation, déconnexion). */
+const BACK_OFFICE = /^\/(admin|vendeur\/espace)(\/|$)/;
+
 export function CookieBanner() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -25,7 +30,7 @@ export function CookieBanner() {
     setVisible(false);
   }
 
-  if (!visible) return null;
+  if (!visible || BACK_OFFICE.test(pathname ?? "")) return null;
 
   // Mobile : fine barre en HAUT (ne masque plus les boutons d'achat en bas) ;
   // ordinateur : encart en bas à gauche.

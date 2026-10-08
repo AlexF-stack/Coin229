@@ -11,6 +11,7 @@ import {
   Bell,
   Store,
   Wallet,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,10 @@ type Props = {
 /** Back-office distinct : sombre utilitaire, sidebar, pas de chrome boutique */
 export function AdminShell({ boutique, children }: Props) {
   const pathname = usePathname();
+  const logout = async () => {
+    await fetch("/api/admin/login", { method: "DELETE" });
+    window.location.href = "/admin/login";
+  };
 
   return (
     <div className="admin-shell flex min-h-dvh bg-[#0a0b0f] text-[#e8eaed]">
@@ -74,18 +79,16 @@ export function AdminShell({ boutique, children }: Props) {
           </Link>
           <button
             type="button"
-            onClick={async () => {
-              await fetch("/api/admin/login", { method: "DELETE" });
-              window.location.href = "/admin/login";
-            }}
+            onClick={logout}
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-white/45 hover:bg-white/5 hover:text-white"
           >
+            <LogOut className="h-4 w-4 stroke-[1.5]" />
             Déconnexion
           </button>
         </div>
       </aside>
 
-      <div className="flex min-h-dvh flex-1 flex-col lg:pl-60">
+      <div className="flex min-h-dvh min-w-0 flex-1 flex-col lg:pl-60">
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-[#111318]/95 px-4 py-3 backdrop-blur-md lg:px-8">
           <div className="flex items-center gap-2 lg:hidden">
             <Boxes className="h-5 w-5 text-emerald-400" />
@@ -94,7 +97,7 @@ export function AdminShell({ boutique, children }: Props) {
           <p className="hidden text-sm text-white/50 lg:block">
             Gestion stock & commandes
           </p>
-          <div className="flex gap-1 overflow-x-auto lg:hidden">
+          <div className="ml-3 flex min-w-0 flex-1 gap-1 overflow-x-auto lg:hidden">
             {links.map(({ href, label, exact }) => {
               const active = exact
                 ? pathname === href
@@ -115,6 +118,15 @@ export function AdminShell({ boutique, children }: Props) {
               );
             })}
           </div>
+          <button
+            type="button"
+            onClick={logout}
+            aria-label="Déconnexion"
+            title="Déconnexion"
+            className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-white/50 hover:bg-white/5 hover:text-white lg:hidden"
+          >
+            <LogOut className="h-4 w-4 stroke-[1.5]" />
+          </button>
         </header>
         <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">{children}</main>
       </div>
