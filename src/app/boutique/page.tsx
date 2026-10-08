@@ -42,7 +42,7 @@ export async function generateMetadata({
   return buildPageMetadata({
     title: "Boutique",
     description:
-      "Tous les accessoires Coin229 : montres, bijoux, sacs et lunettes. Recherche, filtres et prix en FCFA.",
+      "Tous les accessoires Coin229 : montres, bijoux et chaussures. Recherche, filtres et prix en FCFA.",
     path: "/boutique",
   });
 }

@@ -5,7 +5,7 @@ import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "À propos",
-  description: `${SITE.name} — boutique d'accessoires mode au Bénin. Montres, bijoux, sacs et lunettes livrés à Cotonou, Porto-Novo et Godomey.`,
+  description: `${SITE.name} — boutique d'accessoires mode au Bénin. Montres, bijoux et chaussures livrés à Cotonou, Porto-Novo et Godomey.`,
   path: "/a-propos",
 });
 
@@ -21,7 +21,7 @@ export default function AboutPage() {
         </h1>
         <p className="mt-3 leading-relaxed text-muted">
           {SITE.name} est une boutique en ligne basée à Cotonou. Nous sélectionnons
-          montres, bijoux, sacs et lunettes pour un look net au quotidien —
+          montres, bijoux et chaussures pour un look net au quotidien —
           livrés chez vous à {SITE.zones.join(", ")}.
         </p>
       </header>

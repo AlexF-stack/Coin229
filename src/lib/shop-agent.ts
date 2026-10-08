@@ -421,7 +421,7 @@ export async function runShopAgent(input: {
       ? ` Style ${style} pris en compte.`
       : "";
     return {
-      text: `Voici ${products.length} idée(s) pour toi (${prefsSummary(prefs)}).${styleNote}\nTape sur une pièce, ou affine (ex. « homme », « lunettes », « 20k »).`,
+      text: `Voici ${products.length} idée(s) pour toi (${prefsSummary(prefs)}).${styleNote}\nTape sur une pièce, ou affine (ex. « homme », « sandales », « 20k »).`,
       quickReplies: [
         "Autre suggestion",
         "Voir la boutique",

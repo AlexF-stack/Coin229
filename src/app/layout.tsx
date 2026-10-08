@@ -39,9 +39,9 @@ export const metadata: Metadata = {
   keywords: [
     "accessoires mode Bénin",
     "montres Cotonou",
-    "lunettes soleil Bénin",
+    "chaussures Cotonou",
     "bijoux Cotonou",
-    "sacs mode Porto-Novo",
+    "sandales Bénin",
     "livraison Godomey",
     "Mobile Money",
     "paiement à la livraison",

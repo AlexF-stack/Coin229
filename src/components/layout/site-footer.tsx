@@ -15,7 +15,7 @@ export function SiteFooter() {
           </div>
           <p className="mt-2 text-sm text-amber">{SITE.tagline}</p>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
-            Montres, bijoux, sacs, lunettes et chaussures sélectionnés pour
+            Montres, bijoux et chaussures sélectionnés pour
             votre style — livrés à {SITE.zones.join(", ")}.
           </p>
         </div>

@@ -37,7 +37,7 @@ export default function OgImage() {
         <div
           style={{ marginTop: 28, fontSize: 30, color: "#F6F3EC", maxWidth: 820 }}
         >
-          Montres, bijoux, sacs & lunettes — livrés à Cotonou, Porto-Novo et
+          Montres, bijoux et chaussures — livrés à Cotonou, Porto-Novo et
           Godomey.
         </div>
       </div>

@@ -6,9 +6,9 @@ const img = (n) => `${BASE}/montre-${String(n).padStart(2, "0")}.jpg`;
 
 const PRODUCTS = [
   {
-    nom: "AP Royal Oak Iced Out — set complet",
+    nom: "Montre pavée argent — set complet",
     description:
-      "Montre Audemars Piguet style Royal Oak entièrement pavée. Livrée avec boîte bois, certificat, sac, et testeur diamants visible sur les photos. Unisexe.",
+      "Montre entièrement pavée. Livrée avec boîte bois, certificat, pochette, et testeur de pierres visible sur les photos. Unisexe.",
     niche: "montre luxe",
     genre: "unisexe",
     prix: 185000,
@@ -17,9 +17,9 @@ const PRODUCTS = [
     images: [img(1), img(2), img(3), img(5)],
   },
   {
-    nom: "AP Royal Oak Iced Out + bracelet trèfle",
+    nom: "Montre pavée argent + bracelet trèfle",
     description:
-      "Montre AP iced out argent + bracelet pavé motifs trèfle. Boîte mahogany, certificat d’origine et hangtag.",
+      "Montre pavée argent et bracelet motifs trèfle. Boîte, certificat et étiquette.",
     niche: "montre luxe",
     genre: "femme",
     prix: 195000,
@@ -28,9 +28,9 @@ const PRODUCTS = [
     images: [img(4)],
   },
   {
-    nom: "AP Royal Oak Emeraude Full Pavé",
+    nom: "Montre pavée pierres vertes",
     description:
-      "Montre AP Royal Oak entièrement sertie de pierres vertes. Photos avec boîte, certificat et Diamond Selector II.",
+      "Montre entièrement sertie de pierres vertes. Photos avec boîte et certificat.",
     niche: "montre luxe",
     genre: "unisexe",
     prix: 210000,
@@ -39,9 +39,9 @@ const PRODUCTS = [
     images: [img(6), img(13)],
   },
   {
-    nom: "Patek Nautilus Vert & Or Rose + bracelet",
+    nom: "Montre or rose — cadran vert et bracelet",
     description:
-      "Montre Patek Philippe style Nautilus — cadran vert scintillant, bezel baguette, or rose, bracelet assorti. Présentation gant noir.",
+      "Cadran vert scintillant, lunette baguette, or rose, bracelet assorti. Présentation gant noir.",
     niche: "montre luxe",
     genre: "unisexe",
     prix: 220000,
@@ -50,9 +50,9 @@ const PRODUCTS = [
     images: [img(7)],
   },
   {
-    nom: "Patek Philippe Or Rose Full Bagette",
+    nom: "Montre or rose — lunette et bracelet baguettes",
     description:
-      "Montre Patek Philippe or rose, cadran sombre, bezel et bracelet baguettes. Photo studio fond noir.",
+      "Or rose, cadran sombre, lunette et bracelet baguettes. Photo studio fond noir.",
     niche: "montre luxe",
     genre: "homme",
     prix: 215000,
@@ -61,9 +61,9 @@ const PRODUCTS = [
     images: [img(8)],
   },
   {
-    nom: "Patek Or Rose + bracelet infinity",
+    nom: "Montre or rose pavée + bracelet infinity",
     description:
-      "Set Patek Philippe or rose iced out avec bracelet maillons infinity assorti.",
+      "Set or rose pavé avec bracelet maillons infinity assorti.",
     niche: "montre luxe",
     genre: "femme",
     prix: 230000,
@@ -72,9 +72,9 @@ const PRODUCTS = [
     images: [img(9)],
   },
   {
-    nom: "AP Royal Oak Silver Pavé + bracelet",
+    nom: "Montre pavée argent + bracelet",
     description:
-      "Montre AP Royal Oak full pavé argent + bracelet infinity diamants. Vue détail et boîte.",
+      "Montre pavée argent et bracelet assorti. Vue détail et boîte.",
     niche: "montre luxe",
     genre: "unisexe",
     prix: 200000,

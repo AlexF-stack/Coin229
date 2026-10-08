@@ -11,6 +11,7 @@ import {
   Bell,
   Store,
   Wallet,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,11 @@ type Props = {
 /** Back-office distinct : sombre utilitaire, sidebar, pas de chrome boutique */
 export function AdminShell({ boutique, children }: Props) {
   const pathname = usePathname();
+
+  async function logout() {
+    await fetch("/api/admin/login", { method: "DELETE" });
+    window.location.href = "/admin/login";
+  }
 
   return (
     <div className="admin-shell flex min-h-dvh bg-[#0a0b0f] text-[#e8eaed]">
@@ -74,27 +80,35 @@ export function AdminShell({ boutique, children }: Props) {
           </Link>
           <button
             type="button"
-            onClick={async () => {
-              await fetch("/api/admin/login", { method: "DELETE" });
-              window.location.href = "/admin/login";
-            }}
+            onClick={() => void logout()}
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-white/45 hover:bg-white/5 hover:text-white"
           >
+            <LogOut className="h-4 w-4 stroke-[1.5]" />
             Déconnexion
           </button>
         </div>
       </aside>
 
       <div className="flex min-h-dvh flex-1 flex-col lg:pl-60">
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-[#111318]/95 px-4 py-3 backdrop-blur-md lg:px-8">
-          <div className="flex items-center gap-2 lg:hidden">
-            <Boxes className="h-5 w-5 text-emerald-400" />
-            <span className="text-sm font-semibold">Admin</span>
+        <header className="sticky top-0 z-30 border-b border-white/10 bg-[#111318]/95 backdrop-blur-md">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 lg:px-8">
+            <div className="flex items-center gap-2 lg:hidden">
+              <Boxes className="h-5 w-5 text-emerald-400" />
+              <span className="text-sm font-semibold">Admin</span>
+            </div>
+            <p className="hidden text-sm text-white/50 lg:block">
+              Gestion stock & commandes
+            </p>
+            <button
+              type="button"
+              onClick={() => void logout()}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-white/80 hover:bg-white/5 hover:text-white lg:hidden"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Déconnexion
+            </button>
           </div>
-          <p className="hidden text-sm text-white/50 lg:block">
-            Gestion stock & commandes
-          </p>
-          <div className="flex gap-1 overflow-x-auto lg:hidden">
+          <div className="flex gap-1 overflow-x-auto px-4 pb-3 lg:hidden">
             {links.map(({ href, label, exact }) => {
               const active = exact
                 ? pathname === href
