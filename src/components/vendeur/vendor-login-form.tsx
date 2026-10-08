@@ -3,7 +3,10 @@
 import { FormEvent, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Store } from "lucide-react";
+import { AuthCard } from "@/components/ui/auth-card";
+import { Field, Input } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
 
 export function VendorLoginForm() {
   const router = useRouter();
@@ -50,69 +53,49 @@ export function VendorLoginForm() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[#0c0d12] px-4 text-[#e8eaed]">
-      <form
-        onSubmit={onSubmit}
-        className="w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#14161c] p-6"
-      >
-        <div className="flex items-center gap-2 text-amber-400">
-          <Store className="h-5 w-5 stroke-[1.5]" />
-          <p className="text-xs font-semibold uppercase tracking-[0.2em]">
-            Espace vendeur
-          </p>
-        </div>
-        <h1 className="text-xl font-semibold text-white">Connexion marque</h1>
-        <label className="block space-y-1.5 text-sm">
-          <span className="text-white/45">Email</span>
-          <input
+    <AuthCard
+      eyebrow="Espace vendeur"
+      title="Connexion marque"
+      footer={
+        <>
+          Pas encore de compte ?{" "}
+          <Link href="/vendeur/inscription" className="font-semibold text-primary underline-offset-4 hover:underline">
+            S&apos;inscrire
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={onSubmit} className="space-y-4">
+        <Field label="Email">
+          <Input
             type="email"
             required
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-[#0c0d12] px-3 py-3 text-white outline-none focus:border-amber-500/50"
             placeholder="toi@marque.bj"
           />
-        </label>
-        <label className="block space-y-1.5 text-sm">
-          <span className="text-white/45">Mot de passe</span>
-          <input
+        </Field>
+        <Field label="Mot de passe">
+          <Input
             type="password"
             required
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-[#0c0d12] px-3 py-3 text-white outline-none focus:border-amber-500/50"
             placeholder="••••••••"
           />
-        </label>
+        </Field>
         <div className="flex justify-end">
-          <Link
-            href="/vendeur/mot-de-passe-oublie"
-            className="text-xs text-amber-300/90 hover:underline"
-          >
+          <Link href="/vendeur/mot-de-passe-oublie" className="text-sm font-medium text-accent-ink hover:underline">
             Mot de passe oublié ?
           </Link>
         </div>
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        <button
-          type="submit"
-          disabled={pending}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 py-3 text-sm font-semibold text-[#0c0d12] disabled:opacity-60"
-        >
-          {pending && <Loader2 className="h-4 w-4 animate-spin" />}
+        {error && <Alert tone="error">{error}</Alert>}
+        <Button type="submit" loading={pending} fullWidth>
           Se connecter
-        </button>
-        <p className="text-center text-sm text-white/45">
-          Pas encore de compte ?{" "}
-          <Link
-            href="/vendeur/inscription"
-            className="font-medium text-amber-300 hover:underline"
-          >
-            S&apos;inscrire
-          </Link>
-        </p>
+        </Button>
       </form>
-    </div>
+    </AuthCard>
   );
 }

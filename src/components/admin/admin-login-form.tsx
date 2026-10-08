@@ -3,7 +3,10 @@
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { safeNextPath } from "@/lib/safe-next";
-import { Loader2, Lock } from "lucide-react";
+import { AuthCard } from "@/components/ui/auth-card";
+import { Field, Input } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
 
 export function AdminLoginForm() {
   const router = useRouter();
@@ -40,40 +43,24 @@ export function AdminLoginForm() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[#0a0b0f] px-4 text-[#e8eaed]">
-      <form
-        onSubmit={onSubmit}
-        className="w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#111318] p-6"
-      >
-        <div className="flex items-center gap-2 text-emerald-400">
-          <Lock className="h-5 w-5 stroke-[1.5]" />
-          <p className="text-xs font-semibold uppercase tracking-[0.2em]">
-            Back-office
-          </p>
-        </div>
-        <h1 className="text-xl font-semibold text-white">Connexion admin</h1>
-        <label className="block space-y-1.5 text-sm">
-          <span className="text-white/45">Mot de passe</span>
-          <input
+    <AuthCard eyebrow="Back-office" title="Connexion admin">
+      <form onSubmit={onSubmit} className="space-y-4">
+        <Field label="Mot de passe">
+          <Input
             type="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoFocus
-            className="w-full rounded-lg border border-white/10 bg-[#0a0b0f] px-3 py-3 text-white outline-none focus:border-emerald-500/50"
+            autoComplete="current-password"
             placeholder="••••••••"
           />
-        </label>
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        <button
-          type="submit"
-          disabled={pending}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-3 text-sm font-semibold text-[#0a0b0f] disabled:opacity-60"
-        >
-          {pending && <Loader2 className="h-4 w-4 animate-spin" />}
+        </Field>
+        {error && <Alert tone="error">{error}</Alert>}
+        <Button type="submit" loading={pending} fullWidth>
           Entrer
-        </button>
+        </Button>
       </form>
-    </div>
+    </AuthCard>
   );
 }

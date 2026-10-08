@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AuthFallback } from "@/components/ui/auth-card";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
 
 export const metadata = {
@@ -7,13 +8,7 @@ export const metadata = {
 
 export default function AdminLoginPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-dvh items-center justify-center bg-[#0a0b0f] text-white/50">
-          Chargement…
-        </div>
-      }
-    >
+    <Suspense fallback={<AuthFallback />}>
       <AdminLoginForm />
     </Suspense>
   );

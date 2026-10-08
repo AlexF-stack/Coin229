@@ -65,8 +65,9 @@ export function AppShell({
 
   const brand = (
     <div className="px-5 pb-5 pt-6">
-      <Link href="/" aria-label="Retour au site Coin229" className="inline-flex">
-        <BrandLogo variant="wordmark" onDark height={40} />
+      <Link href="/" aria-label="Retour au site Coin229" className="inline-flex items-center gap-2">
+        <BrandLogo variant="mark" height={32} />
+        <BrandLogo variant="wordmark" onDark height={34} />
       </Link>
       <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">{spaceLabel}</p>
       <p className="mt-1 truncate font-display text-[15px] font-semibold text-inverse">{title}</p>

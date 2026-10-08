@@ -3,7 +3,10 @@
 import { FormEvent, useState, useTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Loader2, Store } from "lucide-react";
+import { AuthCard } from "@/components/ui/auth-card";
+import { Field, Input } from "@/components/ui/field";
+import { Button, buttonClasses } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
 
 export function VendorResetForm() {
   const params = useSearchParams();
@@ -54,83 +57,52 @@ export function VendorResetForm() {
 
   if (!token) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#0c0d12] px-4 text-[#e8eaed]">
-        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#14161c] p-6 text-center">
-          <p className="text-sm text-white/60">Lien de réinitialisation invalide.</p>
-          <Link
-            href="/vendeur/mot-de-passe-oublie"
-            className="text-sm font-medium text-amber-300 hover:underline"
-          >
-            Demander un nouveau lien
-          </Link>
-        </div>
-      </div>
+      <AuthCard eyebrow="Espace vendeur" title="Lien invalide">
+        <p className="text-sm text-fg-secondary">Ce lien de réinitialisation est invalide ou incomplet.</p>
+        <Link href="/vendeur/mot-de-passe-oublie" className={buttonClasses({ variant: "outline", fullWidth: true, className: "mt-5" })}>
+          Demander un nouveau lien
+        </Link>
+      </AuthCard>
     );
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[#0c0d12] px-4 text-[#e8eaed]">
-      <form
-        onSubmit={onSubmit}
-        className="w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#14161c] p-6"
-      >
-        <div className="flex items-center gap-2 text-amber-400">
-          <Store className="h-5 w-5 stroke-[1.5]" />
-          <p className="text-xs font-semibold uppercase tracking-[0.2em]">
-            Espace vendeur
-          </p>
+    <AuthCard eyebrow="Espace vendeur" title="Nouveau mot de passe">
+      {done ? (
+        <div className="space-y-4">
+          <Alert tone="success">Ton mot de passe a été mis à jour. Tu peux te connecter.</Alert>
+          <Link href="/vendeur/login" className={buttonClasses({ fullWidth: true })}>
+            Se connecter
+          </Link>
         </div>
-        <h1 className="text-xl font-semibold text-white">Nouveau mot de passe</h1>
-        {done ? (
-          <>
-            <p className="text-sm text-white/60">
-              Ton mot de passe a été mis à jour. Tu peux te connecter.
-            </p>
-            <Link
-              href="/vendeur/login"
-              className="flex w-full items-center justify-center rounded-lg bg-amber-500 py-3 text-sm font-semibold text-[#0c0d12]"
-            >
-              Se connecter
-            </Link>
-          </>
-        ) : (
-          <>
-            <label className="block space-y-1.5 text-sm">
-              <span className="text-white/45">Nouveau mot de passe</span>
-              <input
-                type="password"
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-[#0c0d12] px-3 py-3 text-white outline-none focus:border-amber-500/50"
-              />
-            </label>
-            <label className="block space-y-1.5 text-sm">
-              <span className="text-white/45">Confirmer</span>
-              <input
-                type="password"
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-[#0c0d12] px-3 py-3 text-white outline-none focus:border-amber-500/50"
-              />
-            </label>
-            {error && <p className="text-sm text-red-400">{error}</p>}
-            <button
-              type="submit"
-              disabled={pending}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 py-3 text-sm font-semibold text-[#0c0d12] disabled:opacity-60"
-            >
-              {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Enregistrer
-            </button>
-          </>
-        )}
-      </form>
-    </div>
+      ) : (
+        <form onSubmit={onSubmit} className="space-y-4">
+          <Field label="Nouveau mot de passe" hint="8 caractères minimum">
+            <Input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Field>
+          <Field label="Confirmer">
+            <Input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+          </Field>
+          {error && <Alert tone="error">{error}</Alert>}
+          <Button type="submit" loading={pending} fullWidth>
+            Enregistrer
+          </Button>
+        </form>
+      )}
+    </AuthCard>
   );
 }
