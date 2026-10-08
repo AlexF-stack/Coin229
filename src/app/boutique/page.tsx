@@ -136,21 +136,24 @@ export default async function BoutiquePage({
         />
       </Suspense>
 
-      {products.length > 0 ? (
-        <ProductGrid products={products} />
-      ) : (
-        <div className="mx-auto flex max-w-md flex-col items-center px-6 py-14 text-center">
-          <p className="font-display text-xl font-semibold text-navy">
-            Aucun accessoire trouvé.
-          </p>
-          <p className="mt-2 text-sm text-muted">
-            Essayez un autre mot-clé ou explorez toute la boutique.
-          </p>
-          <Link href="/boutique" className="btn btn-primary mt-6">
-            Voir tous les produits
-          </Link>
-        </div>
-      )}
+      {/* Estompé pendant qu'un nouveau filtre charge (voir data-loading de la barre) */}
+      <div className="transition-opacity duration-200 peer-data-[loading=true]:pointer-events-none peer-data-[loading=true]:opacity-50">
+        {products.length > 0 ? (
+          <ProductGrid products={products} />
+        ) : (
+          <div className="mx-auto flex max-w-md flex-col items-center px-6 py-14 text-center">
+            <p className="font-display text-xl font-semibold text-navy">
+              Aucun accessoire trouvé.
+            </p>
+            <p className="mt-2 text-sm text-muted">
+              Essayez un autre mot-clé ou explorez toute la boutique.
+            </p>
+            <Link href="/boutique" className="btn btn-primary mt-6">
+              Voir tous les produits
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

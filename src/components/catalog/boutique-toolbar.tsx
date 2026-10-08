@@ -1,8 +1,8 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
-import { Filter, Search, SlidersHorizontal, X } from "lucide-react";
+import { FormEvent, useEffect, useState, useTransition } from "react";
+import { Filter, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
 import { CATEGORIES, CATEGORIE_LABELS, nicheLabel } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Categorie, Genre } from "@prisma/client";
@@ -33,6 +33,8 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
   const pathname = usePathname();
   const params = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // Vrai tant que la nouvelle liste n'est pas arrivée du serveur
+  const [loading, startTransition] = useTransition();
   const [q, setQ] = useState(params.get("q") ?? "");
 
   useEffect(() => {
@@ -47,7 +49,9 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
 
   function pushParams(next: URLSearchParams) {
     const qs = next.toString();
-    router.push(qs ? `${pathname}?${qs}` : pathname);
+    startTransition(() => {
+      router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    });
   }
 
   function setParam(key: string, value: string) {
@@ -95,7 +99,13 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
   );
 
   return (
-    <div className="space-y-4">
+    // peer + data-loading : la grille de produits (élément suivant) s'estompe pendant le chargement
+    <div className="peer space-y-4" data-loading={loading ? "true" : undefined} aria-busy={loading}>
+      {loading && (
+        <div className="fixed inset-x-0 top-0 z-[70] h-0.5 overflow-hidden bg-amber/20" aria-hidden>
+          <div className="h-full w-1/3 animate-[catalog-progress_1s_ease-in-out_infinite] bg-amber" />
+        </div>
+      )}
       <form onSubmit={onSearch} className="px-4 md:px-0">
         <label className="relative block">
           <span className="sr-only">Rechercher un produit</span>
@@ -166,8 +176,17 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
       </div>
 
       <div className="flex items-center justify-between gap-2 px-4 md:gap-3 md:px-0">
-        <p className="shrink-0 text-sm text-muted">
-          {resultCount} produit{resultCount !== 1 ? "s" : ""}
+        <p className="flex shrink-0 items-center gap-1.5 text-sm text-muted" aria-live="polite">
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Chargement…
+            </>
+          ) : (
+            <>
+              {resultCount} produit{resultCount !== 1 ? "s" : ""}
+            </>
+          )}
         </p>
         <div className="flex min-w-0 max-w-full items-center justify-end gap-2">
           <button
@@ -318,7 +337,11 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
                 onClick={() => setDrawerOpen(false)}
                 className="btn btn-primary flex-1"
               >
-                Voir {resultCount} résultat{resultCount !== 1 ? "s" : ""}
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>Voir {resultCount} résultat{resultCount !== 1 ? "s" : ""}</>
+                )}
               </button>
             </div>
           </div>
