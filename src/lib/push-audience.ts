@@ -3,6 +3,7 @@
  * - Nouvelle commande  → admin + le vendeur de la commande
  * - Nouveau vendeur    → admin
  * - Annonce marketing  → clients
+ * - Message reçu       → le vendeur ou le client de la discussion
  */
 import type { Prisma, PushRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -18,12 +19,16 @@ export type PushAudience = "client" | "admin" | "vendor";
 export function pushWhere(target: {
   roles: PushRole[];
   vendorId?: string;
+  /** Avec le rôle client : seulement ce client (sinon tous les clients) */
+  clientId?: string;
 }): Prisma.PushSubscriptionWhereInput {
   const or: Prisma.PushSubscriptionWhereInput[] = [];
   for (const role of target.roles) {
     if (role === "vendor") {
       // Jamais tous les vendeurs : uniquement celui concerné
       if (target.vendorId) or.push({ role: "vendor", vendorId: target.vendorId });
+    } else if (role === "client" && target.clientId) {
+      or.push({ role: "client", clientId: target.clientId });
     } else {
       or.push({ role });
     }
@@ -33,7 +38,7 @@ export function pushWhere(target: {
 
 /** Envoie à la cible, purge les abonnements morts. Best-effort. */
 export async function sendPushTo(
-  target: { roles: PushRole[]; vendorId?: string },
+  target: { roles: PushRole[]; vendorId?: string; clientId?: string },
   payload: PushPayload
 ): Promise<{ total: number; sent: number; failed: number }> {
   if (!isWebPushConfigured()) return { total: 0, sent: 0, failed: 0 };
