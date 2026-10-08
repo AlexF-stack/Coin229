@@ -2,25 +2,30 @@
  * Webhook ops Coin229 — cible ORDER_NOTIFY_WEBHOOK.
  * Envoie WhatsApp (CallMeBot ou Meta Cloud) + journalise en AppConfig.
  */
+import { createHash, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
+import { normalizeBjPhone } from "@/lib/bj-phone";
 import { prisma } from "@/lib/prisma";
 import { SITE } from "@/lib/site";
 
 export const runtime = "nodejs";
 
+/**
+ * Secret dans l'en-tête x-notify-secret (ou Authorization: Bearer) uniquement :
+ * un secret dans l'URL finit dans les journaux d'accès.
+ */
 function authorized(request: Request): boolean {
   const secret = process.env.NOTIFY_HOOK_SECRET?.trim();
   if (!secret) return false;
-  const url = new URL(request.url);
-  const q = url.searchParams.get("key") || url.searchParams.get("secret");
-  const header = request.headers.get("x-notify-secret");
-  return q === secret || header === secret;
+  const bearer = request.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
+  const given = request.headers.get("x-notify-secret") ?? bearer ?? "";
+  const digest = (v: string) => createHash("sha256").update(v).digest();
+  return timingSafeEqual(digest(given), digest(secret));
 }
 
+/** Numéro WhatsApp (chiffres, indicatif 229) — format 10 chiffres */
 function normalizePhone(raw: string): string | null {
-  const digits = raw.replace(/\D/g, "");
-  if (digits.length < 8) return null;
-  return digits.startsWith("229") ? digits : `229${digits.slice(-8)}`;
+  return normalizeBjPhone(raw)?.replace(/\D/g, "") ?? null;
 }
 
 async function sendCallMeBot(phone: string, text: string) {

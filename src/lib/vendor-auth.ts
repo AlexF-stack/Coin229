@@ -51,11 +51,18 @@ export function hashVendorPassword(password: string): string {
   return `scrypt$${salt.toString("hex")}$${hash.toString("hex")}`;
 }
 
+const DUMMY_SALT = randomBytes(16);
+
 export function verifyVendorPassword(
   password: string,
   stored: string | null | undefined
 ): boolean {
-  if (!stored || !stored.startsWith("scrypt$")) return false;
+  if (!stored || !stored.startsWith("scrypt$")) {
+    // Même calcul qu'un vrai compte : la durée de réponse ne révèle pas
+    // si l'email est inscrit
+    scryptSync(password, DUMMY_SALT, 64);
+    return false;
+  }
   const parts = stored.split("$");
   const saltHex = parts[1];
   const hashHex = parts[2];

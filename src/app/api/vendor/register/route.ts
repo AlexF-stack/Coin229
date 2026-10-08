@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { rateLimitAsync } from "@/lib/rate-limit";
+import { clientIp, rateLimitAsync } from "@/lib/rate-limit";
 import {
   createVendorSessionToken,
   hashVendorPassword,
@@ -12,6 +12,7 @@ import {
 } from "@/lib/vendor-auth";
 import { SITE } from "@/lib/site";
 import { sendPushTo } from "@/lib/push-audience";
+import { postOpsWebhook } from "@/lib/ops-webhook";
 
 const registerSchema = z.object({
   nomBoutique: z.string().trim().min(2).max(80),
@@ -27,21 +28,13 @@ async function notifyAdminNewVendor(input: {
   contact: string;
   slug: string | null;
 }) {
-  const hook = process.env.ORDER_NOTIFY_WEBHOOK?.trim();
   const adminUrl = `${SITE.url}/admin/vendeurs`;
-  if (hook) {
-    void fetch(hook, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        type: "vendor.registered",
-        ...input,
-        adminUrl,
-        message: `Nouveau vendeur Coin229 : ${input.nomBoutique} (${input.email}) — valider : ${adminUrl}`,
-      }),
-      signal: AbortSignal.timeout(8000),
-    }).catch(() => {});
-  }
+  void postOpsWebhook({
+    type: "vendor.registered",
+    ...input,
+    adminUrl,
+    message: `Nouveau vendeur Coin229 : ${input.nomBoutique} (${input.email}) — valider : ${adminUrl}`,
+  }).catch(() => {});
   try {
     // Admin uniquement — jamais les clients ni les autres vendeurs
     await sendPushTo(
@@ -59,8 +52,7 @@ async function notifyAdminNewVendor(input: {
 }
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anon";
+  const ip = clientIp(request);
   const limited = await rateLimitAsync({
     key: `vendor-register:${ip}`,
     limit: 8,

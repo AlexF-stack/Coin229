@@ -52,10 +52,9 @@ export async function POST(request: Request) {
     where: { email: parsed.data.email.toLowerCase() },
     omit: { passwordHash: false },
   });
-  if (
-    !vendor ||
-    !verifyVendorPassword(parsed.data.password, vendor.passwordHash)
-  ) {
+  // Mot de passe toujours vérifié (calcul factice si le compte n'existe pas)
+  const passwordOk = verifyVendorPassword(parsed.data.password, vendor?.passwordHash);
+  if (!vendor || !passwordOk) {
     return NextResponse.json({ ok: false, error: "invalid_credentials" }, { status: 401 });
   }
 

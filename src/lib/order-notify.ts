@@ -4,6 +4,7 @@
  */
 import { sendPushTo } from "@/lib/push-audience";
 import { SITE, whatsappToBjContact } from "@/lib/site";
+import { postOpsWebhook } from "@/lib/ops-webhook";
 import { formatPrice } from "@/lib/utils";
 
 export type NewOrderNotifyInput = {
@@ -36,12 +37,7 @@ export async function notifyNewOrder(input: NewOrderNotifyInput) {
 }
 
 async function notifyWebhook(input: NewOrderNotifyInput, appUrl: string) {
-  const hook = process.env.ORDER_NOTIFY_WEBHOOK?.trim();
-  if (!hook) return;
-  await fetch(hook, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
+  await postOpsWebhook({
       type: "order.created",
       orderId: input.orderId,
       vendorId: input.vendorId,
@@ -56,8 +52,6 @@ async function notifyWebhook(input: NewOrderNotifyInput, appUrl: string) {
         input.vendorContact,
         `Nouvelle commande Coin229 #${input.orderId.slice(-6)} — ${formatPrice(input.montantTotal)}. Ouvre ton espace : ${appUrl}/vendeur/espace/commandes`
       ),
-    }),
-    signal: AbortSignal.timeout(8000),
   });
 }
 

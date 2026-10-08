@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { clientIp, rateLimitAsync } from "@/lib/rate-limit";
 import { SITE } from "@/lib/site";
 import { sendPushTo } from "@/lib/push-audience";
+import { postOpsWebhook } from "@/lib/ops-webhook";
 
 /**
  * « Mot de passe oublié » vendeur : la demande est enregistrée et l'admin
@@ -54,19 +55,11 @@ export async function POST(request: Request) {
 
   if (!alreadyRecent) {
     const adminUrl = `${SITE.url}/admin/vendeurs`;
-    const hook = process.env.ORDER_NOTIFY_WEBHOOK?.trim();
-    if (hook) {
-      void fetch(hook, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          type: "vendor.password_reset_request",
-          boutique: vendor.nomBoutique,
-          message: `Coin229 : ${vendor.nomBoutique} demande un nouveau mot de passe. Vérifie son identité puis envoie le lien depuis ${adminUrl}`,
-        }),
-        signal: AbortSignal.timeout(8000),
-      }).catch(() => {});
-    }
+    void postOpsWebhook({
+      type: "vendor.password_reset_request",
+      boutique: vendor.nomBoutique,
+      message: `Coin229 : ${vendor.nomBoutique} demande un nouveau mot de passe. Vérifie son identité puis envoie le lien depuis ${adminUrl}`,
+    }).catch(() => {});
     void sendPushTo(
       { roles: ["admin"] },
       {

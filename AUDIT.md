@@ -147,7 +147,7 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | P3-10 | ✅ | Migrer `next lint` → ESLint CLI ; corriger les 2 warnings — `npm run lint` = `eslint .` (fichiers générés ignorés, scripts et service worker désormais vérifiés : 0 erreur, 0 warning). Le warning du formulaire d’inscription cachait un bug : un nom de boutique indisponible affichait « Cet email est déjà utilisé » |
 | P3-11 | ✅ | Assistant boutique : salutation prioritaire sur la recherche, regex « ok », « autre suggestion », niches inexistantes — « Bonjour, une montre à 20k » donne des montres ; mots reconnus en entier (« look » ≠ ok, « produit » ≠ pro, « belle » ≠ elle, « commander » ≠ suivi) ; « Autre suggestion » montre les pièces suivantes puis « fait le tour » ; demandes hors catalogue (cosmétiques…) et rayons vides : réponse honnête avec les vrais rayons ; « 15 000 » avec espace compris comme budget |
 | P3-12 | ✅ | Messagerie : doublons du message auto « Contacter », notification au vendeur — message auto non répété dans les 24 h ; notification push au vendeur (nouveau message client) et au client (réponse du vendeur), seulement au 1er message non lu, envoyée après la réponse (`after`) ; anti-spam 30 messages / 10 min par compte |
-| P3-13 | ⬜ | Énumération des comptes vendeurs (inscription 409, timing login) ; secret `ops/notify` en query string |
+| P3-13 | ✅ | Énumération des comptes vendeurs (inscription 409, timing login) ; secret `ops/notify` en query string — connexion vendeur : même durée de réponse, compte existant ou non ; webhook ops : secret accepté seulement en en-tête (comparaison à temps constant), envoyé automatiquement par le site à son propre webhook, jamais à un service tiers ; numéros WhatsApp au format 10 chiffres. Reste accepté : l’inscription signale un email déjà utilisé (limité à 8 essais / heure par IP ; le masquer demanderait une vérification par email). Détails : `.audit-private/` |
 | P3-14 | ⬜ | En dev (PWA désactivée), la carte notifications reste bloquée sur « Notifications… » (`serviceWorker.ready` ne se résout jamais) — sans impact en production |
 | P3-15 | ✅ | En dev, le navigateur gardait d'anciens fichiers JS (en-tête `immutable` d'un an appliqué aussi en dev, noms de fichiers inchangés) → modifications invisibles. Corrigé : en-tête limité à la production (`next.config.ts`). Revérifié au build production du 07/10 : `immutable` toujours actif en production, `no-store` en dev. |
 
@@ -193,8 +193,9 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 - [ ] **Vercel → frais de livraison** : seules `NEXT_PUBLIC_FREE_SHIPPING_THRESHOLD` et `NEXT_PUBLIC_SHIPPING_FEE_COTONOU / _PORTO_NOVO / _GODOMEY` comptent. Si les anciennes `SHIPPING_FEE_*` / `FREE_SHIPPING_THRESHOLD` y ont d’autres valeurs, les recopier dans les `NEXT_PUBLIC_*` (sinon les valeurs par défaut 1 000 / 1 500 / 1 500, seuil 25 000 s’appliquent). (P2-8)
 - [ ] Migration `20261008_product_held_by_moderation` : appliquée au build ; les produits archivés des vendeurs en attente / suspendus sont marqués « retenus par la modération ». (P2-9)
 - [ ] Migration `20261007_order_reservation_expiry` : appliquée au build. Au premier passage, les anciennes commandes Mobile Money non payées de plus de 30 min seront annulées et leur stock rendu — vérifier la liste avant (Admin → Commandes). (P1-2)
-- [ ] Les commandes avec `refundStatus = pending` (paiement reçu après expiration, plus de stock) doivent être remboursées à la main en attendant l'écran admin (P1-13). (P1-2)
+- [ ] Les commandes avec `refundStatus = pending` (paiement reçu après expiration, plus de stock) se remboursent à la main, puis bouton « Marquer remboursé » dans Admin → Commandes. (P1-2, P3-9)
 - [ ] Migration `20261006_push_roles` : les abonnements push existants deviennent « client ». **Après déploiement, l'admin et chaque vendeur doivent réactiver leurs alertes** (Admin → Notifications, Espace vendeur → Tableau de bord). Tester la réception sur un vrai téléphone. (P0-4)
+- [ ] **Webhook ops** (seulement si `ORDER_NOTIFY_WEBHOOK` est utilisé) : retirer tout `?key=` / `?secret=` de l’URL ; si le webhook est `…/api/ops/notify` du site, définir `NOTIFY_HOOK_SECRET` (le site l’envoie lui-même en en-tête). Un service tiers (Make, n8n) doit l’envoyer dans l’en-tête `x-notify-secret`. (P3-13)
 
 ## Journal des corrections
 
@@ -250,3 +251,4 @@ Aucun débordement mesuré. Problème réel : sur mobile, le bandeau cookies et 
 | 08/10/2026 | P3-10 | voir `git log` | ESLint CLI, 0 warning ; bon message d’erreur à l’inscription vendeur |
 | 08/10/2026 | P3-11 | voir `git log` | Assistant boutique : intentions mieux reconnues, vraies suggestions suivantes, catalogue réel |
 | 08/10/2026 | P3-12 | voir `git log` | Messagerie : plus de message auto en double, notifications vendeur / client, anti-spam |
+| 08/10/2026 | P3-13 | voir `git log` | Connexion vendeur à durée constante, secret du webhook ops hors URL |
