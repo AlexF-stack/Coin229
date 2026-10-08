@@ -23,10 +23,10 @@ export function OfflineBanner() {
   return (
     <div
       role="status"
-      className="sticky top-0 z-[45] border-b border-amber/40 bg-navy px-3 py-2 text-center text-xs font-medium text-white"
+      className="sticky top-0 z-[45] border-b border-accent/40 bg-primary px-3 py-2 text-center text-xs font-medium text-white"
     >
       <span className="inline-flex items-center gap-1.5">
-        <WifiOff className="h-3.5 w-3.5 stroke-[1.5] text-amber" aria-hidden />
+        <WifiOff className="h-3.5 w-3.5 stroke-[1.5] text-accent" aria-hidden />
         Hors ligne — pages déjà ouvertes restent disponibles
       </span>
     </div>

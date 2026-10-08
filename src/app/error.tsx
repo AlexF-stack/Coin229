@@ -24,8 +24,8 @@ export default function ErrorPage({
       {/* Avec le streaming (loading.tsx) le statut HTTP reste 200 :
           on empêche l'indexation d'un écran d'erreur temporaire */}
       <meta name="robots" content="noindex" />
-      <AlertTriangle className="h-12 w-12 stroke-[1.25] text-coral" />
-      <h1 className="mt-4 font-display text-2xl font-bold text-navy md:text-3xl">
+      <AlertTriangle className="h-12 w-12 stroke-[1.25] text-error" />
+      <h1 className="mt-4 font-display text-2xl font-bold text-primary md:text-3xl">
         Oups, un souci technique
       </h1>
       <p className="mt-2 max-w-md text-sm text-muted">

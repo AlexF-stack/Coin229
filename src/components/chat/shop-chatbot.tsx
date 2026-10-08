@@ -189,9 +189,9 @@ export function ShopChatbot() {
           role="dialog"
           aria-label="Assistant Coin229"
         >
-          <header className="flex items-center justify-between bg-[#0F2D26] px-4 py-3 text-white">
+          <header className="flex items-center justify-between bg-primary px-4 py-3 text-white">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D4AF37]/20 text-[#D4AF37]">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-accent">
                 <Sparkles className="h-4 w-4 stroke-[1.5]" />
               </span>
               <div>
@@ -218,8 +218,8 @@ export function ShopChatbot() {
                   className={cn(
                     "max-w-[92%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm leading-relaxed",
                     m.role === "bot"
-                      ? "self-start bg-card text-fg shadow-card md:border md:border-border"
-                      : "self-end bg-amber text-navy"
+                      ? "self-start bg-surface text-fg shadow-surface md:border md:border-border"
+                      : "self-end bg-accent text-primary"
                   )}
                 >
                   {m.text}
@@ -234,9 +234,9 @@ export function ShopChatbot() {
                           key={p.id}
                           href={p.href}
                           onClick={() => setOpen(false)}
-                          className="flex gap-2.5 rounded-xl border border-border bg-bg p-2 transition hover:border-amber"
+                          className="flex gap-2.5 rounded-xl border border-border bg-surface p-2 transition hover:border-accent"
                         >
-                          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-card">
+                          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-surface">
                             {p.image ? (
                               <Image
                                 src={p.image}
@@ -255,7 +255,7 @@ export function ShopChatbot() {
                             <p className="truncate text-xs font-semibold text-fg">
                               {p.nom}
                             </p>
-                            <p className="mt-0.5 text-xs font-medium text-amber">
+                            <p className="mt-0.5 text-xs font-medium text-accent-ink">
                               {formatPrice(price)}
                               {p.prixPromo && p.prixPromo < p.prix && (
                                 <span className="ml-1 text-[10px] text-muted line-through">
@@ -276,7 +276,7 @@ export function ShopChatbot() {
             ))}
 
             {typing && (
-              <div className="self-start rounded-2xl bg-card px-3 py-2 text-xs text-muted md:border md:border-border">
+              <div className="self-start rounded-2xl bg-surface px-3 py-2 text-xs text-muted md:border md:border-border">
                 Je cherche les meilleures pièces…
               </div>
             )}
@@ -290,7 +290,7 @@ export function ShopChatbot() {
                         key={chip}
                         href="/boutique"
                         onClick={() => setOpen(false)}
-                        className="rounded-full border border-border bg-bg px-3 py-1.5 text-xs font-medium text-fg hover:border-amber hover:text-amber"
+                        className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-fg hover:border-accent-ink hover:text-accent-ink"
                       >
                         {chip}
                       </Link>
@@ -316,7 +316,7 @@ export function ShopChatbot() {
                       key={chip}
                       type="button"
                       onClick={() => void pushReply(chip)}
-                      className="rounded-full border border-border bg-bg px-3 py-1.5 text-xs font-medium text-fg hover:border-amber hover:text-amber"
+                      className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-fg hover:border-accent-ink hover:text-accent-ink"
                     >
                       {chip}
                     </button>
@@ -348,13 +348,13 @@ export function ShopChatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ex. montre homme 20 000…"
-              className="min-w-0 flex-1 rounded-xl border border-border bg-bg px-3 py-2.5 text-sm outline-none focus:border-amber"
+              className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm outline-none focus:border-accent"
             />
             <button
               type="submit"
               aria-label="Envoyer"
               disabled={typing}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber text-navy disabled:opacity-50"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-primary disabled:opacity-50"
             >
               <Send className="h-4 w-4 stroke-[1.5]" />
             </button>
@@ -367,7 +367,7 @@ export function ShopChatbot() {
           className="fixed bottom-[5.75rem] right-4 z-[60] flex w-[min(100vw-5.25rem,18rem)] animate-[fab-in_0.45s_ease-out_both] flex-col items-end md:bottom-28 md:right-8"
           role="status"
         >
-          <div className="relative w-full rounded-2xl rounded-br-md border border-[#0F2D26]/12 bg-white px-3.5 py-3 shadow-[0_12px_32px_rgba(15,45,38,0.14)]">
+          <div className="relative w-full rounded-2xl rounded-br-md border border-primary/12 bg-white px-3.5 py-3 shadow-[0_12px_32px_rgba(15,45,38,0.14)]">
             <button
               type="button"
               onClick={dismissNudge}
@@ -381,10 +381,10 @@ export function ShopChatbot() {
               onClick={openChat}
               className="block w-full pr-1 text-left"
             >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent-ink">
                 Assistant Coin229
               </p>
-              <p className="mt-1 text-[15px] font-semibold leading-snug text-[#0F2D26]">
+              <p className="mt-1 text-[15px] font-semibold leading-snug text-primary">
                 Besoin d&apos;aide pour choisir ?
               </p>
               <p className="mt-1 text-xs leading-relaxed text-muted">
@@ -405,9 +405,9 @@ export function ShopChatbot() {
           onPurchasePage && "max-md:bottom-32",
           "animate-[fab-in_0.5s_ease-out_both]",
           open
-            ? "border border-border bg-white text-navy shadow-md"
-            : "bg-amber text-navy",
-          !open && nudge && !onPurchasePage && "ring-2 ring-[#D4AF37]/45 ring-offset-2 ring-offset-bg"
+            ? "border border-border bg-white text-primary shadow-md"
+            : "bg-accent text-primary",
+          !open && nudge && !onPurchasePage && "ring-2 ring-accent/45 ring-offset-2 ring-offset-surface"
         )}
       >
         {open ? (
@@ -416,7 +416,7 @@ export function ShopChatbot() {
           <span className="relative">
             <MessageCircle className="h-7 w-7 stroke-[1.5]" />
             {nudge && (
-              <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#0F2D26]" />
+              <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary" />
             )}
           </span>
         )}

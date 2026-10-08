@@ -29,13 +29,13 @@ export function WishlistButton({ productId, className }: Props) {
         toggle(productId);
       }}
       className={cn(
-        "flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-white/90 text-navy shadow-sm backdrop-blur-md transition active:scale-95",
-        active && "border-rose/30 text-rose",
+        "flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-white/90 text-primary shadow-sm backdrop-blur-md transition active:scale-95",
+        active && "border-error/30 text-error",
         className
       )}
     >
       <Heart
-        className={cn("h-4 w-4 stroke-[1.5]", active && "fill-rose")}
+        className={cn("h-4 w-4 stroke-[1.5]", active && "fill-error")}
       />
     </button>
   );

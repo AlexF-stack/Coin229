@@ -83,10 +83,10 @@ export function ChatThread({
 
   const bubbleMine = dark
     ? "bg-amber-500 text-[#0c0d12]"
-    : "bg-navy text-white";
+    : "bg-primary text-white";
   const bubbleOther = dark
     ? "bg-white/10 text-white"
-    : "bg-cream text-navy";
+    : "bg-background text-primary";
 
   return (
     <div
@@ -105,7 +105,7 @@ export function ChatThread({
           href={backHref}
           className={cn(
             "text-sm",
-            dark ? "text-white/50 hover:text-white" : "text-muted hover:text-navy"
+            dark ? "text-white/50 hover:text-white" : "text-muted hover:text-primary"
           )}
         >
           ← Retour
@@ -114,7 +114,7 @@ export function ChatThread({
           <p
             className={cn(
               "truncate font-medium",
-              dark ? "text-white" : "text-navy"
+              dark ? "text-white" : "text-primary"
             )}
           >
             {title}
@@ -199,7 +199,7 @@ export function ChatThread({
             "flex-1 rounded-lg border px-3 py-2.5 text-sm outline-none",
             dark
               ? "border-white/10 bg-[#0c0d12] text-white focus:border-amber-500/50"
-              : "border-border bg-white text-navy focus:border-navy"
+              : "border-border bg-white text-primary focus:border-primary"
           )}
         />
         <button
@@ -209,7 +209,7 @@ export function ChatThread({
             "inline-flex items-center justify-center rounded-lg px-3 py-2.5 disabled:opacity-50",
             dark
               ? "bg-amber-500 text-[#0c0d12]"
-              : "bg-navy text-white"
+              : "bg-primary text-white"
           )}
           aria-label="Envoyer"
         >

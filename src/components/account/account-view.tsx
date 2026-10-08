@@ -117,7 +117,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
   if (!ready) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16">
-        <div className="h-40 animate-pulse rounded-3xl bg-card" />
+        <div className="h-40 animate-pulse rounded-3xl bg-surface" />
       </div>
     );
   }
@@ -132,7 +132,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
           />
           <div className="mx-auto max-w-md text-center">
             <p className="font-display text-3xl font-bold tracking-tight md:text-4xl">
-              Coin<span className="text-amber">229</span>
+              Coin<span className="text-accent">229</span>
             </p>
             <h1 className="mt-4 font-display text-2xl font-bold md:text-3xl">
               Connexion
@@ -144,7 +144,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
         </div>
 
         <div className="mx-auto max-w-md space-y-6 px-4 md:px-0">
-          <div className="space-y-5 rounded-3xl border border-border bg-bg-elevated p-5 shadow-card md:p-6">
+          <div className="space-y-5 rounded-3xl border border-border bg-background p-5 shadow-surface md:p-6">
             <SocialAuthButtons next={next} />
             <PhoneAuthForm onAuthenticated={onPhoneAuth} />
           </div>
@@ -153,9 +153,9 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
             {BENEFITS.map(({ icon: Icon, title, text }) => (
               <li
                 key={title}
-                className="flex items-start gap-3 rounded-2xl bg-card/80 px-4 py-3"
+                className="flex items-start gap-3 rounded-2xl bg-surface/80 px-4 py-3"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber/15 text-amber">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
                   <Icon className="h-4 w-4 stroke-[1.5]" />
                 </span>
                 <div>
@@ -176,7 +176,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
 
           <p className="text-center text-xs text-muted">
             Tu peux aussi{" "}
-            <Link href="/" className="font-medium text-amber hover:underline">
+            <Link href="/" className="font-medium text-accent-ink hover:underline">
               continuer sans compte
             </Link>
           </p>
@@ -223,7 +223,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pb-10 pt-5 md:px-0 md:pt-8">
-      <section className="overflow-hidden rounded-3xl border border-border bg-bg-elevated shadow-card">
+      <section className="overflow-hidden rounded-3xl border border-border bg-background shadow-surface">
         <div className="relative bg-[linear-gradient(135deg,#1a1916_0%,#3d2a1a_55%,#d4890f_120%)] px-5 py-6 text-white md:px-6">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -260,9 +260,9 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
             <Link
               key={label}
               href={href}
-              className="flex flex-col items-center gap-1.5 rounded-2xl px-1 py-3 text-center transition hover:bg-surface"
+              className="flex flex-col items-center gap-1.5 rounded-2xl px-1 py-3 text-center transition hover:bg-background"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber/12 text-amber">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
                 <Icon className="h-5 w-5 stroke-[1.5]" />
               </span>
               <span className="text-[11px] font-medium leading-tight">
@@ -294,13 +294,13 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
 
         {loading && (
           <div className="space-y-2">
-            <div className="h-24 animate-pulse rounded-2xl bg-card" />
-            <div className="h-24 animate-pulse rounded-2xl bg-card" />
+            <div className="h-24 animate-pulse rounded-2xl bg-surface" />
+            <div className="h-24 animate-pulse rounded-2xl bg-surface" />
           </div>
         )}
 
         {!client?.orders.length && !loading && (
-          <div className="rounded-2xl border border-dashed border-border bg-card/50 px-4 py-10 text-center">
+          <div className="rounded-2xl border border-dashed border-border bg-surface/50 px-4 py-10 text-center">
             <Package className="mx-auto h-8 w-8 stroke-[1.5] text-muted" />
             <p className="mt-3 text-sm font-medium">Aucune commande</p>
             <p className="mt-1 text-xs text-muted">
@@ -308,7 +308,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
             </p>
             <Link
               href="/boutique"
-              className="mt-4 inline-flex rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-navy"
+              className="mt-4 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-primary"
             >
               Explorer la boutique
             </Link>
@@ -319,7 +319,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
           {client?.orders.map((order) => (
             <li
               key={order.id}
-              className="rounded-2xl border border-border bg-card p-4 shadow-card"
+              className="rounded-2xl border border-border bg-surface p-4 shadow-surface"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -330,7 +330,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
                       year: "numeric",
                     })}
                   </p>
-                  <p className="mt-0.5 font-display text-lg font-semibold text-amber">
+                  <p className="mt-0.5 font-display text-lg font-semibold text-accent-ink">
                     {formatPrice(order.montantTotal)}
                   </p>
                 </div>
@@ -359,11 +359,11 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
 
       <section className="space-y-3">
         <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
-          <MapPin className="h-5 w-5 stroke-[1.5] text-violet" />
+          <MapPin className="h-5 w-5 stroke-[1.5] text-info" />
           Adresses
         </h2>
         {!client?.adresses.length && !loading && (
-          <p className="rounded-2xl bg-card p-4 text-sm text-muted">
+          <p className="rounded-2xl bg-surface p-4 text-sm text-muted">
             Les adresses sont enregistrées à la première commande.
           </p>
         )}
@@ -371,13 +371,13 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
           {client?.adresses.map((addr) => (
             <li
               key={addr.id}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-sm"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4 text-sm"
             >
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{ZONE_LABELS[addr.zone]}</span>
                   {addr.estPrincipale && (
-                    <span className="rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-medium text-amber">
+                    <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-medium text-accent-ink">
                       Principale
                     </span>
                   )}

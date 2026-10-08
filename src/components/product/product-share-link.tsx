@@ -32,7 +32,7 @@ export function ProductShareLink({
     <button
       type="button"
       onClick={copy}
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-amber hover:underline"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-accent-ink hover:underline"
       title={productName}
     >
       {copied ? (

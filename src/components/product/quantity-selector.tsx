@@ -11,7 +11,7 @@ type Props = {
 
 export function QuantitySelector({ value, min = 1, max, onChange }: Props) {
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-[16px] bg-card px-1.5 py-1 sm:gap-3 sm:px-2 sm:py-1.5">
+    <div className="inline-flex items-center gap-1.5 rounded-[16px] bg-surface px-1.5 py-1 sm:gap-3 sm:px-2 sm:py-1.5">
       <button
         type="button"
         aria-label="Diminuer"

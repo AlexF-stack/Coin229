@@ -84,7 +84,7 @@ function AccordionItem({
       open={defaultOpen}
       className="group border-b border-border/80 py-3"
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-display text-sm font-semibold text-navy marker:content-none [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-display text-sm font-semibold text-primary marker:content-none [&::-webkit-details-marker]:hidden">
         {title}
         <ChevronDown className="h-4 w-4 shrink-0 stroke-[1.5] text-muted transition group-open:rotate-180" />
       </summary>
@@ -132,7 +132,7 @@ export default async function ProductPage({ params }: Props) {
         <div className="relative">
           <Link
             href="/boutique"
-            className="absolute left-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-white/90 text-navy shadow-sm backdrop-blur-md md:left-0 md:top-0"
+            className="absolute left-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-white/90 text-primary shadow-sm backdrop-blur-md md:left-0 md:top-0"
             aria-label="Retour à la boutique"
           >
             <ArrowLeft className="h-5 w-5 stroke-[1.5]" />
@@ -147,7 +147,7 @@ export default async function ProductPage({ params }: Props) {
 
         <div className="space-y-5 px-4 pt-5 md:px-0 md:pt-2">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-amber">
+            <p className="text-xs font-medium uppercase tracking-wider text-accent-ink">
               <Link
                 href={
                   product.niche
@@ -160,7 +160,7 @@ export default async function ProductPage({ params }: Props) {
                   CATEGORIE_LABELS[product.categorie]}
               </Link>
             </p>
-            <h1 className="mt-1 font-display text-2xl font-bold leading-tight text-navy md:text-4xl">
+            <h1 className="mt-1 font-display text-2xl font-bold leading-tight text-primary md:text-4xl">
               {product.nom}
             </h1>
 
@@ -171,12 +171,12 @@ export default async function ProductPage({ params }: Props) {
                   {product.vendor.slug ? (
                     <Link
                       href={`/vendeur/${product.vendor.slug}`}
-                      className="font-medium text-navy hover:underline"
+                      className="font-medium text-primary hover:underline"
                     >
                       {product.vendor.nomBoutique}
                     </Link>
                   ) : (
-                    <span className="font-medium text-navy">
+                    <span className="font-medium text-primary">
                       {product.vendor.nomBoutique}
                     </span>
                   )}
@@ -192,7 +192,7 @@ export default async function ProductPage({ params }: Props) {
             )}
 
             <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="text-2xl font-semibold text-navy md:text-3xl">
+              <span className="text-2xl font-semibold text-primary md:text-3xl">
                 {formatPrice(price)}
               </span>
               {hasPromo && (
@@ -206,7 +206,7 @@ export default async function ProductPage({ params }: Props) {
             </div>
 
             {hasPromo && savings > 0 && (
-              <p className="mt-1 text-sm font-medium text-green">
+              <p className="mt-1 text-sm font-medium text-success">
                 Vous économisez {formatPrice(savings)}
               </p>
             )}
@@ -217,7 +217,7 @@ export default async function ProductPage({ params }: Props) {
 
             <p
               className={`mt-3 text-sm font-medium ${
-                inStock ? "text-green" : "text-coral"
+                inStock ? "text-success" : "text-error"
               }`}
             >
               {inStock
@@ -253,7 +253,7 @@ export default async function ProductPage({ params }: Props) {
               <dl className="space-y-2">
                 <div className="flex justify-between gap-4">
                   <dt>Catégorie</dt>
-                  <dd className="font-medium text-navy">
+                  <dd className="font-medium text-primary">
                     <Link
                       href={`/boutique?categorie=${product.categorie}`}
                       className="hover:underline"
@@ -264,13 +264,13 @@ export default async function ProductPage({ params }: Props) {
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt>Genre</dt>
-                  <dd className="font-medium text-navy">
+                  <dd className="font-medium text-primary">
                     {GENRE_LABELS[product.genre]}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt>Stock</dt>
-                  <dd className="font-medium text-navy">
+                  <dd className="font-medium text-primary">
                     {product.statut === "actif"
                       ? product.stockQuantite > 0
                         ? `${product.stockQuantite} disponible${product.stockQuantite > 1 ? "s" : ""}`
@@ -284,7 +284,7 @@ export default async function ProductPage({ params }: Props) {
             <AccordionItem title="Livraison">
               <p>
                 Zones {SITE.zones.join(", ")}. Frais et délais selon votre zone.{" "}
-                <Link href="/livraison" className="font-medium text-amber">
+                <Link href="/livraison" className="font-medium text-accent-ink">
                   Voir la livraison
                 </Link>
               </p>
@@ -294,7 +294,7 @@ export default async function ProductPage({ params }: Props) {
               <p>
                 Conditions d&apos;échange et de retour détaillées sur notre page
                 dédiée.{" "}
-                <Link href="/retours" className="font-medium text-amber">
+                <Link href="/retours" className="font-medium text-accent-ink">
                   Voir les retours
                 </Link>
               </p>
@@ -312,7 +312,7 @@ export default async function ProductPage({ params }: Props) {
 
       {similar.length > 0 && (
         <section className="mt-10 space-y-4 px-4 md:mt-14 md:px-0">
-          <h2 className="font-display text-lg font-semibold text-navy md:text-2xl">
+          <h2 className="font-display text-lg font-semibold text-primary md:text-2xl">
             Vous pourriez aussi aimer
           </h2>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">

@@ -86,7 +86,7 @@ export function KkiaPayCheckout({ orderId, amount, phone, email }: Props) {
 
   if (!publicKey) {
     return (
-      <p className="text-sm text-coral">
+      <p className="text-sm text-error">
         Le paiement Mobile Money est momentanément indisponible. Écris-nous sur
         WhatsApp pour finaliser ta commande.
       </p>
@@ -94,7 +94,7 @@ export function KkiaPayCheckout({ orderId, amount, phone, email }: Props) {
   }
 
   return (
-    <div className="space-y-3 rounded-2xl border border-border bg-card p-4 text-center">
+    <div className="space-y-3 rounded-2xl border border-border bg-surface p-4 text-center">
       <Script
         src="https://cdn.kkiapay.me/k.js"
         strategy="afterInteractive"
@@ -114,7 +114,7 @@ export function KkiaPayCheckout({ orderId, amount, phone, email }: Props) {
             Valide le paiement Mobile Money dans la fenêtre KkiaPay.
           </p>
           {error && (
-            <p role="alert" className="text-sm text-coral">
+            <p role="alert" className="text-sm text-error">
               {error}
             </p>
           )}

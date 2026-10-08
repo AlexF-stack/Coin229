@@ -25,7 +25,7 @@ export default async function PaymentPage({ searchParams }: Props) {
           Cette page de paiement n’est disponible que depuis ton parcours de
           commande.
         </p>
-        <Link href="/boutique" className="mt-4 inline-block text-amber">
+        <Link href="/boutique" className="mt-4 inline-block text-accent-ink">
           Boutique
         </Link>
       </div>
@@ -61,7 +61,7 @@ export default async function PaymentPage({ searchParams }: Props) {
     return (
       <div className="px-6 py-16 text-center">
         <p className="text-muted">Commande introuvable.</p>
-        <Link href="/boutique" className="mt-4 inline-block text-amber">
+        <Link href="/boutique" className="mt-4 inline-block text-accent-ink">
           Boutique
         </Link>
       </div>

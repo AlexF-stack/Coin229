@@ -58,7 +58,7 @@ export function ProductCard({ product, className }: Props) {
     >
       <Link
         href={`/produit/${product.id}`}
-        className="relative block aspect-[4/5] overflow-hidden rounded-[12px] bg-cream"
+        className="relative block aspect-[4/5] overflow-hidden rounded-[12px] bg-background"
       >
         <Image
           src={image}
@@ -91,7 +91,7 @@ export function ProductCard({ product, className }: Props) {
           <span className="badge-new absolute left-2.5 top-2.5">Nouveau</span>
         )}
         {outOfStock && (
-          <span className="absolute inset-x-0 bottom-0 bg-navy/85 py-1.5 text-center text-xs font-medium text-white">
+          <span className="absolute inset-x-0 bottom-0 bg-primary/85 py-1.5 text-center text-xs font-medium text-white">
             Épuisé
           </span>
         )}
@@ -102,7 +102,7 @@ export function ProductCard({ product, className }: Props) {
           {eyebrow}
         </p>
         <Link href={`/produit/${product.id}`}>
-          <h3 className="line-clamp-2 font-display text-sm font-semibold leading-snug text-fg transition-colors group-hover:text-navy md:text-[15px]">
+          <h3 className="line-clamp-2 font-display text-sm font-semibold leading-snug text-fg transition-colors group-hover:text-primary md:text-[15px]">
             {product.nom}
           </h3>
         </Link>

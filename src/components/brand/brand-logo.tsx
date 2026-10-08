@@ -44,12 +44,12 @@ export function BrandLogo({
       <span
         className={cn(
           "font-display font-bold tracking-tight",
-          onDark ? "text-white" : "text-navy",
+          onDark ? "text-white" : "text-primary",
           className
         )}
         style={{ fontSize: height * 0.55 }}
       >
-        Coin<span className="text-amber">229</span>
+        Coin<span className="text-accent">229</span>
       </span>
     );
   }

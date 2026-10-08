@@ -28,8 +28,8 @@ export function ZoneSelector({ value, onChange }: Props) {
               className={cn(
                 "flex items-center justify-between gap-3 rounded-[16px] border px-4 py-3 text-left text-sm transition-colors",
                 value === zone
-                  ? "border-amber bg-amber/10 text-fg"
-                  : "border-border bg-card text-muted"
+                  ? "border-accent bg-accent/10 text-fg"
+                  : "border-border bg-surface text-muted"
               )}
             >
               <span>
@@ -40,7 +40,7 @@ export function ZoneSelector({ value, onChange }: Props) {
                   {eta.label}
                 </span>
               </span>
-              <span className="shrink-0 text-xs font-medium text-amber">
+              <span className="shrink-0 text-xs font-medium text-accent-ink">
                 {formatPrice(fees[zone])}
               </span>
             </button>

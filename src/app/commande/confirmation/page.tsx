@@ -16,8 +16,8 @@ export default async function ConfirmationPage({ searchParams }: Props) {
   if (!id) {
     return (
       <div className="flex flex-col items-center px-6 py-16 text-center">
-        <XCircle className="h-16 w-16 stroke-[1.25] text-coral" />
-        <h1 className="mt-4 font-display text-2xl font-bold text-navy">
+        <XCircle className="h-16 w-16 stroke-[1.25] text-error" />
+        <h1 className="mt-4 font-display text-2xl font-bold text-primary">
           Commande introuvable
         </h1>
         <Link href="/boutique" className="btn btn-primary mt-8">
@@ -32,8 +32,8 @@ export default async function ConfirmationPage({ searchParams }: Props) {
   if (!demo && !order) {
     return (
       <div className="flex flex-col items-center px-6 py-16 text-center">
-        <XCircle className="h-16 w-16 stroke-[1.25] text-coral" />
-        <h1 className="mt-4 font-display text-2xl font-bold text-navy">
+        <XCircle className="h-16 w-16 stroke-[1.25] text-error" />
+        <h1 className="mt-4 font-display text-2xl font-bold text-primary">
           Commande introuvable
         </h1>
         <p className="mt-2 text-sm text-muted">
@@ -65,13 +65,13 @@ export default async function ConfirmationPage({ searchParams }: Props) {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-6 py-16 text-center">
       {state.kind === "cancelled" ? (
-        <XCircle className="h-16 w-16 stroke-[1.25] text-coral" />
+        <XCircle className="h-16 w-16 stroke-[1.25] text-error" />
       ) : state.kind === "payment_pending" ? (
-        <Clock className="h-16 w-16 stroke-[1.25] text-amber" />
+        <Clock className="h-16 w-16 stroke-[1.25] text-accent-ink" />
       ) : (
-        <CheckCircle2 className="h-16 w-16 stroke-[1.25] text-green" />
+        <CheckCircle2 className="h-16 w-16 stroke-[1.25] text-success" />
       )}
-      <h1 className="mt-4 font-display text-2xl font-bold text-navy md:text-3xl">
+      <h1 className="mt-4 font-display text-2xl font-bold text-primary md:text-3xl">
         {state.title}
       </h1>
       <p className="mt-2 text-sm text-muted">{state.message}</p>
@@ -95,15 +95,15 @@ export default async function ConfirmationPage({ searchParams }: Props) {
         </div>
       )}
 
-      <p className="mt-4 rounded-full bg-cream px-4 py-1.5 text-xs font-medium text-navy">
+      <p className="mt-4 rounded-full bg-background px-4 py-1.5 text-xs font-medium text-primary">
         N° {id}
       </p>
 
       {order && (
-        <div className="mt-6 w-full rounded-[12px] bg-cream p-5 text-left text-sm">
+        <div className="mt-6 w-full rounded-[12px] bg-background p-5 text-left text-sm">
           <div className="flex items-baseline justify-between gap-3">
             <span className="text-muted">Total</span>
-            <span className="font-display text-lg font-semibold text-navy">
+            <span className="font-display text-lg font-semibold text-primary">
               {formatPrice(order.montantTotal)}
             </span>
           </div>

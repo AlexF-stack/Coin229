@@ -73,14 +73,14 @@ function HeaderInner() {
       className={cn(
         "sticky top-0 z-40 border-b transition-[background-color,box-shadow,border-color] duration-300",
         scrolled
-          ? "border-border/80 bg-white/95 shadow-card backdrop-blur-md"
-          : "border-transparent bg-cream/90 backdrop-blur-sm"
+          ? "border-border/80 bg-white/95 shadow-surface backdrop-blur-md"
+          : "border-transparent bg-background/90 backdrop-blur-sm"
       )}
     >
       <div className="page-shell flex items-center gap-3 py-3 md:gap-6 md:py-3.5">
         <button
           type="button"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-navy md:hidden"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-primary md:hidden"
           aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((v) => !v)}
@@ -112,8 +112,8 @@ function HeaderInner() {
                 className={cn(
                   "rounded-[10px] px-3 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "text-navy underline decoration-amber decoration-2 underline-offset-8"
-                    : "text-muted hover:text-navy"
+                    ? "text-primary underline decoration-accent decoration-2 underline-offset-8"
+                    : "text-muted hover:text-primary"
                 )}
               >
                 {item.label}
@@ -133,7 +133,7 @@ function HeaderInner() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Rechercher…"
-              className="w-full rounded-[10px] border border-border bg-white py-2 pl-9 pr-3 text-sm outline-none transition focus:border-navy"
+              className="w-full rounded-[10px] border border-border bg-white py-2 pl-9 pr-3 text-sm outline-none transition focus:border-primary"
             />
           </label>
         </form>
@@ -141,7 +141,7 @@ function HeaderInner() {
         <div className="ml-auto flex items-center gap-0.5 md:ml-0">
           <button
             type="button"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-navy lg:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-primary lg:hidden"
             aria-label="Rechercher"
             onClick={() => setSearchOpen((v) => !v)}
           >
@@ -149,29 +149,29 @@ function HeaderInner() {
           </button>
           <Link
             href="/favoris"
-            className="relative hidden rounded-[10px] p-2 text-navy transition hover:bg-white sm:inline-flex"
+            className="relative hidden rounded-[10px] p-2 text-primary transition hover:bg-white sm:inline-flex"
             aria-label="Favoris"
           >
             <Heart className="h-5 w-5 stroke-[1.5]" />
             {favorites.length > 0 && (
-              <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber" />
+              <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-accent" />
             )}
           </Link>
           <Link
             href="/panier"
-            className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-navy transition hover:bg-white"
+            className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] p-2.5 text-primary transition hover:bg-white"
             aria-label={`Panier${cartCount ? `, ${cartCount} article(s)` : ""}`}
           >
             <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
             {cartCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-navy px-1 text-[10px] font-semibold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-white">
                 {cartCount}
               </span>
             )}
           </Link>
           <Link
             href="/compte"
-            className="hidden rounded-[10px] p-2 text-navy transition hover:bg-white md:inline-flex"
+            className="hidden rounded-[10px] p-2 text-primary transition hover:bg-white md:inline-flex"
             aria-label="Compte"
           >
             <User className="h-5 w-5 stroke-[1.5]" />
@@ -192,7 +192,7 @@ function HeaderInner() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Rechercher une montre, un sac…"
-              className="w-full rounded-[10px] border border-border bg-cream py-2.5 pl-9 pr-3 text-sm outline-none focus:border-navy"
+              className="w-full rounded-[10px] border border-border bg-background py-2.5 pl-9 pr-3 text-sm outline-none focus:border-primary"
             />
           </label>
         </form>
@@ -208,7 +208,7 @@ function HeaderInner() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-navy hover:bg-cream"
+                  className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-primary hover:bg-background"
                 >
                   {item.label}
                 </Link>
@@ -217,7 +217,7 @@ function HeaderInner() {
             <li>
               <Link
                 href="/favoris"
-                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-navy hover:bg-cream"
+                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-primary hover:bg-background"
               >
                 Favoris
               </Link>
@@ -225,7 +225,7 @@ function HeaderInner() {
             <li>
               <Link
                 href="/compte"
-                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-navy hover:bg-cream"
+                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-primary hover:bg-background"
               >
                 Compte
               </Link>
@@ -233,7 +233,7 @@ function HeaderInner() {
             <li>
               <Link
                 href="/livraison"
-                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-navy hover:bg-cream"
+                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-primary hover:bg-background"
               >
                 Livraison
               </Link>
@@ -241,7 +241,7 @@ function HeaderInner() {
             <li>
               <Link
                 href="/vendeur/inscription"
-                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-navy hover:bg-cream"
+                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-primary hover:bg-background"
               >
                 Vendre sur Coin229
               </Link>
@@ -249,7 +249,7 @@ function HeaderInner() {
             <li>
               <Link
                 href="/vendeur/login"
-                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-navy hover:bg-cream"
+                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium text-primary hover:bg-background"
               >
                 Espace vendeur
               </Link>
@@ -265,7 +265,7 @@ export function SiteHeader() {
   return (
     <Suspense
       fallback={
-        <header className="sticky top-0 z-40 border-b border-transparent bg-cream/90 py-3">
+        <header className="sticky top-0 z-40 border-b border-transparent bg-background/90 py-3">
           <div className="page-shell h-10" />
         </header>
       }

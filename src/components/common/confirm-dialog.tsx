@@ -92,13 +92,13 @@ function ConfirmDialog({
       }}
       className={cn(
         "m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl p-0 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm",
-        dark ? "border border-white/10 bg-[#161920] text-[#e8eaed]" : "border border-border bg-white text-navy"
+        dark ? "border border-white/10 bg-[#161920] text-[#e8eaed]" : "border border-border bg-white text-primary"
       )}
     >
       <div className="p-5">
         <h2
           id="confirm-dialog-title"
-          className={cn("text-base font-semibold", dark ? "text-white" : "text-navy")}
+          className={cn("text-base font-semibold", dark ? "text-white" : "text-primary")}
         >
           {title}
         </h2>
@@ -116,7 +116,7 @@ function ConfirmDialog({
               onClick={() => onClose(false)}
               className={cn(
                 "rounded-lg px-4 py-2 text-sm font-medium",
-                dark ? "text-white/70 hover:bg-white/5 hover:text-white" : "text-navy hover:bg-navy/5"
+                dark ? "text-white/70 hover:bg-white/5 hover:text-white" : "text-primary hover:bg-primary/5"
               )}
             >
               {cancelLabel}
@@ -132,7 +132,7 @@ function ConfirmDialog({
                 ? "bg-red-600 text-white hover:bg-red-500"
                 : dark
                   ? "bg-emerald-600 text-white hover:bg-emerald-500"
-                  : "bg-navy text-white hover:bg-navy/90"
+                  : "bg-primary text-white hover:bg-primary/90"
             )}
           >
             {confirmLabel}

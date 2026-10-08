@@ -116,7 +116,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr-BJ" className={`${inter.variable} ${poppins.variable}`}>
-      <body className="min-h-dvh bg-bg font-sans text-fg antialiased">
+      <body className="min-h-dvh bg-surface font-sans text-fg antialiased">
         {/* Hints réseau mobile — images produits */}
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link

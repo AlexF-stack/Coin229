@@ -117,9 +117,9 @@ export default async function BoutiquePage({
   return (
     <div className="space-y-6 py-5 md:space-y-8 md:py-8">
       {categorie || niche ? (
-        <div className="-mx-4 border-b border-border bg-navy md:-mx-6">
+        <div className="-mx-4 border-b border-border bg-primary md:-mx-6">
           <div className="px-4 py-8 md:px-6 md:py-10">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-amber">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
               {niche ? "Niche" : "Collection"}
             </p>
             <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-white md:text-3xl">
@@ -133,7 +133,7 @@ export default async function BoutiquePage({
         </div>
       ) : (
         <header className="px-4 md:px-0">
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-navy md:text-3xl">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-primary md:text-3xl">
             {heading}
           </h1>
           <p className="mt-1 text-sm text-muted">{sub}</p>
@@ -169,7 +169,7 @@ export default async function BoutiquePage({
           </>
         ) : (
           <div className="mx-auto flex max-w-md flex-col items-center px-6 py-14 text-center">
-            <p className="font-display text-xl font-semibold text-navy">
+            <p className="font-display text-xl font-semibold text-primary">
               Aucun accessoire trouvé.
             </p>
             <p className="mt-2 text-sm text-muted">

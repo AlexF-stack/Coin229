@@ -1,7 +1,7 @@
 /** Squelettes de chargement (loading.tsx) — même rythme visuel que les vraies pages */
 
 function Bar({ className }: { className: string }) {
-  return <div className={`animate-pulse rounded-xl bg-cream ${className}`} />;
+  return <div className={`animate-pulse rounded-xl bg-background ${className}`} />;
 }
 
 export function CatalogSkeleton() {

@@ -47,7 +47,7 @@ export function SocialAuthButtons({ next = "/compte" }: { next?: string } = {}) 
     <div className="space-y-3">
       <div className="relative py-1 text-center">
         <span className="absolute inset-x-0 top-1/2 h-px bg-border" />
-        <span className="relative bg-bg-elevated px-3 text-xs text-muted">
+        <span className="relative bg-background px-3 text-xs text-muted">
           ou continuer avec
         </span>
       </div>
@@ -56,7 +56,7 @@ export function SocialAuthButtons({ next = "/compte" }: { next?: string } = {}) 
         type="button"
         disabled={Boolean(pending)}
         onClick={() => void signIn("google")}
-        className="flex w-full items-center justify-center gap-2.5 rounded-full border border-border bg-card py-3 text-sm font-semibold transition hover:border-amber disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2.5 rounded-full border border-border bg-surface py-3 text-sm font-semibold transition hover:border-accent disabled:opacity-60"
       >
         {pending === "google" ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -80,7 +80,7 @@ export function SocialAuthButtons({ next = "/compte" }: { next?: string } = {}) 
         Facebook
       </button>
 
-      {error && <p className="text-center text-xs text-coral">{error}</p>}
+      {error && <p className="text-center text-xs text-error">{error}</p>}
     </div>
   );
 }

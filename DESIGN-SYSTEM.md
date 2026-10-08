@@ -12,7 +12,7 @@
 |---|---|
 | 1. Audit du design system actuel | ✅ |
 | 2. Incohérences public / espaces internes | ✅ |
-| 3. Tokens globaux | ⬜ |
+| 3. Tokens globaux | ✅ |
 | 4. Composants partagés | ⬜ |
 | 5. Migration des pages | ⬜ |
 | 6. Vérification par espace | ⬜ |
@@ -190,3 +190,4 @@ Le site public garde son fond blanc principal ; les espaces internes passent sur
 | Date | Étape | Commit | Résumé |
 |---|---|---|---|
 | 08/10/2026 | 1-2 | voir `git log` | Audit du design system et des incohérences, tokens et composants cibles |
+| 08/10/2026 | 3 | voir `git log` | Tokens sémantiques dans `globals.css` (primary, accent, accent-ink, background, surface, états…), anciens noms `navy` / `amber` / `cream` / `coral` renommés partout (423 classes), Gold en texte sur fond clair → `accent-ink` (34 endroits) |

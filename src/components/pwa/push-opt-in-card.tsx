@@ -198,7 +198,7 @@ export function PushOptInCard({
   const dark = audience !== "client";
   const boxClass = dark
     ? "rounded-xl border border-white/10 bg-[#1a1c24] text-white"
-    : "rounded-2xl border border-border bg-card/80";
+    : "rounded-2xl border border-border bg-surface/80";
   const mutedClass = dark ? "text-white/55" : "text-muted";
 
   if (status === "loading") {
@@ -217,7 +217,7 @@ export function PushOptInCard({
   return (
     <section className={`p-4 ${boxClass}`}>
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber/15 text-amber">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
           {status === "on" ? (
             <Bell className="h-5 w-5 stroke-[1.5]" />
           ) : (

@@ -19,20 +19,20 @@ export function FreeShippingProgress({
   const progress = Math.min(100, (subtotal / threshold) * 100);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-navy/10 bg-cream p-3.5 md:p-4">
+    <div className="overflow-hidden rounded-xl border border-primary/10 bg-background p-3.5 md:p-4">
       <div className="flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-amber">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-accent">
           <Truck className="h-4 w-4 stroke-[1.5]" />
         </span>
         <div className="min-w-0 flex-1">
           {isFree ? (
-            <p className="text-sm font-semibold text-navy">
+            <p className="text-sm font-semibold text-primary">
               Livraison gratuite débloquée
             </p>
           ) : (
             <p className="text-sm text-fg">
               Plus que{" "}
-              <span className="font-semibold text-amber">
+              <span className="font-semibold text-accent-ink">
                 {formatPrice(amountToFreeShipping)}
               </span>{" "}
               pour la livraison offerte
@@ -43,7 +43,7 @@ export function FreeShippingProgress({
           </p>
           <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-white">
             <div
-              className="h-full rounded-full bg-amber transition-all duration-500 ease-out"
+              className="h-full rounded-full bg-accent transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>

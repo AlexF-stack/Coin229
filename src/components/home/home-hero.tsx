@@ -37,7 +37,7 @@ export function HomeHero({ images }: Props) {
   return (
     <section
       aria-label="Coin229 — accueil"
-      className="relative min-h-[82dvh] w-full overflow-hidden bg-navy md:min-h-[90dvh]"
+      className="relative min-h-[82dvh] w-full overflow-hidden bg-primary md:min-h-[90dvh]"
     >
       {slides.map((src, i) => (
         <div
@@ -61,19 +61,19 @@ export function HomeHero({ images }: Props) {
 
       <div className="hero-scrim absolute inset-0" aria-hidden />
       <div
-        className="absolute inset-0 bg-gradient-to-r from-navy/80 via-navy/45 to-navy/10 md:from-navy/85 md:via-navy/40 md:to-transparent"
+        className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/45 to-primary/10 md:from-primary/85 md:via-primary/40 md:to-transparent"
         aria-hidden
       />
 
       <div className="relative z-10 flex min-h-[82dvh] flex-col justify-end px-5 pb-14 pt-28 md:min-h-[90dvh] md:justify-center md:px-10 md:pb-24 md:pt-28 lg:px-16">
         <div className="max-w-2xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-amber">
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-accent">
             Accessoires de mode · Bénin
           </p>
 
           <h1 className="mt-5 font-display text-[clamp(3rem,9vw,5.5rem)] font-bold leading-[0.95] tracking-tight text-white">
             Coin229
-            <span className="text-amber" aria-hidden>
+            <span className="text-accent" aria-hidden>
               .
             </span>
           </h1>
@@ -93,7 +93,7 @@ export function HomeHero({ images }: Props) {
             </Link>
             <Link
               href="/boutique?categorie=montre"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-white/90 transition hover:text-amber"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-white/90 transition hover:text-accent"
             >
               Voir les montres
               <ArrowRight className="h-4 w-4 stroke-[1.75]" aria-hidden />
@@ -117,7 +117,7 @@ export function HomeHero({ images }: Props) {
                 onClick={() => setIndex(i)}
                 className={cn(
                   "font-display text-xs font-semibold tracking-[0.14em] transition",
-                  i === index ? "text-amber" : "text-white/35 hover:text-white/70"
+                  i === index ? "text-accent" : "text-white/35 hover:text-white/70"
                 )}
               >
                 {String(i + 1).padStart(2, "0")}

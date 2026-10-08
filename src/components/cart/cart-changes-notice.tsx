@@ -29,9 +29,9 @@ export function CartChangesNotice({
   return (
     <div
       role="status"
-      className="relative flex gap-3 rounded-[12px] border border-amber/40 bg-amber/10 px-4 py-3 pr-10 text-sm text-fg"
+      className="relative flex gap-3 rounded-[12px] border border-accent/40 bg-accent/10 px-4 py-3 pr-10 text-sm text-fg"
     >
-      <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-amber" />
+      <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-accent-ink" />
       <div className="space-y-1">
         <p className="font-semibold">Ton panier a été mis à jour</p>
         <ul className="space-y-0.5 text-muted">

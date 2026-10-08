@@ -164,21 +164,21 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
               onChange={(e) => onDigitChange(i, e.target.value)}
               onKeyDown={(e) => onDigitKeyDown(i, e)}
               className={cn(
-                "h-12 w-10 rounded-xl border bg-card text-center text-xl font-semibold outline-none transition focus:border-amber focus:ring-2 focus:ring-amber/25 md:h-14 md:w-12",
-                d ? "border-amber text-fg" : "border-border text-fg"
+                "h-12 w-10 rounded-xl border bg-surface text-center text-xl font-semibold outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/25 md:h-14 md:w-12",
+                d ? "border-accent text-fg" : "border-border text-fg"
               )}
               aria-label={`Chiffre ${i + 1}`}
             />
           ))}
         </div>
 
-        {info && <p className="text-center text-xs text-violet">{info}</p>}
-        {error && <p className="text-center text-sm text-coral">{error}</p>}
+        {info && <p className="text-center text-xs text-info">{info}</p>}
+        {error && <p className="text-center text-sm text-error">{error}</p>}
 
         <button
           type="submit"
           disabled={pending || otp.length < 6}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-amber py-3.5 text-sm font-semibold text-navy transition active:scale-[0.98] disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 text-sm font-semibold text-primary transition active:scale-[0.98] disabled:opacity-50"
         >
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}
           Se connecter
@@ -189,7 +189,7 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
             type="button"
             disabled={resendIn > 0 || pending}
             onClick={() => sendOtp()}
-            className="text-amber disabled:text-muted"
+            className="text-accent-ink disabled:text-muted"
           >
             {resendIn > 0 ? `Renvoyer dans ${resendIn}s` : "Renvoyer le code"}
           </button>
@@ -218,8 +218,8 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
     <form onSubmit={sendOtp} className="space-y-4">
       <label className="block space-y-2 text-sm">
         <span className="font-medium text-fg">Numéro de téléphone</span>
-        <div className="flex overflow-hidden rounded-2xl border border-border bg-card focus-within:border-amber focus-within:ring-2 focus-within:ring-amber/20">
-          <span className="flex items-center border-r border-border bg-surface px-3 text-sm font-medium text-muted">
+        <div className="flex overflow-hidden rounded-2xl border border-border bg-surface focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20">
+          <span className="flex items-center border-r border-border bg-background px-3 text-sm font-medium text-muted">
             +229
           </span>
           <input
@@ -234,11 +234,11 @@ export function PhoneAuthForm({ onAuthenticated }: Props) {
           />
         </div>
       </label>
-      {error && <p className="text-sm text-coral">{error}</p>}
+      {error && <p className="text-sm text-error">{error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-amber py-3.5 text-sm font-semibold text-navy transition active:scale-[0.98] disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 text-sm font-semibold text-primary transition active:scale-[0.98] disabled:opacity-60"
       >
         {pending && <Loader2 className="h-4 w-4 animate-spin" />}
         Continuer

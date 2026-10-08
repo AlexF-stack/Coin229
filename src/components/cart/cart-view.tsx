@@ -102,9 +102,9 @@ export function CartView({ suggestions }: Props) {
   if (!mounted) {
     return (
       <div className="space-y-4 px-4 py-6 md:px-0">
-        <div className="h-24 animate-pulse rounded-xl bg-cream" />
-        <div className="h-28 animate-pulse rounded-xl bg-cream" />
-        <div className="h-28 animate-pulse rounded-xl bg-cream" />
+        <div className="h-24 animate-pulse rounded-xl bg-background" />
+        <div className="h-28 animate-pulse rounded-xl bg-background" />
+        <div className="h-28 animate-pulse rounded-xl bg-background" />
       </div>
     );
   }
@@ -118,10 +118,10 @@ export function CartView({ suggestions }: Props) {
           <CartChangesNotice changes={cartSync.changes} onDismiss={cartSync.dismiss} />
         </div>
         <div className="mx-auto flex max-w-md flex-col items-center text-center">
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-navy">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-background text-primary">
             <ShoppingBag className="h-7 w-7 stroke-[1.25]" />
           </span>
-          <p className="mt-5 font-display text-2xl font-semibold text-navy">
+          <p className="mt-5 font-display text-2xl font-semibold text-primary">
             Votre panier est encore vide.
           </p>
           <Link href="/boutique" className="btn btn-primary mt-6">
@@ -131,7 +131,7 @@ export function CartView({ suggestions }: Props) {
 
         {shown.length > 0 ? (
           <section className="mt-12">
-            <h2 className="font-display text-lg font-semibold text-navy">
+            <h2 className="font-display text-lg font-semibold text-primary">
               Suggestions
             </h2>
             <ul className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
@@ -158,7 +158,7 @@ export function CartView({ suggestions }: Props) {
         <div className="space-y-4">
           <CartChangesNotice changes={cartSync.changes} onDismiss={cartSync.dismiss} />
           {multiVendor && (
-            <p className="rounded-xl border border-coral/30 bg-coral/10 px-3 py-2.5 text-sm text-navy">
+            <p className="rounded-xl border border-error/30 bg-error/10 px-3 py-2.5 text-sm text-primary">
               Ton panier contient déjà des articles d’une autre marque — vide ou
               commande d’abord.
             </p>
@@ -171,13 +171,13 @@ export function CartView({ suggestions }: Props) {
             subtotal={subtotal}
           />
 
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-cream/60 px-3 py-2.5 text-sm">
-            <label className="flex cursor-pointer items-center gap-2.5 font-medium text-navy">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background/60 px-3 py-2.5 text-sm">
+            <label className="flex cursor-pointer items-center gap-2.5 font-medium text-primary">
               <input
                 type="checkbox"
                 checked={allSelected}
                 onChange={toggleAll}
-                className="h-4 w-4 accent-[var(--color-amber)]"
+                className="h-4 w-4 accent-primary"
               />
               Tout sélectionner
             </label>
@@ -212,14 +212,14 @@ export function CartView({ suggestions }: Props) {
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleOne(item.productId)}
-                      className="h-4 w-4 accent-[var(--color-amber)]"
+                      className="h-4 w-4 accent-primary"
                       aria-label={`Sélectionner ${item.nom}`}
                     />
                   </label>
 
                   <Link
                     href={`/produit/${item.productId}`}
-                    className="relative h-24 w-20 shrink-0 overflow-hidden rounded-[10px] bg-cream md:h-28 md:w-24"
+                    className="relative h-24 w-20 shrink-0 overflow-hidden rounded-[10px] bg-background md:h-28 md:w-24"
                   >
                     <Image
                       src={item.image || "/placeholder-product.svg"}
@@ -239,7 +239,7 @@ export function CartView({ suggestions }: Props) {
                     <div className="flex items-start justify-between gap-2">
                       <Link
                         href={`/produit/${item.productId}`}
-                        className="line-clamp-2 text-sm font-medium leading-snug text-navy"
+                        className="line-clamp-2 text-sm font-medium leading-snug text-primary"
                       >
                         {item.nom}
                       </Link>
@@ -247,14 +247,14 @@ export function CartView({ suggestions }: Props) {
                         type="button"
                         aria-label="Retirer"
                         onClick={() => removeItem(item.productId)}
-                        className="shrink-0 rounded-[10px] p-1 text-muted hover:bg-cream hover:text-coral"
+                        className="shrink-0 rounded-[10px] p-1 text-muted hover:bg-background hover:text-error"
                       >
                         <Trash2 className="h-4 w-4 stroke-[1.5]" />
                       </button>
                     </div>
 
                     <div className="mt-1 flex flex-wrap items-baseline gap-x-2">
-                      <p className="font-semibold text-navy">
+                      <p className="font-semibold text-primary">
                         {formatPrice(unit)}
                       </p>
                       {item.prixPromo && item.prixPromo < item.prix && (
@@ -271,13 +271,13 @@ export function CartView({ suggestions }: Props) {
                         onChange={(q) => updateQuantity(item.productId, q)}
                       />
                       <div className="ml-auto shrink-0 text-right">
-                        <p className="text-sm font-semibold text-navy">
+                        <p className="text-sm font-semibold text-primary">
                           {formatPrice(line)}
                         </p>
                         <button
                           type="button"
                           onClick={() => moveToWishlist(item.productId)}
-                          className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted hover:text-amber"
+                          className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted hover:text-accent-ink"
                         >
                           <Heart className="h-3 w-3 stroke-[1.5]" />
                           Favoris
@@ -294,8 +294,8 @@ export function CartView({ suggestions }: Props) {
         <aside className="hidden space-y-4 md:sticky md:top-24 md:block">
           <ZoneSelector value={zone} onChange={setZone} />
 
-          <div className="space-y-3 rounded-xl border border-border bg-cream/40 p-5">
-            <p className="font-display text-lg font-semibold text-navy">
+          <div className="space-y-3 rounded-xl border border-border bg-background/40 p-5">
+            <p className="font-display text-lg font-semibold text-primary">
               Récapitulatif
             </p>
             <div className="space-y-2 text-sm">
@@ -304,14 +304,14 @@ export function CartView({ suggestions }: Props) {
                 <span>{formatPrice(subtotal)}</span>
               </div>
               {savings > 0 && (
-                <div className="flex justify-between text-green">
+                <div className="flex justify-between text-success">
                   <span>Économies</span>
                   <span>−{formatPrice(savings)}</span>
                 </div>
               )}
               <div className="flex justify-between text-muted">
                 <span>Livraison</span>
-                <span className={shipping.isFree ? "font-medium text-green" : ""}>
+                <span className={shipping.isFree ? "font-medium text-success" : ""}>
                   {!canCheckout
                     ? "—"
                     : shipping.isFree
@@ -320,7 +320,7 @@ export function CartView({ suggestions }: Props) {
                 </span>
               </div>
               <p className="text-xs text-muted">{shipping.etaLabel}</p>
-              <div className="flex justify-between border-t border-border pt-3 text-base font-semibold text-navy">
+              <div className="flex justify-between border-t border-border pt-3 text-base font-semibold text-primary">
                 <span>Total</span>
                 <span>{formatPrice(canCheckout ? total : 0)}</span>
               </div>
@@ -349,7 +349,7 @@ export function CartView({ suggestions }: Props) {
 
           <Link
             href="/boutique"
-            className="block text-center text-sm text-muted hover:text-navy"
+            className="block text-center text-sm text-muted hover:text-primary"
           >
             Continuer mes achats
           </Link>
@@ -358,24 +358,24 @@ export function CartView({ suggestions }: Props) {
 
       <div className="fixed inset-x-0 bottom-16 z-40 border-t border-border bg-white/95 px-3 py-2.5 backdrop-blur-md md:hidden">
         <div className="flex items-center gap-3">
-          <label className="flex shrink-0 items-center gap-1.5 text-xs text-navy">
+          <label className="flex shrink-0 items-center gap-1.5 text-xs text-primary">
             <input
               type="checkbox"
               checked={allSelected}
               onChange={toggleAll}
-              className="h-4 w-4 accent-[var(--color-amber)]"
+              className="h-4 w-4 accent-primary"
             />
             Tout
           </label>
           <div className="min-w-0 flex-1">
             {savings > 0 && (
-              <p className="text-[10px] font-medium text-green">
+              <p className="text-[10px] font-medium text-success">
                 Économie {formatPrice(savings)}
               </p>
             )}
             <p className="truncate text-sm">
               <span className="text-muted">Total </span>
-              <span className="font-display text-base font-bold text-navy">
+              <span className="font-display text-base font-bold text-primary">
                 {formatPrice(canCheckout ? total : 0)}
               </span>
             </p>

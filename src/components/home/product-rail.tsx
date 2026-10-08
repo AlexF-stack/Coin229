@@ -31,10 +31,10 @@ export function ProductRail({
         <div>
           <h2
             id={id ? `${id}-heading` : undefined}
-            className="font-display text-2xl font-bold tracking-tight text-navy md:text-3xl"
+            className="font-display text-2xl font-bold tracking-tight text-primary md:text-3xl"
           >
             {title}
-            <span className="text-amber" aria-hidden>
+            <span className="text-accent" aria-hidden>
               .
             </span>
           </h2>
@@ -47,7 +47,7 @@ export function ProductRail({
         {ctaHref && ctaLabel ? (
           <Link
             href={ctaHref}
-            className="text-sm font-semibold text-navy underline decoration-amber decoration-2 underline-offset-4"
+            className="text-sm font-semibold text-primary underline decoration-accent decoration-2 underline-offset-4"
           >
             {ctaLabel}
           </Link>

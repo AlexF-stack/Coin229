@@ -20,7 +20,7 @@ export default async function CartPage() {
         <p className="text-xs font-medium uppercase tracking-wider text-muted">
           Coin229
         </p>
-        <h1 className="font-display text-2xl font-bold text-navy md:text-3xl">
+        <h1 className="font-display text-2xl font-bold text-primary md:text-3xl">
           Mon panier
         </h1>
       </header>

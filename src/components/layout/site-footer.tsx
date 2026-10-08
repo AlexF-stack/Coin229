@@ -6,14 +6,14 @@ import { SITE, whatsappHref } from "@/lib/site";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 bg-navy text-white">
+    <footer className="mt-16 bg-primary text-white">
       <div className="page-shell grid gap-10 px-4 py-14 md:grid-cols-12 md:gap-8 md:px-6">
         <div className="md:col-span-4">
           <div className="flex items-center gap-2.5">
             <BrandLogo variant="mark" height={40} />
             <BrandLogo variant="wordmark" height={40} onDark />
           </div>
-          <p className="mt-2 text-sm text-amber">{SITE.tagline}</p>
+          <p className="mt-2 text-sm text-accent">{SITE.tagline}</p>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/65">
             Montres, bijoux, sacs, lunettes et chaussures sélectionnés pour
             votre style — livrés à {SITE.zones.join(", ")}.
@@ -21,7 +21,7 @@ export function SiteFooter() {
         </div>
 
         <div className="md:col-span-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
             Explorer
           </p>
           <ul className="mt-4 space-y-2 text-sm text-white/75">
@@ -59,7 +59,7 @@ export function SiteFooter() {
         </div>
 
         <div className="md:col-span-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
             Catégories
           </p>
           <ul className="mt-4 space-y-2 text-sm text-white/75">
@@ -77,7 +77,7 @@ export function SiteFooter() {
         </div>
 
         <div className="md:col-span-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
             Contact
           </p>
           <ul className="mt-4 space-y-2 text-sm text-white/75">

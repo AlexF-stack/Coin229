@@ -1,38 +1,72 @@
 @import "tailwindcss";
 
 /**
- * Coin229 V1 — Deep Green × Gold × Cream
- * --color-navy  = Deep Green (classes Tailwind existantes conservées)
- * --color-amber = Gold signature
+ * Design System Coin229 — Deep Green × Gold × Cream (voir DESIGN-SYSTEM.md)
+ *
+ * Règle : un écran n'utilise QUE ces tokens (bg-primary, text-fg-secondary,
+ * rounded-control…). Pas de couleur hexadécimale ni de couleur Tailwind brute
+ * (emerald, orange…) dans les composants.
  */
 
 @theme {
-  --color-bg: #ffffff;
-  --color-bg-elevated: #f6f3ec;
-  --color-card: #ffffff;
-  --color-card-hover: #faf9f6;
-  --color-cream: #f6f3ec;
-  --color-amber: #d4af37;
-  --color-amber-dark: #b8942a;
-  --color-coral: #c45c5c;
-  --color-rose: #c45c5c;
-  --color-violet: #5b6cff;
-  --color-green: #1f7a5c;
-  --color-muted: #6b7280;
+  /* — Marque — */
+  --color-primary: #0f2d26; /* Deep Green : actions, navigation, marque */
+  --color-primary-hover: #163a32;
+  --color-primary-active: #0a211b;
+  --color-primary-soft: #e7eeec;
+  --color-accent: #d4af37; /* Gold : accent, jamais en texte sur fond clair */
+  --color-accent-hover: #b8942a;
+  --color-accent-soft: #f7efd4;
+  --color-accent-ink: #7a5f14; /* doré lisible en texte sur fond clair */
+
+  /* — Surfaces (du fond vers le premier plan) — */
+  --color-background: #f6f3ec; /* Cream : fond des espaces, sections alternées */
+  --color-surface: #ffffff; /* cartes, panneaux, champs, fenêtres */
+  --color-surface-muted: #faf8f3; /* en-têtes de tableau, zones secondaires */
+  --color-surface-inverse: #0f2d26; /* seule surface sombre : sidebar, bandeau, pied de page */
+  --color-overlay: rgb(15 45 38 / 0.55);
+
+  /* — Texte — */
+  --color-fg: #111111; /* texte principal */
+  --color-fg-secondary: #4b5563;
+  --color-muted: #6b7280; /* aide, métadonnées */
+  --color-inverse: #ffffff; /* texte sur Deep Green */
+
+  /* — Bordures — */
   --color-border: #e5e7eb;
-  --color-fg: #111111;
-  --color-surface: #f6f3ec;
-  --color-navy: #0f2d26;
-  --color-navy-soft: #163a32;
+  --color-border-strong: #d1d5db;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  /* — États (jamais à la place des couleurs de marque) — */
+  --color-success: #1f7a5c;
+  --color-success-soft: #e6f2ec;
+  --color-warning: #b45309;
+  --color-warning-soft: #fef3e2;
+  --color-error: #b42318;
+  --color-error-soft: #fdecea;
+  --color-info: #1d5d8c;
+  --color-info-soft: #e8f1f8;
+  --color-neutral: #4b5563;
+  --color-neutral-soft: #f3f4f6;
 
+  /* — Typographie — */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif; /* texte, formulaires, tableaux */
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif; /* titres, navigation, boutons */
+
+  /* — Rayons — */
+  --radius-badge: 6px;
+  --radius-control: 10px; /* champs, boutons */
   --radius-card: 12px;
-  --radius-pill: 999px;
-  --radius-control: 10px;
+  --radius-panel: 16px; /* fenêtres, tiroirs */
+  --radius-pill: 999px; /* puces de filtre */
 
-  --shadow-soft: 0 1px 2px rgba(17, 17, 17, 0.04), 0 8px 24px rgba(15, 45, 38, 0.06);
+  /* — Ombres — */
+  --shadow-card: 0 1px 2px rgb(17 17 17 / 0.04), 0 8px 24px rgb(15 45 38 / 0.06);
+  --shadow-raised: 0 2px 4px rgb(17 17 17 / 0.05), 0 12px 32px rgb(15 45 38 / 0.1);
+  --shadow-overlay: 0 24px 64px rgb(15 45 38 / 0.25);
+
+  /* — Mouvement — */
+  --default-transition-duration: 150ms;
+
   --max-content: 80rem;
 }
 
@@ -43,7 +77,7 @@
   }
 
   body {
-    background-color: var(--color-bg);
+    background-color: var(--color-surface);
     color: var(--color-fg);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -51,8 +85,8 @@
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--color-amber) 40%, transparent);
-    color: var(--color-navy);
+    background: color-mix(in oklab, var(--color-accent) 40%, transparent);
+    color: var(--color-primary);
   }
 
   h1,
@@ -68,8 +102,9 @@
   button:focus-visible,
   input:focus-visible,
   select:focus-visible,
-  textarea:focus-visible {
-    outline: 2px solid var(--color-amber);
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
@@ -103,26 +138,30 @@
   }
 }
 
+/*
+ * Classes historiques du site public, branchées sur les tokens.
+ * Pour un nouvel écran : composants de src/components/ui (Button, Badge…).
+ */
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-control px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
     font-family: var(--font-display);
   }
 
   .btn-primary {
-    @apply bg-navy text-white hover:bg-navy-soft;
+    @apply bg-primary text-inverse hover:bg-primary-hover active:bg-primary-active;
   }
 
   .btn-secondary {
-    @apply border border-navy/20 bg-white text-navy hover:border-navy hover:bg-cream;
+    @apply border border-primary/20 bg-surface text-primary hover:border-primary hover:bg-background;
   }
 
   .btn-accent {
-    @apply bg-amber text-navy hover:bg-amber-dark;
+    @apply bg-accent text-primary hover:bg-accent-hover;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-navy hover:bg-cream;
+    @apply bg-transparent text-primary hover:bg-background;
   }
 
   .section-title {
@@ -134,19 +173,19 @@
   }
 
   .badge {
-    @apply inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider;
+    @apply inline-flex items-center rounded-badge px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider;
   }
 
   .badge-new {
-    @apply inline-flex items-center rounded-md bg-navy px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white;
+    @apply inline-flex items-center rounded-badge bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-inverse;
   }
 
   .badge-sale {
-    @apply inline-flex items-center rounded-md bg-amber px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-navy;
+    @apply inline-flex items-center rounded-badge bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary;
   }
 
   .badge-soldout {
-    @apply inline-flex items-center rounded-md bg-fg/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white;
+    @apply inline-flex items-center rounded-badge bg-fg/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-inverse;
   }
 }
 
@@ -161,10 +200,6 @@
 
   .content-shell {
     @apply mx-auto w-full max-w-5xl px-4 md:px-6;
-  }
-
-  .shadow-card {
-    box-shadow: var(--shadow-soft);
   }
 
   .text-balance {
@@ -202,7 +237,7 @@
     background: linear-gradient(
       90deg,
       transparent,
-      var(--color-amber),
+      var(--color-accent),
       transparent
     );
   }

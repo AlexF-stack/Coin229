@@ -19,7 +19,7 @@ export default async function ClientMessagesPage() {
         <p className="text-xs font-medium uppercase tracking-wider text-muted">
           Compte
         </p>
-        <h1 className="font-display text-2xl font-bold text-navy">Messages</h1>
+        <h1 className="font-display text-2xl font-bold text-primary">Messages</h1>
         <p className="mt-1 text-sm text-muted">
           Discussions avec les marques Coin229.
         </p>
@@ -28,7 +28,7 @@ export default async function ClientMessagesPage() {
       {conversations.length === 0 ? (
         <div className="mx-auto max-w-md px-4 py-12 text-center">
           <MessageCircle className="mx-auto h-10 w-10 text-muted" />
-          <p className="mt-4 font-display text-lg font-semibold text-navy">
+          <p className="mt-4 font-display text-lg font-semibold text-primary">
             Aucune discussion
           </p>
           <p className="mt-2 text-sm text-muted">
@@ -46,13 +46,13 @@ export default async function ClientMessagesPage() {
               <li key={c.id}>
                 <Link
                   href={`/compte/messages/${c.id}`}
-                  className="flex items-start justify-between gap-3 px-4 py-4 hover:bg-cream/60"
+                  className="flex items-start justify-between gap-3 px-4 py-4 hover:bg-background/60"
                 >
                   <div className="min-w-0">
-                    <p className="font-medium text-navy">
+                    <p className="font-medium text-primary">
                       {c.vendor.nomBoutique}
                       {c.clientUnread > 0 && (
-                        <span className="ml-2 rounded-full bg-amber px-1.5 py-0.5 text-[10px] font-semibold text-navy">
+                        <span className="ml-2 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                           {c.clientUnread}
                         </span>
                       )}

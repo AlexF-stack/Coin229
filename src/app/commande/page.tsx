@@ -17,12 +17,12 @@ export default function CheckoutPage() {
       <header className="flex items-center gap-3 px-4 pt-5">
         <Link
           href="/panier"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-card"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-surface"
           aria-label="Retour panier"
         >
           <ArrowLeft className="h-5 w-5 stroke-[1.5]" />
         </Link>
-        <h1 className="font-display text-2xl font-bold text-navy">Commande</h1>
+        <h1 className="font-display text-2xl font-bold text-primary">Commande</h1>
       </header>
       <CheckoutForm />
     </div>

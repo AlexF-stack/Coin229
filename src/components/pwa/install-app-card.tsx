@@ -120,7 +120,7 @@ export function InstallAppCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-amber/30 bg-cream/80 p-4 text-left",
+        "rounded-2xl border border-accent/30 bg-background/80 p-4 text-left",
         variant === "inline" && "p-3",
         className
       )}
@@ -173,10 +173,10 @@ function CardBody({
           )}
         />
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-navy">{title}</p>
+          <p className="font-semibold text-primary">{title}</p>
           <p className="mt-1 text-xs leading-relaxed text-muted">{description}</p>
           {iosHint ? (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-navy">
+            <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-primary">
               <Share className="h-3.5 w-3.5 stroke-[1.5]" />
               Safari → Partager → Écran d’accueil
             </p>
@@ -186,7 +186,7 @@ function CardBody({
           <button
             type="button"
             onClick={onDismiss}
-            className="rounded-full p-1 text-muted hover:bg-white hover:text-navy"
+            className="rounded-full p-1 text-muted hover:bg-white hover:text-primary"
             aria-label="Plus tard"
           >
             <X className="h-4 w-4 stroke-[1.5]" />
@@ -197,7 +197,7 @@ function CardBody({
         <button
           type="button"
           onClick={onInstall}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-2.5 text-sm font-semibold text-white"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-primary py-2.5 text-sm font-semibold text-white"
         >
           <Download className="h-4 w-4 stroke-[1.5]" />
           Installer l&apos;app

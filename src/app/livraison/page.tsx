@@ -21,10 +21,10 @@ export default function LivraisonPage() {
   return (
     <div className="space-y-8 px-4 py-6 md:px-0 md:py-10">
       <header className="max-w-2xl">
-        <p className="text-sm font-medium uppercase tracking-wider text-amber">
+        <p className="text-sm font-medium uppercase tracking-wider text-accent-ink">
           Service
         </p>
-        <h1 className="mt-1 font-display text-3xl font-bold text-navy">
+        <h1 className="mt-1 font-display text-3xl font-bold text-primary">
           Livraison
         </h1>
         <p className="mt-2 text-muted">
@@ -39,13 +39,13 @@ export default function LivraisonPage() {
           return (
             <div
               key={zone}
-              className="rounded-[12px] bg-cream p-5"
+              className="rounded-[12px] bg-background p-5"
             >
-              <MapPin className="h-5 w-5 stroke-[1.5] text-amber" />
-              <h2 className="mt-3 font-display text-lg font-semibold text-navy">
+              <MapPin className="h-5 w-5 stroke-[1.5] text-accent-ink" />
+              <h2 className="mt-3 font-display text-lg font-semibold text-primary">
                 {ZONE_LABELS[zone]}
               </h2>
-              <p className="mt-1 text-2xl font-semibold text-navy">
+              <p className="mt-1 text-2xl font-semibold text-primary">
                 {formatPrice(fees[zone])}
               </p>
               <p className="mt-1 text-xs text-muted">{eta.label}</p>
@@ -54,10 +54,10 @@ export default function LivraisonPage() {
         })}
       </div>
 
-      <div className="flex items-start gap-3 rounded-[12px] border border-green/25 bg-green/10 p-5">
-        <Gift className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-green" />
+      <div className="flex items-start gap-3 rounded-[12px] border border-success/25 bg-success/10 p-5">
+        <Gift className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-success" />
         <div>
-          <p className="font-semibold text-navy">Livraison gratuite</p>
+          <p className="font-semibold text-primary">Livraison gratuite</p>
           <p className="mt-1 text-sm text-muted">
             Dès {formatPrice(freeShippingThreshold)} d&apos;achat (hors frais déjà
             inclus selon zone).
@@ -65,10 +65,10 @@ export default function LivraisonPage() {
         </div>
       </div>
 
-      <div className="rounded-[12px] bg-cream p-5">
+      <div className="rounded-[12px] bg-background p-5">
         <div className="flex items-center gap-2">
-          <Truck className="h-5 w-5 stroke-[1.5] text-amber" />
-          <h2 className="font-display text-lg font-semibold text-navy">
+          <Truck className="h-5 w-5 stroke-[1.5] text-accent-ink" />
+          <h2 className="font-display text-lg font-semibold text-primary">
             Déroulement
           </h2>
         </div>
@@ -79,7 +79,7 @@ export default function LivraisonPage() {
         </ol>
         <p className="mt-4 text-sm text-muted">
           Voir aussi{" "}
-          <Link href="/retours" className="font-medium text-navy underline-offset-2 hover:underline">
+          <Link href="/retours" className="font-medium text-primary underline-offset-2 hover:underline">
             Retours & échanges
           </Link>
           .

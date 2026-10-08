@@ -60,7 +60,7 @@ export function ContactVendorButton({
         type="button"
         onClick={onClick}
         disabled={pending}
-        className="inline-flex items-center gap-2 text-sm font-medium text-amber hover:underline disabled:opacity-60"
+        className="inline-flex items-center gap-2 text-sm font-medium text-accent-ink hover:underline disabled:opacity-60"
       >
         {pending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -69,7 +69,7 @@ export function ContactVendorButton({
         )}
         Contacter {vendorName}
       </button>
-      {error && <p className="mt-1 text-xs text-coral">{error}</p>}
+      {error && <p className="mt-1 text-xs text-error">{error}</p>}
       {!loggedIn && (
         <p className="mt-1 text-xs text-muted">
           Connexion requise pour discuter avec la marque.

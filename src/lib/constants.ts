@@ -132,11 +132,11 @@ export const ORDER_STATUS_LABELS = {
 } as const;
 
 export const ORDER_STATUS_COLORS = {
-  en_attente: "bg-amber/20 text-amber border-amber/40",
-  confirmee: "bg-violet/20 text-violet border-violet/40",
-  en_livraison: "bg-coral/20 text-coral border-coral/40",
-  livree: "bg-green/20 text-green border-green/40",
-  annulee: "bg-surface text-muted border-border",
+  en_attente: "bg-accent/20 text-accent border-accent/40",
+  confirmee: "bg-info/20 text-info border-info/40",
+  en_livraison: "bg-error/20 text-error border-error/40",
+  livree: "bg-success/20 text-success border-success/40",
+  annulee: "bg-background text-muted border-border",
 } as const;
 
 export function isProductAvailable(statut: ProductStatus, stock: number) {

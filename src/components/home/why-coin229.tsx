@@ -24,12 +24,12 @@ const blocks = [
 export function WhyCoin229() {
   return (
     <section aria-labelledby="why-heading" className="px-4 md:px-0">
-      <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber">
+      <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent-ink">
         Pourquoi Coin229
       </p>
       <h2
         id="why-heading"
-        className="mt-3 max-w-xl font-display text-3xl font-bold tracking-tight text-navy md:text-4xl"
+        className="mt-3 max-w-xl font-display text-3xl font-bold tracking-tight text-primary md:text-4xl"
       >
         Une boutique. Un fil clair.
       </h2>
@@ -41,10 +41,10 @@ export function WhyCoin229() {
       <ol className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
         {blocks.map(({ n, title, text }) => (
           <li key={n} className="flex flex-col gap-3 border-t border-border pt-5">
-            <span className="font-display text-xs font-semibold tracking-[0.16em] text-amber">
+            <span className="font-display text-xs font-semibold tracking-[0.16em] text-accent-ink">
               {n}
             </span>
-            <h3 className="font-display text-lg font-semibold text-navy">
+            <h3 className="font-display text-lg font-semibold text-primary">
               {title}
             </h3>
             <p className="text-sm leading-relaxed text-muted">{text}</p>

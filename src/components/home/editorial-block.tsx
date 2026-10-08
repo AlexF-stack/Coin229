@@ -10,11 +10,11 @@ export function EditorialBlock({ image }: Props) {
   return (
     <section
       aria-labelledby="editorial-heading"
-      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden bg-cream"
+      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen overflow-hidden bg-background"
     >
       <div className="page-shell grid items-center gap-10 px-5 py-14 md:grid-cols-2 md:gap-14 md:px-6 md:py-20">
         {image ? (
-          <div className="relative order-2 aspect-[4/5] overflow-hidden bg-navy md:order-1 md:aspect-[5/6] md:rounded-none">
+          <div className="relative order-2 aspect-[4/5] overflow-hidden bg-primary md:order-1 md:aspect-[5/6] md:rounded-none">
             <Image
               src={image}
               alt="Détails Coin229"
@@ -26,21 +26,21 @@ export function EditorialBlock({ image }: Props) {
           </div>
         ) : (
           <div
-            className="order-2 aspect-[4/5] bg-navy md:order-1 md:aspect-[5/6]"
+            className="order-2 aspect-[4/5] bg-primary md:order-1 md:aspect-[5/6]"
             aria-hidden
           />
         )}
 
         <div className="order-1 md:order-2">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-amber">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent">
             Le détail qui compte
           </p>
           <h2
             id="editorial-heading"
-            className="mt-3 max-w-md font-display text-3xl font-bold leading-[1.05] tracking-tight text-navy md:text-5xl"
+            className="mt-3 max-w-md font-display text-3xl font-bold leading-[1.05] tracking-tight text-primary md:text-5xl"
           >
             Les détails qui changent tout
-            <span className="text-amber" aria-hidden>
+            <span className="text-accent" aria-hidden>
               .
             </span>
           </h2>
@@ -49,14 +49,14 @@ export function EditorialBlock({ image }: Props) {
             une tenue — et on les livre chez vous.
           </p>
 
-          <ol className="mt-8 space-y-3 text-sm text-navy">
+          <ol className="mt-8 space-y-3 text-sm text-primary">
             {[
               ["01", "Choisir la pièce"],
               ["02", "Commander en quelques taps"],
               ["03", "Recevoir localement"],
             ].map(([n, label]) => (
               <li key={n} className="flex items-center gap-3">
-                <span className="font-display text-xs font-semibold tracking-[0.14em] text-amber">
+                <span className="font-display text-xs font-semibold tracking-[0.14em] text-accent">
                   {n}
                 </span>
                 <span className="font-medium">{label}</span>

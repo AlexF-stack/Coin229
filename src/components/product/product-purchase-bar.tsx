@@ -48,7 +48,7 @@ export function ProductPurchaseBar({ product }: Props) {
   }
 
   const blockedNotice = blocked && (
-    <p role="alert" className="rounded-[10px] bg-coral/10 px-3 py-2 text-sm text-coral">
+    <p role="alert" className="rounded-[10px] bg-error/10 px-3 py-2 text-sm text-error">
       {blocked}{" "}
       <Link href="/panier" className="font-semibold underline">
         Voir mon panier

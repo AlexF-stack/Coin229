@@ -69,15 +69,15 @@ export default async function VendorStorefrontPage({ params }: Props) {
               />
             </div>
           ) : (
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-lg font-semibold text-white">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
               {vendor.nomBoutique.slice(0, 1).toUpperCase()}
             </div>
           )}
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-amber">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
               Marque sur Coin229
             </p>
-            <h1 className="mt-1 font-display text-2xl font-bold text-navy md:text-3xl">
+            <h1 className="mt-1 font-display text-2xl font-bold text-primary md:text-3xl">
               {vendor.nomBoutique}
             </h1>
             {vendor.description && (
@@ -93,7 +93,7 @@ export default async function VendorStorefrontPage({ params }: Props) {
         <ProductGrid products={products} />
       ) : (
         <div className="px-4 py-12 text-center md:px-0">
-          <p className="font-display text-lg font-semibold text-navy">
+          <p className="font-display text-lg font-semibold text-primary">
             Aucun produit publié pour le moment.
           </p>
           <Link href="/boutique" className="btn btn-primary mt-6 inline-flex">

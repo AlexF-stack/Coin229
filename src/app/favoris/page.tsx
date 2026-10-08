@@ -45,10 +45,10 @@ export default function FavorisPage() {
   if (!mounted || loading) {
     return (
       <div className="space-y-4 px-4 py-6 md:px-0">
-        <div className="h-8 w-40 animate-pulse rounded bg-cream" />
+        <div className="h-8 w-40 animate-pulse rounded bg-background" />
         <div className="grid grid-cols-2 gap-3">
-          <div className="aspect-[4/5] animate-pulse rounded-[12px] bg-cream" />
-          <div className="aspect-[4/5] animate-pulse rounded-[12px] bg-cream" />
+          <div className="aspect-[4/5] animate-pulse rounded-[12px] bg-background" />
+          <div className="aspect-[4/5] animate-pulse rounded-[12px] bg-background" />
         </div>
       </div>
     );
@@ -57,7 +57,7 @@ export default function FavorisPage() {
   return (
     <div className="space-y-5 py-5 md:py-8">
       <header className="px-4 md:px-0">
-        <h1 className="font-display text-2xl font-bold text-navy md:text-3xl">
+        <h1 className="font-display text-2xl font-bold text-primary md:text-3xl">
           Favoris
         </h1>
         <p className="mt-1 text-sm text-muted">
@@ -68,10 +68,10 @@ export default function FavorisPage() {
 
       {!products.length ? (
         <div className="mx-auto flex max-w-md flex-col items-center px-6 py-12 text-center md:px-0">
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-navy">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-background text-primary">
             <Heart className="h-7 w-7 stroke-[1.25]" />
           </span>
-          <p className="mt-5 font-display text-2xl font-semibold text-navy">
+          <p className="mt-5 font-display text-2xl font-semibold text-primary">
             Votre sélection est vide.
           </p>
           <Link href="/boutique" className="btn btn-primary mt-6">

@@ -93,8 +93,8 @@ export function CheckoutForm() {
   if (redirecting) {
     return (
       <div className="flex flex-col items-center px-4 py-16 text-center">
-        <Loader2 className="h-8 w-8 animate-spin stroke-[1.5] text-navy" />
-        <p className="mt-4 font-display text-lg font-semibold text-navy">
+        <Loader2 className="h-8 w-8 animate-spin stroke-[1.5] text-primary" />
+        <p className="mt-4 font-display text-lg font-semibold text-primary">
           Commande enregistrée
         </p>
         <p className="mt-1 text-sm text-muted">Redirection…</p>
@@ -202,7 +202,7 @@ export function CheckoutForm() {
   }
 
   const fieldClass =
-    "w-full rounded-[10px] border border-border bg-white px-3 py-3 text-fg outline-none transition focus:border-navy";
+    "w-full rounded-[10px] border border-border bg-white px-3 py-3 text-fg outline-none transition focus:border-primary";
 
   return (
     <form
@@ -211,7 +211,7 @@ export function CheckoutForm() {
     >
       <CartChangesNotice changes={cartSync.changes} onDismiss={cartSync.dismiss} />
 
-      <section className="space-y-2 rounded-[12px] bg-cream p-5">
+      <section className="space-y-2 rounded-[12px] bg-background p-5">
         <ZoneSelector value={zone} onChange={setZone} />
         <p className="text-xs text-muted">
           {ZONE_LABELS[zone]} · {shipping.etaLabel}
@@ -219,12 +219,12 @@ export function CheckoutForm() {
         </p>
       </section>
 
-      <section className="space-y-4 rounded-[12px] bg-cream p-5">
-        <h2 className="font-display text-base font-semibold text-navy">
+      <section className="space-y-4 rounded-[12px] bg-background p-5">
+        <h2 className="font-display text-base font-semibold text-primary">
           Vos informations
         </h2>
         <label className="block space-y-1.5 text-sm">
-          <span className="font-medium text-navy">Nom complet</span>
+          <span className="font-medium text-primary">Nom complet</span>
           <input
             required
             value={nom}
@@ -235,7 +235,7 @@ export function CheckoutForm() {
           />
         </label>
         <label className="block space-y-1.5 text-sm">
-          <span className="font-medium text-navy">Téléphone WhatsApp</span>
+          <span className="font-medium text-primary">Téléphone WhatsApp</span>
           <input
             required
             type="tel"
@@ -248,7 +248,7 @@ export function CheckoutForm() {
           />
         </label>
         <label className="block space-y-1.5 text-sm">
-          <span className="font-medium text-navy">
+          <span className="font-medium text-primary">
             Adresse — {ZONE_LABELS[zone]}
           </span>
           <textarea
@@ -269,7 +269,7 @@ export function CheckoutForm() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-display text-base font-semibold text-navy">
+        <h2 className="font-display text-base font-semibold text-primary">
           Mode de paiement
         </h2>
         <button
@@ -278,13 +278,13 @@ export function CheckoutForm() {
           className={cn(
             "flex w-full items-start gap-3 rounded-[12px] border p-4 text-left transition-colors",
             mode === "livraison"
-              ? "border-navy bg-cream"
-              : "border-border bg-white hover:border-navy/30"
+              ? "border-primary bg-background"
+              : "border-border bg-white hover:border-primary/30"
           )}
         >
-          <Banknote className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-green" />
+          <Banknote className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-success" />
           <div>
-            <p className="font-medium text-navy">Paiement à la livraison</p>
+            <p className="font-medium text-primary">Paiement à la livraison</p>
             <p className="text-xs text-muted">Le plus simple — recommandé</p>
           </div>
         </button>
@@ -294,20 +294,20 @@ export function CheckoutForm() {
           className={cn(
             "flex w-full items-start gap-3 rounded-[12px] border p-4 text-left transition-colors",
             mode === "mobile_money"
-              ? "border-navy bg-cream"
-              : "border-border bg-white hover:border-navy/30"
+              ? "border-primary bg-background"
+              : "border-border bg-white hover:border-primary/30"
           )}
         >
-          <Smartphone className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-amber" />
+          <Smartphone className="mt-0.5 h-5 w-5 shrink-0 stroke-[1.5] text-accent-ink" />
           <div>
-            <p className="font-medium text-navy">Mobile Money</p>
+            <p className="font-medium text-primary">Mobile Money</p>
             <p className="text-xs text-muted">MTN MoMo ou Moov Money</p>
           </div>
         </button>
       </section>
 
       <section className="space-y-2 rounded-[12px] border border-border bg-white p-5 text-sm">
-        <h2 className="mb-3 font-display text-base font-semibold text-navy">
+        <h2 className="mb-3 font-display text-base font-semibold text-primary">
           Récapitulatif
         </h2>
         {items.map((i) => (
@@ -326,24 +326,24 @@ export function CheckoutForm() {
             {shipping.isFree ? "Offerte" : formatPrice(shipping.fee)}
           </span>
         </div>
-        <div className="flex justify-between pt-1 text-base font-semibold text-navy">
+        <div className="flex justify-between pt-1 text-base font-semibold text-primary">
           <span>Total</span>
           <span>{formatPrice(total)}</span>
         </div>
       </section>
 
       {error && (
-        <p className="rounded-[10px] bg-coral/15 px-3 py-2 text-sm text-coral">
+        <p className="rounded-[10px] bg-error/15 px-3 py-2 text-sm text-error">
           {error}
         </p>
       )}
 
-      <label className="flex items-start gap-3 rounded-[12px] border border-border bg-cream/60 p-4 text-sm">
+      <label className="flex items-start gap-3 rounded-[12px] border border-border bg-background/60 p-4 text-sm">
         <input
           type="checkbox"
           checked={acceptCgv}
           onChange={(e) => setAcceptCgv(e.target.checked)}
-          className="mt-1 h-4 w-4 accent-[var(--color-navy)]"
+          className="mt-1 h-4 w-4 accent-primary"
           required
         />
         <span className="text-muted">
@@ -352,7 +352,7 @@ export function CheckoutForm() {
             href="/cgv"
             target="_blank"
             rel="noreferrer"
-            className="font-medium text-navy underline-offset-2 hover:underline"
+            className="font-medium text-primary underline-offset-2 hover:underline"
           >
             Conditions générales de vente
           </a>{" "}
@@ -361,7 +361,7 @@ export function CheckoutForm() {
             href="/confidentialite"
             target="_blank"
             rel="noreferrer"
-            className="font-medium text-navy underline-offset-2 hover:underline"
+            className="font-medium text-primary underline-offset-2 hover:underline"
           >
             Politique de confidentialité
           </a>

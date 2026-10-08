@@ -103,8 +103,8 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
     // peer + data-loading : la grille de produits (élément suivant) s'estompe pendant le chargement
     <div className="peer space-y-4" data-loading={loading ? "true" : undefined} aria-busy={loading}>
       {loading && (
-        <div className="fixed inset-x-0 top-0 z-[70] h-0.5 overflow-hidden bg-amber/20" aria-hidden>
-          <div className="h-full w-1/3 animate-[catalog-progress_1s_ease-in-out_infinite] bg-amber" />
+        <div className="fixed inset-x-0 top-0 z-[70] h-0.5 overflow-hidden bg-accent/20" aria-hidden>
+          <div className="h-full w-1/3 animate-[catalog-progress_1s_ease-in-out_infinite] bg-accent" />
         </div>
       )}
       <form onSubmit={onSearch} className="px-4 md:px-0">
@@ -115,7 +115,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Rechercher une montre, un bijou, une sandale…"
-            className="w-full rounded-[10px] border border-border bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-navy"
+            className="w-full rounded-[10px] border border-border bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-primary"
           />
         </label>
       </form>
@@ -128,8 +128,8 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
             className={cn(
               "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
               !categorie && !niche
-                ? "bg-navy text-white"
-                : "border border-border bg-white text-muted hover:text-navy"
+                ? "bg-primary text-white"
+                : "border border-border bg-white text-muted hover:text-primary"
             )}
           >
             Toutes
@@ -143,8 +143,8 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
               className={cn(
                 "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
                 categorie === c
-                  ? "bg-navy text-white"
-                  : "border border-border bg-white text-muted hover:text-navy"
+                  ? "bg-primary text-white"
+                  : "border border-border bg-white text-muted hover:text-primary"
               )}
             >
               {CATEGORIE_LABELS[c]}
@@ -165,8 +165,8 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
                 className={cn(
                   "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition md:h-9 md:rounded-[10px] md:px-3.5 md:text-sm",
                   niche.toLowerCase() === n.toLowerCase()
-                    ? "bg-amber text-navy"
-                    : "border border-border bg-white text-muted hover:text-navy"
+                    ? "bg-accent text-primary"
+                    : "border border-border bg-white text-muted hover:text-primary"
                 )}
               >
                 {nicheLabel(n)}
@@ -193,7 +193,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[10px] border border-border bg-white px-2.5 py-2 text-sm font-medium text-navy md:hidden"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[10px] border border-border bg-white px-2.5 py-2 text-sm font-medium text-primary md:hidden"
           >
             <Filter className="h-4 w-4" />
             Filtrer
@@ -203,7 +203,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
             <select
               value={sort}
               onChange={(e) => setParam("sort", e.target.value)}
-              className="rounded-[10px] border border-border bg-white px-3 py-2 text-sm outline-none focus:border-navy"
+              className="rounded-[10px] border border-border bg-white px-3 py-2 text-sm outline-none focus:border-primary"
               aria-label="Trier par"
             >
               {sorts.map((s) => (
@@ -216,7 +216,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
           <select
             value={sort}
             onChange={(e) => setParam("sort", e.target.value)}
-            className="min-w-0 max-w-[9.5rem] rounded-[10px] border border-border bg-white px-2 py-2 text-sm outline-none focus:border-navy md:hidden"
+            className="min-w-0 max-w-[9.5rem] rounded-[10px] border border-border bg-white px-2 py-2 text-sm outline-none focus:border-primary md:hidden"
             aria-label="Trier par"
           >
             {sorts.map((s) => (
@@ -241,8 +241,8 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
             className={cn(
               "rounded-[10px] border px-3 py-1.5 text-xs font-medium",
               genre === g.value || (!genre && !g.value)
-                ? "border-amber bg-amber/15 text-navy"
-                : "border-border text-muted hover:text-navy"
+                ? "border-accent bg-accent/15 text-primary"
+                : "border-border text-muted hover:text-primary"
             )}
           >
             {g.label}
@@ -254,8 +254,8 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
           className={cn(
             "ml-auto rounded-[10px] border px-3 py-1.5 text-xs font-medium",
             enStock
-              ? "border-amber bg-amber/15 text-navy"
-              : "border-border text-muted hover:text-navy"
+              ? "border-accent bg-accent/15 text-primary"
+              : "border-border text-muted hover:text-primary"
           )}
         >
           En stock
@@ -264,7 +264,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
           <button
             type="button"
             onClick={clearAll}
-            className="rounded-[10px] border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-navy"
+            className="rounded-[10px] border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-primary"
           >
             Tout effacer
           </button>
@@ -276,13 +276,13 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
         <div className="fixed inset-0 z-[60] md:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-navy/40"
+            className="absolute inset-0 bg-primary/40"
             aria-label="Fermer les filtres"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className="safe-pb absolute inset-x-0 bottom-0 rounded-t-2xl bg-white p-5 shadow-card">
+          <div className="safe-pb absolute inset-x-0 bottom-0 rounded-t-2xl bg-white p-5 shadow-surface">
             <div className="mb-4 flex items-center justify-between">
-              <p className="font-display text-lg font-semibold text-navy">
+              <p className="font-display text-lg font-semibold text-primary">
                 Filtrer
               </p>
               <button
@@ -306,7 +306,7 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
                   className={cn(
                     "rounded-[10px] border px-3 py-2 text-sm",
                     genre === g.value || (!genre && !g.value)
-                      ? "border-navy bg-navy text-white"
+                      ? "border-primary bg-primary text-white"
                       : "border-border"
                   )}
                 >
@@ -314,14 +314,14 @@ export function BoutiqueToolbar({ resultCount, niches = [], categories = CATEGOR
                 </button>
               ))}
             </div>
-            <label className="mt-5 flex items-center gap-2 text-sm text-navy">
+            <label className="mt-5 flex items-center gap-2 text-sm text-primary">
               <input
                 type="checkbox"
                 checked={enStock}
                 onChange={(e) =>
                   setParam("enStock", e.target.checked ? "1" : "")
                 }
-                className="h-4 w-4 accent-[var(--color-navy)]"
+                className="h-4 w-4 accent-primary"
               />
               En stock uniquement
             </label>

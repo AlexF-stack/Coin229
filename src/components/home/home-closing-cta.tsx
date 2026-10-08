@@ -6,11 +6,11 @@ export function HomeClosingCta() {
   return (
     <section
       aria-labelledby="closing-cta-heading"
-      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen bg-navy"
+      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen bg-primary"
     >
       <div className="page-shell px-5 py-16 md:px-6 md:py-24">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-amber">
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-accent">
             Coin229
           </p>
           <h2
@@ -18,7 +18,7 @@ export function HomeClosingCta() {
             className="mt-4 font-display text-3xl font-bold leading-[1.05] tracking-tight text-white md:text-5xl"
           >
             Voyons votre prochaine pièce
-            <span className="text-amber" aria-hidden>
+            <span className="text-accent" aria-hidden>
               .
             </span>
           </h2>

@@ -33,7 +33,7 @@ function swipeHandler(onPrev: () => void, onNext: () => void) {
 }
 
 const arrowClass =
-  "absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-navy shadow-md transition hover:bg-white disabled:pointer-events-none disabled:opacity-0";
+  "absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white disabled:pointer-events-none disabled:opacity-0";
 
 export function ProductGallery({ images, alt }: Props) {
   const [index, setIndex] = useState(0);
@@ -63,7 +63,7 @@ export function ProductGallery({ images, alt }: Props) {
   return (
     <div className="space-y-3">
       <div
-        className="group relative aspect-square overflow-hidden rounded-b-[20px] bg-card md:rounded-[20px]"
+        className="group relative aspect-square overflow-hidden rounded-b-[20px] bg-surface md:rounded-[20px]"
         role="region"
         aria-roledescription="galerie"
         aria-label={`Photos : ${alt}`}
@@ -102,7 +102,7 @@ export function ProductGallery({ images, alt }: Props) {
         </div>
 
         {hasRealPhoto && (
-          <span className="pointer-events-none absolute right-3 top-3 hidden h-9 w-9 items-center justify-center rounded-full bg-white/85 text-navy opacity-0 shadow transition group-hover:opacity-100 md:flex">
+          <span className="pointer-events-none absolute right-3 top-3 hidden h-9 w-9 items-center justify-center rounded-full bg-white/85 text-primary opacity-0 shadow transition group-hover:opacity-100 md:flex">
             <ZoomIn className="h-4 w-4" />
           </span>
         )}
@@ -137,7 +137,7 @@ export function ProductGallery({ images, alt }: Props) {
                   onClick={() => setIndex(i)}
                   className={cn(
                     "h-1.5 rounded-full shadow-sm transition-all",
-                    i === index ? "w-5 bg-amber" : "w-1.5 bg-white/70"
+                    i === index ? "w-5 bg-accent" : "w-1.5 bg-white/70"
                   )}
                 />
               ))}
@@ -157,8 +157,8 @@ export function ProductGallery({ images, alt }: Props) {
               aria-label={`Voir la photo ${i + 1}`}
               aria-current={i === index}
               className={cn(
-                "relative h-16 w-16 overflow-hidden rounded-[10px] bg-card ring-offset-2 transition",
-                i === index ? "ring-2 ring-navy" : "opacity-70 hover:opacity-100"
+                "relative h-16 w-16 overflow-hidden rounded-[10px] bg-surface ring-offset-2 transition",
+                i === index ? "ring-2 ring-primary" : "opacity-70 hover:opacity-100"
               )}
             >
               <Image

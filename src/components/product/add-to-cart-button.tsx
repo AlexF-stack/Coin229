@@ -83,8 +83,8 @@ export function AddToCartButton({
           onClick={handleClick}
           aria-label="Ajouter au panier"
           className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-[10px] bg-navy text-white transition-transform active:scale-90",
-            added && "bg-green animate-[pop_0.4s_ease-out]",
+            "flex h-9 w-9 items-center justify-center rounded-[10px] bg-primary text-white transition-transform active:scale-90",
+            added && "bg-success animate-[pop_0.4s_ease-out]",
             className
           )}
         >
@@ -107,7 +107,7 @@ export function AddToCartButton({
         className={cn(
           "btn w-full",
           variant === "secondary" ? "btn-secondary" : "btn-primary",
-          added && "!bg-green !text-white shadow-none animate-[pop_0.35s_ease-out]",
+          added && "!bg-success !text-white shadow-none animate-[pop_0.35s_ease-out]",
           className
         )}
       >
