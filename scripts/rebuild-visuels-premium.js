@@ -51,23 +51,6 @@ async function cover(src, w, h, dest) {
     .toFile(dest);
 }
 
-async function containOnDark(src, w, h, dest) {
-  await sharp({
-    create: { width: w, height: h, channels: 3, background: { r: 8, g: 12, b: 10 } },
-  })
-    .composite([
-      {
-        input: await sharp(src)
-          .resize(w, h, { fit: "inside" })
-          .png()
-          .toBuffer(),
-        gravity: "centre",
-      },
-    ])
-    .png()
-    .toFile(dest);
-}
-
 /** Soft C2 badge bottom-right — one mark only */
 async function withC2Badge(srcPath, outPath, badgePath, size = 96, margin = 36) {
   const meta = await sharp(srcPath).metadata();

@@ -21,7 +21,6 @@ const CLIPS = path.join(ASSETS, "clips");
 
 const LOGO = path.join(ROOT, "public/brand/logo-on-dark.png");
 const LOGO_LIGHT = path.join(ROOT, "public/brand/logo-lockup.png");
-const ICON = path.join(ROOT, "public/icons/c2/icon-512.png");
 const PROD = {
   montre: path.join(ROOT, "public/uploads/montres-luxe/montre-05.jpg"),
   bijou: path.join(ROOT, "public/uploads/montres-bijoux/mb-08.jpg"),
@@ -355,7 +354,6 @@ function main() {
   // Teaser vendeur court depuis affiche + CTA
   console.log("6. Teaser vendeur…");
   const vendPoster = path.join(AFF, "03-recrute-vendeurs.png");
-  const vendClip = path.join(CLIPS, "vendeur.mp4");
   ff(
     `-loop 1 -i "${vendPoster}" -i "${bed}" ` +
       `-vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0xF4EFE6,zoompan=z='min(1.0+0.0007*on,1.06)':d=360:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30,format=yuv420p" ` +

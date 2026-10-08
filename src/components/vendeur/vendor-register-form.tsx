@@ -39,7 +39,11 @@ export function VendorRegisterForm() {
         return;
       }
       if (res.status === 409) {
-        setError("Cet email est déjà utilisé.");
+        setError(
+          data.error === "slug_unavailable"
+            ? "Ce nom de boutique est déjà pris ou réservé. Choisis-en un autre."
+            : "Cet email est déjà utilisé."
+        );
         return;
       }
       if (!res.ok) {

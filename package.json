@@ -8,7 +8,7 @@
     "build:next": "node scripts/generate-pwa-icons.cjs && prisma generate && next build",
     "icons:pwa": "node scripts/generate-pwa-icons.cjs",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

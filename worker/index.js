@@ -2,7 +2,6 @@
  * Custom service worker (next-pwa importScripts).
  * Gère Web Push + clic notification.
  */
-/* eslint-disable no-undef */
 
 // Ancien cache de pages : pouvait contenir des pages privées (admin, espace
 // vendeur, compte). Supprimé à l'activation de la nouvelle version.

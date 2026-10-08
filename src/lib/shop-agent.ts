@@ -178,7 +178,10 @@ async function recommend(prefs: AgentPrefs, limit = 4): Promise<ChatProductCard[
   }
 
   // Style soft-ranking
-  return list.slice(0, limit).map(({ effective: _, ...card }) => card);
+  return list.slice(0, limit).map(({ effective, ...card }) => {
+    void effective; // champ de tri interne, pas envoyé au client
+    return card;
+  });
 }
 
 function mergePrefs(base: AgentPrefs, q: string): AgentPrefs {

@@ -49,7 +49,6 @@ async function auditPage(page, route) {
   const title = await page.title();
 
   const metrics = await page.evaluate(() => {
-    const doc = document.documentElement;
     const body = document.body;
     const vw = window.innerWidth;
 

@@ -21,7 +21,7 @@ const realDb =
 if (realDb) {
   try {
     run("npx prisma migrate deploy");
-  } catch (e) {
+  } catch {
     console.error("prisma migrate deploy a échoué — abort build");
     process.exit(1);
   }
