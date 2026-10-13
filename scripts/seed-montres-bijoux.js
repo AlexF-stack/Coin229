@@ -7,9 +7,9 @@ const img = (n) => `${BASE}/mb-${String(n).padStart(2, "0")}.jpg`;
 /** @type {Array<{nom:string,description:string,categorie:'montre'|'bijou',niche:string,genre:string,prix:number,prixPromo:number|null,stockQuantite:number,images:string[]}>} */
 const PRODUCTS = [
   {
-    nom: "Rolex Datejust Or Rose — cadran chocolat Oysterflex",
+    nom: "Montre or rose — cadran chocolat, bracelet souple",
     description:
-      "Datejust or rose, bezel cannelé, cadran chocolat, bracelet Oysterflex. Set complet boîte verte, papiers et bracelet trèfle pavé (photos).",
+      "Or rose, lunette cannelée, cadran chocolat, bracelet souple. Set complet boîte verte, papiers et bracelet trèfle pavé (photos).",
     categorie: "montre",
     niche: "montre luxe",
     genre: "unisexe",
@@ -19,9 +19,9 @@ const PRODUCTS = [
     images: [img(1), img(3), img(7)],
   },
   {
-    nom: "Rolex Daytona Or — cadran noir Oysterflex",
+    nom: "Montre or — cadran noir chronographe",
     description:
-      "Cosmograph Daytona or / noir, tachymètre, bracelet Oysterflex. Full set boîte Rolex, tag, certificat et bracelet cordon.",
+      "Chronographe or et noir, tachymètre, bracelet souple. Full set boîte, étiquette, certificat et bracelet cordon.",
     categorie: "montre",
     niche: "montre luxe",
     genre: "homme",
@@ -31,9 +31,9 @@ const PRODUCTS = [
     images: [img(2), img(4)],
   },
   {
-    nom: "Patek Philippe Or — cadran bleu complications",
+    nom: "Montre or — cadran bleu complications",
     description:
-      "Patek or, cadran bleu, calendrier / cœur ouvert, bracelet intégré. Présentation boîte + carte rouge.",
+      "Or, cadran bleu, calendrier et cœur ouvert, bracelet intégré. Présentation boîte et carte.",
     categorie: "montre",
     niche: "montre luxe",
     genre: "homme",
@@ -43,9 +43,9 @@ const PRODUCTS = [
     images: [img(5), img(11)],
   },
   {
-    nom: "Patek Nautilus Acier — cadran bleu open-heart",
+    nom: "Montre acier — cadran bleu, cœur ouvert",
     description:
-      "Nautilus acier, cadran bleu avec ouverture mouvement. Photo studio boîte.",
+      "Acier, cadran bleu avec ouverture mouvement. Photo studio avec boîte.",
     categorie: "montre",
     niche: "montre luxe",
     genre: "unisexe",
@@ -55,9 +55,9 @@ const PRODUCTS = [
     images: [img(6)],
   },
   {
-    nom: "Patek Nautilus Acier — cadran bleu",
+    nom: "Montre acier — cadran bleu",
     description:
-      "Nautilus acier classique, cadran bleu rainuré, date à 3h. Full set boîte bois, carte rouge, sac rouge.",
+      "Acier, cadran bleu rainuré, date à 3h. Full set boîte bois, carte et pochette.",
     categorie: "montre",
     niche: "montre luxe",
     genre: "unisexe",
@@ -67,9 +67,9 @@ const PRODUCTS = [
     images: [img(10), img(14)],
   },
   {
-    nom: "Patek Aquanaut Chrono — noir tropical",
+    nom: "Montre chronographe — cadran noir",
     description:
-      "Aquanaut chronographe, cadran noir grille, bracelet tropical. Présentation gant + boîte.",
+      "Chronographe, cadran noir à grille, bracelet souple. Présentation gant et boîte.",
     categorie: "montre",
     niche: "montre luxe",
     genre: "homme",
@@ -79,9 +79,9 @@ const PRODUCTS = [
     images: [img(25)],
   },
   {
-    nom: "Patek Aquanaut Chrono — bleu",
+    nom: "Montre chronographe — cadran bleu",
     description:
-      "Aquanaut chronographe cadran bleu. Photo détail.",
+      "Chronographe, cadran bleu. Photo détail.",
     categorie: "montre",
     niche: "montre luxe",
     genre: "homme",
@@ -91,9 +91,9 @@ const PRODUCTS = [
     images: [img(28)],
   },
   {
-    nom: "Patek Aquanaut Chrono — beige",
+    nom: "Montre chronographe — beige",
     description:
-      "Aquanaut chronographe cadran / bracelet beige. Photo détail.",
+      "Chronographe, cadran et bracelet beige. Photo détail.",
     categorie: "montre",
     niche: "montre luxe",
     genre: "unisexe",
@@ -103,9 +103,9 @@ const PRODUCTS = [
     images: [img(27)],
   },
   {
-    nom: "Patek Aquanaut — bleu bezel diamants",
+    nom: "Montre bleue — lunette sertie",
     description:
-      "Aquanaut bleu, bezel serti, bracelet composite. Full set boîte, sac rouge, docs.",
+      "Cadran bleu, lunette sertie, bracelet souple. Full set boîte, pochette et documents.",
     categorie: "montre",
     niche: "montre luxe",
     genre: "femme",

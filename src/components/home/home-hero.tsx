@@ -83,7 +83,7 @@ export function HomeHero({ images }: Props) {
           </p>
 
           <p className="mt-4 max-w-md text-base leading-relaxed text-white/75 md:text-lg">
-            Montres, bijoux, sacs et lunettes — sélectionnés, livrés localement,
+            Montres, bijoux et chaussures — sélectionnés, livrés localement,
             payés à votre rythme.
           </p>
 

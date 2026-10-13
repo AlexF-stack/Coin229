@@ -23,7 +23,7 @@ export function HomeClosingCta() {
             </span>
           </h2>
           <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-white/65 md:text-base">
-            Montres, bijoux, sacs et lunettes. Recherchez, filtrez, commandez —
+            Montres, bijoux et chaussures. Recherchez, filtrez, commandez —
             livraison locale et paiement flexible.
           </p>
           <Link
