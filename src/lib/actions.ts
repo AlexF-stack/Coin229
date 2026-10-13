@@ -15,9 +15,11 @@ import { randomBytes } from "crypto";
 import { SITE, whatsappToBjContact } from "@/lib/site";
 import { hashResetToken } from "@/lib/vendor-auth";
 import { processPayment } from "@/lib/payment";
+import { isMobileMoneyAvailable } from "@/lib/features";
 import { calculateShippingFee } from "@/lib/shipping";
 import { checkoutSchema } from "@/lib/checkout-schema";
 import { requireAdmin } from "@/lib/assert-admin";
+import { createClientResetToken } from "@/lib/password-requests";
 import { allowDemoCatalog } from "@/lib/runtime-flags";
 import {
   normalizeBjPhone,
@@ -84,6 +86,13 @@ async function createOrderUnsafe(input: {
   }
 
   const data = parsed.data;
+  // Mobile Money pas encore branché : refus clair plutôt qu'une commande bloquée
+  if (data.modePaiement === "mobile_money" && !isMobileMoneyAvailable()) {
+    return {
+      success: false as const,
+      error: "Le paiement Mobile Money arrive bientôt. Choisis le paiement à la livraison.",
+    };
+  }
   const telephone = normalizeBjPhone(data.telephone);
   if (!telephone) {
     return { success: false as const, error: "Numéro invalide" };
@@ -711,7 +720,7 @@ export async function getAdminOverview() {
   } catch {
     return null;
   }
-  const [products, orders, waiting, sold, payable, refunds, pendingVendors, resetRequests] =
+  const [products, orders, waiting, sold, payable, refunds, pendingVendors, resetRequests, clientResetRequests] =
     await Promise.all([
       prisma.product.count({ where: { statut: { in: ["actif", "rupture"] } } }),
       prisma.order.count(),
@@ -724,6 +733,7 @@ export async function getAdminOverview() {
       prisma.order.count({ where: { refundStatus: "pending" } }),
       prisma.vendor.count({ where: { statut: "en_attente" } }),
       prisma.vendor.count({ where: { resetRequestedAt: { not: null } } }),
+      prisma.client.count({ where: { resetRequestedAt: { not: null } } }),
     ]);
   return {
     products,
@@ -735,6 +745,53 @@ export async function getAdminOverview() {
     refunds,
     pendingVendors,
     resetRequests,
+    clientResetRequests,
+  };
+}
+
+/** Comptes client email (et demandes « mot de passe oublié ») — admin */
+export async function listClientAccounts() {
+  await requireAdmin();
+  const clients = await prisma.client.findMany({
+    where: { OR: [{ passwordHash: { not: null } }, { resetRequestedAt: { not: null } }] },
+    select: {
+      id: true,
+      nom: true,
+      email: true,
+      telephone: true,
+      resetRequestedAt: true,
+      _count: { select: { orders: true } },
+    },
+    orderBy: { nom: "asc" },
+    take: 500,
+  });
+  // Demandes en attente en premier
+  return clients.sort((a, b) => (b.resetRequestedAt?.getTime() ?? 0) - (a.resetRequestedAt?.getTime() ?? 0));
+}
+
+/** Lien « nouveau mot de passe » pour un client (24 h, usage unique) — à envoyer à SON email */
+export async function createClientResetLink(clientId: string) {
+  try {
+    await requireAdmin();
+  } catch {
+    return { success: false as const, error: "Non autorisé" };
+  }
+  const client = await prisma.client.findUnique({
+    where: { id: clientId },
+    select: { email: true, nom: true, passwordHash: true },
+  });
+  if (!client?.email || !client.passwordHash) {
+    return { success: false as const, error: "Ce client n’a pas de compte email." };
+  }
+  const resetUrl = await createClientResetToken(clientId);
+  const subject = "Coin229 — ton nouveau mot de passe";
+  const body = `Bonjour ${client.nom},\n\nVoici ton lien pour choisir un nouveau mot de passe Coin229 (valable 24 h, une seule fois) :\n${resetUrl}\n\nSi tu n’as rien demandé, ignore ce message.\n\nL’équipe Coin229`;
+  revalidatePath("/admin/clients");
+  return {
+    success: true as const,
+    resetUrl,
+    // Envoyé à l'adresse du compte : seul son propriétaire reçoit le lien
+    mailto: `mailto:${client.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
   };
 }
 

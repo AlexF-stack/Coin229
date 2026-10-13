@@ -8,6 +8,7 @@ import {
   Bell,
   Store,
   Wallet,
+  Users,
 } from "lucide-react";
 import { AppShell, type ShellLink } from "@/components/ui/app-shell";
 
@@ -16,6 +17,7 @@ const links: ShellLink[] = [
   { href: "/admin/produits", label: "Produits", icon: Package },
   { href: "/admin/commandes", label: "Commandes", icon: ShoppingCart },
   { href: "/admin/vendeurs", label: "Vendeurs", icon: Store },
+  { href: "/admin/clients", label: "Clients", icon: Users },
   { href: "/admin/payouts", label: "Reversements", icon: Wallet },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
 ];

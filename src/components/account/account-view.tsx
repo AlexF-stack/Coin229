@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { PhoneAuthForm } from "./phone-auth-form";
 import { EmailAuthForm } from "./email-auth-form";
+import { ChangePasswordForm } from "./change-password-form";
 import { SocialAuthButtons } from "./social-auth-buttons";
 import { getAccountSession, getMyOrders } from "@/lib/actions";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -50,7 +51,7 @@ const BENEFITS = [
   },
 ];
 
-export function AccountView({ next = "/compte" }: { next?: string } = {}) {
+export function AccountView({ next = "/compte", smsEnabled = true }: { next?: string; smsEnabled?: boolean } = {}) {
   const router = useRouter();
   const [identity, setIdentity] = useState<{
     label: string;
@@ -140,7 +141,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
               Connexion
             </h1>
             <p className="mt-2 text-sm text-muted">
-              Email, Google, Facebook ou SMS — clients et marques, même formulaire.
+              {smsEnabled ? "Email, Google, Facebook ou SMS" : "Email, Google ou Facebook"} — clients et marques, même formulaire.
             </p>
           </div>
         </div>
@@ -149,6 +150,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
           <div className="space-y-5 rounded-card border border-border bg-surface p-5 shadow-card md:p-6">
             <EmailAuthForm next={next} />
             <SocialAuthButtons next={next} />
+            {smsEnabled && (
             <details className="group rounded-control border border-border">
               <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-sm font-medium text-fg-secondary hover:text-fg">
                 Recevoir un code par SMS
@@ -158,6 +160,7 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
                 <PhoneAuthForm onAuthenticated={onPhoneAuth} />
               </div>
             </details>
+            )}
           </div>
 
           <Link
@@ -401,6 +404,9 @@ export function AccountView({ next = "/compte" }: { next?: string } = {}) {
           ))}
         </ul>
       </section>
+
+      {/* Comptes email : changer le mot de passe */}
+      {identity.provider === "email" && <ChangePasswordForm />}
     </div>
   );
 }

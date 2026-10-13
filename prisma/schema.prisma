@@ -128,6 +128,11 @@ model Client {
   passwordHash       String?            @map("password_hash")
   /// Incrémenté à chaque changement de mot de passe : invalide les sessions email ouvertes
   sessionVersion     Int                @default(0) @map("session_version")
+  /// Lien « mot de passe oublié » (seul le hash est stocké), valable 24 h
+  resetTokenHash     String?            @map("reset_token_hash")
+  resetTokenExpires  DateTime?          @map("reset_token_expires")
+  /// Demande « mot de passe oublié » en attente de traitement par l’admin
+  resetRequestedAt   DateTime?          @map("reset_requested_at")
   adresses           Address[]
   orders             Order[]
   pushSubscriptions  PushSubscription[]

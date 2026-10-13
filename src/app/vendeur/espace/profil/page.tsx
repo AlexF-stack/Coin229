@@ -1,6 +1,7 @@
 import { VendorShell } from "@/components/vendeur/vendor-shell";
 import { PageHeader } from "@/components/ui/page-header";
 import { VendorProfileForm } from "@/components/vendeur/vendor-profile-form";
+import { ChangePasswordForm } from "@/components/account/change-password-form";
 import { requireVendorPage } from "@/lib/require-vendor-page";
 import { getMyVendorProfile } from "@/lib/vendor-actions";
 import { getVendorUnreadTotal } from "@/lib/messaging";
@@ -29,6 +30,7 @@ export default async function VendorProfilePage() {
       <div className="space-y-6">
         <PageHeader title="Profil marque" description="Infos publiques, fiscalité et reversements." />
         <VendorProfileForm vendor={vendor} />
+        <ChangePasswordForm />
       </div>
     </VendorShell>
   );

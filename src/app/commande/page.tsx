@@ -3,6 +3,7 @@ import { CheckoutForm } from "@/components/checkout/checkout-form";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { buildPageMetadata } from "@/lib/seo";
+import { isMobileMoneyAvailable } from "@/lib/features";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Commande",
@@ -10,6 +11,9 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/commande",
   noIndex: true,
 });
+
+// Configuration lue à chaque requête (prestataire de paiement)
+export const dynamic = "force-dynamic";
 
 export default function CheckoutPage() {
   return (
@@ -24,7 +28,7 @@ export default function CheckoutPage() {
         </Link>
         <h1 className="font-display text-2xl font-bold text-primary">Commande</h1>
       </header>
-      <CheckoutForm />
+      <CheckoutForm mobileMoneyEnabled={isMobileMoneyAvailable()} />
     </div>
   );
 }

@@ -22,7 +22,9 @@ export function ShopShell({ children }: { children: React.ReactNode }) {
   const isVendorPortal =
     pathname.startsWith("/vendeur/espace") ||
     pathname.startsWith("/vendeur/login") ||
-    pathname.startsWith("/vendeur/inscription");
+    pathname.startsWith("/vendeur/inscription") ||
+    pathname.startsWith("/vendeur/mot-de-passe-oublie") ||
+    pathname.startsWith("/vendeur/reinitialiser");
   const isProduct = pathname.startsWith("/produit/");
   const isCheckout =
     pathname.startsWith("/commande") && !pathname.includes("confirmation");

@@ -3,7 +3,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/feedback";
-import { Package, ShoppingCart, TrendingUp, Undo2, Users, Wallet } from "lucide-react";
+import { Package, ShoppingCart, TrendingUp, Undo2, Users, Wallet, KeyRound } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
 export const metadata = {
@@ -52,6 +52,14 @@ export default async function AdminDashboardPage() {
             href="/admin/payouts"
           />
           <StatCard icon={<Package />} label="Produits en ligne" value={String(o.products)} href="/admin/produits" />
+          <StatCard
+            icon={<KeyRound />}
+            label="Mots de passe clients"
+            value={String(o.clientResetRequests)}
+            hint={o.clientResetRequests > 0 ? "Demande(s) à traiter" : "Aucune demande"}
+            tone={o.clientResetRequests > 0 ? "warning" : undefined}
+            href="/admin/clients"
+          />
           <StatCard
             icon={<Users />}
             label="Vendeurs à valider"

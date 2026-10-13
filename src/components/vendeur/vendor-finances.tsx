@@ -1,6 +1,6 @@
 "use client";
 
-import type { Order } from "@prisma/client";
+import type { Order, VendorPayout } from "@prisma/client";
 import { Wallet } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { StatCard } from "@/components/ui/card";
@@ -16,6 +16,8 @@ type Props = {
   pendingPayout: number;
   inProgress: number;
   recentOrders: Order[];
+  /** Reversements faits par Coin229 (les plus récents) */
+  payouts?: VendorPayout[];
 };
 
 export function VendorFinances({
@@ -26,6 +28,7 @@ export function VendorFinances({
   pendingPayout,
   inProgress,
   recentOrders,
+  payouts = [],
 }: Props) {
   return (
     <div className="space-y-6">
@@ -46,6 +49,24 @@ export function VendorFinances({
             + {formatPrice(inProgress)} de commandes confirmées ou en livraison, reversables une fois livrées.
           </p>
         )}
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-lg font-semibold text-fg">Reversements reçus</h2>
+          <p className="mt-1 text-sm text-muted">Virés par Coin229 sur le Mobile Money indiqué dans ton profil.</p>
+        </div>
+        <DataTable
+          caption="Reversements reçus"
+          rows={payouts}
+          rowKey={(p) => p.id}
+          empty={<EmptyState icon={<Wallet />} title="Aucun reversement pour l’instant" description="Dès qu’une commande est livrée, son montant net apparaît « En attente de reversement »." />}
+          columns={[
+            { key: "date", header: "Date", primary: true, cell: (p) => new Date(p.datePaid ?? p.dateCreation).toLocaleDateString("fr-FR") },
+            { key: "montant", header: "Montant", align: "right", cell: (p) => <span className="font-semibold">{formatPrice(p.amount)}</span> },
+            { key: "statut", header: "Statut", cell: (p) => <StatusBadge kind="payout" status={p.statut} /> },
+          ]}
+        />
       </section>
 
       <section className="space-y-4">

@@ -28,7 +28,7 @@ type SavedCheckout = {
   adresse: string;
 };
 
-export function CheckoutForm() {
+export function CheckoutForm({ mobileMoneyEnabled = true }: { mobileMoneyEnabled?: boolean } = {}) {
   const router = useRouter();
   const allItems = useCartStore((s) => s.items);
   const checkoutIds = useCartStore((s) => s.checkoutIds);
@@ -288,6 +288,7 @@ export function CheckoutForm() {
             <p className="text-xs text-muted">Le plus simple — recommandé</p>
           </div>
         </button>
+        {mobileMoneyEnabled && (
         <button
           type="button"
           onClick={() => setMode("mobile_money")}
@@ -304,6 +305,7 @@ export function CheckoutForm() {
             <p className="text-xs text-muted">MTN MoMo ou Moov Money</p>
           </div>
         </button>
+        )}
       </section>
 
       <section className="space-y-2 rounded-card border border-border bg-white p-5 text-sm">

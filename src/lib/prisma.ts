@@ -12,6 +12,8 @@ function createPrismaClient() {
     omit: {
       client: {
         passwordHash: true,
+        resetTokenHash: true,
+        resetTokenExpires: true,
       },
       vendor: {
         passwordHash: true,

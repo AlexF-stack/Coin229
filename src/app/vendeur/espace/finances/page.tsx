@@ -32,6 +32,7 @@ export default async function VendorFinancesPage() {
           pendingPayout={finances.pendingPayout}
           inProgress={finances.inProgress}
           recentOrders={finances.orders}
+          payouts={finances.payouts}
         />
       </div>
     </VendorShell>
